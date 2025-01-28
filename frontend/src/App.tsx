@@ -1,14 +1,12 @@
-
-import './App.css'
+import './App.css';
+import AppRoutes from './Routes';
 
 function App() {
- 
-
   return (
-    <div className="p-4 bg-gradient-to-r from-blue-500 to-gray-700 text-white">
-    <h1>Tailwind CSS is working!</h1>
-  </div>
+    <div className="min-h-screen flex items-center justify-center bg-white text-gray-800">
+      <AppRoutes />
+    </div>
   );
 }
 
-export default App
+export default App;
