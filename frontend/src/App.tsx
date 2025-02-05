@@ -1,13 +1,16 @@
-
 import './App.css'
+import MapComponent from './MapComponent';
+
+
 
 function App() {
  
 
   return (
-    <div className="p-4 bg-gradient-to-r from-blue-500 to-gray-700 text-white">
-    <h1>Tailwind CSS is working!</h1>
-  </div>
+        // The div needs a constant height and width to display the map
+      <div style={{height: '85vh', width: '75vw'}}>
+        <MapComponent />
+      </div>
   );
 }
 
