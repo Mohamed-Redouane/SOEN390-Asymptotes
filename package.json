@@ -1,10 +1,21 @@
 {
   "devDependencies": {
     "@cypress/code-coverage": "^3.13.10",
-    "cypress": "^14.0.1",
+    "babel-plugin-istanbul": "^7.0.0",
+    "codecov": "^3.8.2",
+    "cypress": "^14.0.2",
+    "nyc": "^17.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "vite": "^6.0.11",
     "vitest": "^3.0.5"
+  },
+  "scripts": {
+    "test:backend": "cd backend && npm run test:coverage",
+    "test:cypress": "cypress run",
+    "test:coverage": "npm run test:backend && npm run test:cypress",
+    "upload-backend-coverage": "npx codecov -f backend/coverage/lcov.info -F backend",
+    "upload-cypress-coverage": "npx codecov -f cypress/coverage/lcov.info -F cypress",
+    "upload-coverage": "npm run upload-backend-coverage && npm run upload-cypress-coverage"
   }
 }

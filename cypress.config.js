@@ -16,6 +16,7 @@ module.exports = defineConfig({
       require("@cypress/code-coverage/task")(on, config);
       return config;
     },
+    experimentalInteractiveRunEvents: true, // Required for newer Cypress versions to track coverage
   },
   component: {
     devServer: {
@@ -23,7 +24,7 @@ module.exports = defineConfig({
       bundler: "vite",
     },
   },
+  env: {
+    coverage: true, // Enables coverage tracking
+  },
 });
-  
-
-

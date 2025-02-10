@@ -1,0 +1,42 @@
+name: Run tests and upload coverage
+
+on:
+  push:
+    # Run on all branches
+    branches-ignore: []  # This ensures it runs on all branches
+  pull_request:          # Optionally, also run on pull requests
+
+jobs:
+  test:
+    name: Run tests and collect coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Step 2: Set up Node.js
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Step 3: Install project dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Run tests and generate coverage
+      - name: Run tests
+        run: npx vitest run --coverage
+
+      # Step 5: Upload results to Codecov
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # Codecov token from GitHub secrets
+          files: ./coverage/lcov.info         # Adjust the path if necessary
+          slug: Mohamed-Redouane/SOEN390-Asymptotes
+          flags: backend                      # Add a flag for this report
