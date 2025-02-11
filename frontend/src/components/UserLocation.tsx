@@ -19,7 +19,7 @@ function UserLocation() {
       const { latitude, longitude, accuracy } = position.coords;
       console.log(`New Location: Lat: ${latitude}, Lng: ${longitude}, Accuracy: ${accuracy}m`);
 
-      if (accuracy > 151) {
+      if (accuracy > 2000) {
         console.warn("Waiting for better accuracy...");
         if (isOnCampus === null) {
           setIsModalVisible(true);
