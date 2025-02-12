@@ -7,6 +7,8 @@ import { requireAuthLoader } from './loaders/authLoader';
 import SGWCampus from './pages/SGWCampus';
 import LOYCampus from './pages/LOYCampus';
 
+import UnityComponent from './Components/UnityComponent';
+
 // Public Pages
 //import WelcomePage from './pages/WelcomePage';
 import { LoginPage } from './pages/Auth/LoginPage';
@@ -61,7 +63,7 @@ export const router = createBrowserRouter([
         loader: requireAuthLoader,
         element: (
           <div style={{ height: '86vh', width: '100vw' }}>
-            404 Not Found
+            <UnityComponent />
           </div>
         ),
       },

@@ -49,6 +49,7 @@
     "axios": "^1.7.9",
     "lucide-react": "^0.475.0",
     "react-router-dom": "^7.1.5",
+    "react-unity-webgl": "^9.7.0",
     "typescript-toastify": "^1.0.4"
   }
 }

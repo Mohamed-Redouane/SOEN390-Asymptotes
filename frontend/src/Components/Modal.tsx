@@ -31,7 +31,3 @@ const Modal: React.FC<ModalProps> = ({ message, onConfirm, onCancel }) => {
 };
 
 export default Modal;
-
-
-
-
