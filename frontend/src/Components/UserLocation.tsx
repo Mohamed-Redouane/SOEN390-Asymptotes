@@ -26,7 +26,7 @@ function UserLocation() {
 
   
   const isFarFromCampusBuildings = (userLat: number, userLng: number): boolean => {
-    if (!geoJsonData) return true; 
+    if (!geoJsonData) return false; 
 
     const thresholdDistance = 0.5; 
     let isFar = true;
@@ -59,6 +59,13 @@ function UserLocation() {
 
       setHasReceivedLocation(true);
 
+      if (accuracy > 2000) {
+        console.warn("Waiting for better accuracy...");
+        if (isOnCampus === null) {
+          setIsModalVisible(true);
+        }
+        return;
+      }
       
       if (isFarFromCampusBuildings(latitude, longitude)) {
         console.warn("User is far from campus buildings.");
