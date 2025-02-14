@@ -3,7 +3,7 @@ import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
 import { LocationContext } from "../Components/LocationContext";
 import MapComponent from "../Components/MapComponent";
 
-const CAMPUS_COORDINATES = { lat: 45.4584, lng: -73.6405 };
+const CAMPUS_COORDINATES = { lat: 45.4953529, lng: -73.579838 };
 
 function LoyolaCampus() {
   const [geoJsonData, setGeoJsonData] = useState<any>(null);

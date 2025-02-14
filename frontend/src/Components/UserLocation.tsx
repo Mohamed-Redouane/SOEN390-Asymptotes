@@ -120,7 +120,7 @@ function UserLocation() {
   return (
     <div>
       {error ? (
-        <p>{error}</p>
+        <Message isVisible={true} message={error} />
       ) : !hasReceivedLocation ? null : isModalVisible ? null : (
         <>
           {isOnCampus === false && <Message isVisible={showMessage} message="You are not on campus." />}
