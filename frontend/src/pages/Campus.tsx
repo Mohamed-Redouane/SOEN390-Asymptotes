@@ -47,7 +47,7 @@ function CampusMap() {
                 libraries={["geometry"]}>
                 <Map
                     defaultZoom={17}
-                    center={CAMPUS_COORDINATES[campus as CampusType]}
+                    defaultCenter={CAMPUS_COORDINATES[campus as CampusType]}
                     mapTypeControl={false}
                     fullscreenControl={false}
                 >
