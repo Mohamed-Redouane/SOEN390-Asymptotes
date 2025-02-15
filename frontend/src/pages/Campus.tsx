@@ -17,6 +17,7 @@ function CampusMap() {
     const { location: userLocation } = useContext(LocationContext);
     const [isUserInsideBuilding, setIsUserInsideBuilding] = useState(false);
     const [campus, setCampus] = useState<string>("SGW");
+    const [center, setCenter] = useState(CAMPUS_COORDINATES[campus as CampusType]);
 
     useEffect(() => {
         fetch("/Building.geojson")
@@ -27,10 +28,21 @@ function CampusMap() {
     }, []);
 
     function handleToggle() {
-        console.log("CampusMap.tsx: 1 handleToggle--> campus: ", campus);
-        setCampus((prevCampus) => (prevCampus === "SGW" ? "LOYOLA" : "SGW"));
+        // console.log("CampusMap.tsx: 1 handleToggle--> campus: ", campus);
+        // setCampus((prevCampus) => (prevCampus === "SGW" ? "LOYOLA" : "SGW"));
+        // setCenter(CAMPUS_COORDINATES[campus as CampusType]);
+        setCampus((prevCampus) => {
+            const newCampus = prevCampus === "SGW" ? "LOYOLA" : "SGW";
+            setCenter(CAMPUS_COORDINATES[newCampus as CampusType]); // Ensure center updates correctly
+            return newCampus;
+        });
     }
 
+    const onChange = (args: any) => {
+        console.log(args.map.center);
+        setCenter(args.map.center);
+            
+    };
     return (
 
         <div
@@ -47,9 +59,10 @@ function CampusMap() {
                 libraries={["geometry"]}>
                 <Map
                     defaultZoom={17}
-                    defaultCenter={CAMPUS_COORDINATES[campus as CampusType]}
+                    center={center}
                     mapTypeControl={false}
                     fullscreenControl={false}
+                    onCenterChanged={onChange}
                 >
                     {geoJsonData && <MapComponent geoJsonData={geoJsonData} setIsUserInsideBuilding={setIsUserInsideBuilding} />}
                     {isUserInsideBuilding && userLocation && <Marker position={userLocation} />}

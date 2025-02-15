@@ -25,7 +25,7 @@ describe("Toggle Button Component ", () => {
         cy.get('[data-testid="toggle-button-sgw"]').should("have.text", "SGW");
     });
 
-    it("The toggle button is changes the option backgrounds appropriately", () => {
+    it("The toggle button changes the option's background appropriately", () => {
         cy.wait("@getCurrentUser"); // Wait for mock authentication request
 
         
