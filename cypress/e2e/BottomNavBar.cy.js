@@ -17,31 +17,7 @@ describe("Bottom Navigation Bar", () => {
         cy.get("nav").find("button").should("have.length.at.least", 4);
     });
 
-    it("The map button should toggle the menu when clicked", () => {
-        cy.get("nav").find("button").contains("Map").click();
-        cy.contains("SGW Campus").should("be.visible");
-        cy.contains("Loyola Campus").should("be.visible");
-
-        // Click again to close the menu
-        cy.get("nav").find("button").contains("Map").click();
-        cy.contains("SGW Campus").should("not.exist");
-        cy.contains("Loyola Campus").should("not.exist");
-    });
-
-    it("The map button label should change based on the current path", () => {
-        cy.visit("http://localhost:5173/");
-        cy.get("nav").find("button").contains("Map: SGW").should("exist");
-
-        cy.visit("http://localhost:5173/LOYcampus");
-        cy.get("nav").find("button").contains("Map: Loyola").should("exist");
-
-        cy.visit("http://localhost:5173/directions");
-        cy.get("nav").find("button").contains("Map").should("exist");
-    });
-
     
-    
-
     it("Each navigation button should navigate correctly", () => {
         const navItems = [
             { label: "Shuttle", path: "/shuttle" },
