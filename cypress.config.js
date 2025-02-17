@@ -3,8 +3,8 @@ const { defineConfig } = require("cypress");
 module.exports = defineConfig({
   e2e: {
     baseUrl: "http://localhost:5173",
-    viewportWidth: 1280,
-    viewportHeight: 720,
+    viewportWidth: 430,
+    viewportHeight: 932,
     video: true,
     screenshotsFolder: "cypress/screenshots",
     videosFolder: "cypress/videos",
@@ -17,7 +17,6 @@ module.exports = defineConfig({
       return config;
     },
   },
-
   component: {
     devServer: {
       framework: "react",
@@ -25,3 +24,6 @@ module.exports = defineConfig({
     },
   },
 });
+  
+
+

@@ -1,12 +1,19 @@
-
 describe("MapComponent", () => {
-    it("The Google Maps API is loaded", () => {
-        cy.visit("http://localhost:5174/")
-        // The map component should exist
-        cy.get('[data-testid="map"]').should("exist")
-        // Check if the Google Maps API is loaded
-        cy.window().should("have.property", "google")
+    beforeEach(() => {
+        cy.intercept("GET", "/api/auth/me", {
+            statusCode: 200,
+            body: { user: { id: "test-user", email: "test@example.com" } }, // Fake authenticated user
+        }).as("getCurrentUser");
 
-})
-})
+        cy.visit("http://localhost:5173/");
+    });
+
+    it("The Google Maps API is loaded", () => {
+        cy.wait("@getCurrentUser"); // Wait for mock authentication request
+        cy.get('[data-testid="map"]').should("exist");
+        cy.window().should("have.property", "google");
+    });
+
+});
+
 
