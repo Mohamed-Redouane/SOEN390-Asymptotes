@@ -24,6 +24,7 @@ function CampusMap() {
     const [prevRadius, setPrevRadius] = useState(100);      //Store the previous radius
     const [poiType, setPoiType] = useState("restaurant");       //Store the selected POI type
     const [prevPoiType, setPrevPoiType] = useState("restaurant");       //Store the previous POI type
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         fetch("/Building.geojson")
@@ -54,6 +55,7 @@ function CampusMap() {
     };
 
     const performNearbySearch = (location: { lat: number, lng: number }, map?: google.maps.Map) => {
+        setLoading(true);
         console.log("Performing nearby search with radius:", radius, "and type:", poiType);
         if (radius < prevRadius || poiType !== prevPoiType) {
             setPointsOfInterest([]);    //Clear previous points of interest if new radius is smaller or chaneg POI type
@@ -68,6 +70,7 @@ function CampusMap() {
         };
 
         service.nearbySearch(request, (results, status) => {
+            setLoading(false);
             if (status === google.maps.places.PlacesServiceStatus.OK && results) {
                 console.log("Nearby search results:", results);
                 setPointsOfInterest((prevPoints) => {
@@ -119,6 +122,7 @@ function CampusMap() {
 
     return (
         <div>
+            {loading && <div>Loading...</div>}
             <div>
                 <label htmlFor="radius">Select Radius: </label>
                 <select id="radius" value={radius} onChange={handleRadiusChange}>    {/*RADIUS PREDEFINED VALUES //CHANGETO INPUT ??? */}
@@ -127,6 +131,11 @@ function CampusMap() {
                     <option value={500}>500 meters</option>
                     <option value={1000}>1000 meters</option>
                 </select>
+                <input
+                    type="number"
+                    placeholder="Enter custom radius"
+                    onBlur={(e) => setRadius(Number(e.target.value))}
+                />
             </div>
             <div>
                 <label htmlFor="poiType">Select POI Type: </label>
