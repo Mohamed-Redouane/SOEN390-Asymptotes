@@ -1,5 +1,5 @@
-import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
-import { useState, useContext, useEffect } from "react";
+import { APIProvider, Map, Marker, InfoWindow } from "@vis.gl/react-google-maps";
+import { useState, useContext, useEffect, useRef } from "react";
 import { LocationContext } from "../Components/LocationContext";
 import MapComponent from "../Components/MapComponent";
 import ToggleCampus from "../Components/ToggleCampusComponent";
@@ -25,6 +25,7 @@ function CampusMap() {
     const [poiType, setPoiType] = useState("restaurant");       //Store the selected POI type
     const [prevPoiType, setPrevPoiType] = useState("restaurant");       //Store the previous POI type
     const [loading, setLoading] = useState(false);
+    const [selectedPoi, setSelectedPoi] = useState<any>(null);
 
     useEffect(() => {
         fetch("/Building.geojson")
@@ -174,9 +175,40 @@ function CampusMap() {
                     >
                         {geoJsonData && <MapComponent geoJsonData={geoJsonData} setIsUserInsideBuilding={setIsUserInsideBuilding} />}
                         {isUserInsideBuilding && userLocation && <Marker position={userLocation} />}
-                        {filterPointsOfInterest().map((poi, index) => (     
-                            <Marker key={index} position={poi.geometry.location} />
+                        {filterPointsOfInterest().map((poi, index) => (     //Filter POIs based on radius
+                            <Marker 
+                                key={index} 
+                                position={poi.geometry.location} 
+                                onClick={() => {
+                                    console.log("Selected POI:", poi);
+                                    setSelectedPoi(poi);
+                                }} 
+                            />
                         ))}
+                        {selectedPoi && (           //Info pop up for selected POI
+                            <InfoWindow
+                                position={selectedPoi.geometry.location}
+                                onCloseClick={() => setSelectedPoi(null)}
+                            >
+                                <div style={{ color: 'black', padding: '10px', maxWidth: '250px', fontFamily: 'Arial, sans-serif' }}>
+                                    <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', fontWeight: 'bold' }}>{selectedPoi.name}</h3>
+                                    <p style={{ margin: '0 0 5px 0', fontSize: '14px' }}>{selectedPoi.vicinity}</p>
+                                    <p style={{ margin: '0 0 5px 0', fontSize: '14px' }}>Rating: {selectedPoi.rating}</p>
+                                    {selectedPoi.opening_hours && (
+                                        <p style={{ margin: '0 0 5px 0', fontSize: '14px' }}>
+                                            {selectedPoi.opening_hours.open_now ? 'Now Open' : 'Closed'}
+                                        </p>
+                                    )}
+                                    {selectedPoi.photos && selectedPoi.photos.length > 0 && (
+                                        <img
+                                            src={selectedPoi.photos[0].getUrl({ maxWidth: 400, maxHeight: 200 })}
+                                            alt={selectedPoi.name}
+                                            style={{ width: '100%', height: 'auto', borderRadius: '5px' }}
+                                        />
+                                    )}
+                                </div>
+                            </InfoWindow>
+                        )}
                     </Map>
                 </APIProvider>
             </div>
