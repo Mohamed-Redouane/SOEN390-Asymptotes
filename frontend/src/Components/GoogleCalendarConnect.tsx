@@ -4,15 +4,21 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 
 interface GoogleCalendarConnectProps {
-  onEventsLoaded: (events: any[]) => void;
+  onCalendarsLoaded: (calendars: any[]) => void;
+  onAuthChange: (isAuthenticated: boolean) => void;
+  onError: (errorMessage: string) => void; 
 }
 
-const GoogleCalendarConnect: React.FC<GoogleCalendarConnectProps> = ({ onEventsLoaded }) => {
+const GoogleCalendarConnect: React.FC<GoogleCalendarConnectProps> = ({
+  onCalendarsLoaded,
+  onAuthChange,
+  onError,
+}) => {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID; // Access from .env
-  const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY; // Access from .env
+  const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
   const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'];
   const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 
@@ -36,71 +42,57 @@ const GoogleCalendarConnect: React.FC<GoogleCalendarConnectProps> = ({ onEventsL
     gapi.load('client:auth2', initClient);
   }, []);
 
-  const updateSigninStatus = (isSignedIn: boolean) => {
-    setIsSignedIn(isSignedIn);
+  const updateSigninStatus = (status: boolean) => {
+    setIsSignedIn(status);
+    onAuthChange(status);
+    if (status) handleGetCalendars();
   };
 
-  const handleSignIn = () => {
-    gapi.auth2.getAuthInstance().signIn().then(() => {
+  const handleSignIn = async () => {
+    try {
+      await gapi.auth2.getAuthInstance().signIn();
       alert('Signed in successfully.');
-    });
+    } catch (error) {
+      console.error("Error signing in:", error);
+      onError("Failed to sign in. Please try again."); 
+    }
   };
 
-  const handleSignOut = () => {
-    gapi.auth2.getAuthInstance().signOut().then(() => {
+  const handleSignOut = async () => {
+    try {
+      await gapi.auth2.getAuthInstance().signOut();
       alert('You have been signed out.');
-    });
-    //clear events
-    onEventsLoaded([]);
-    
+      onAuthChange(false);
+      setIsSignedIn(false);
+    } catch (error) {
+      console.error("Error signing out:", error);
+      onError("Failed to sign out. Please try again.");
+    }
   };
-  /**
-   * CALENDAR + EVENT LOGIC 
-   * 
-   */
-  const handleGetEvents = async () => {
+
+  const handleGetCalendars = async () => {
     setIsLoading(true);
     try {
-      const response = await gapi.client.calendar.events.list({
-        calendarId: 'primary',
-        timeMin: new Date().toISOString(),
-        showDeleted: false,
-        singleEvents: true,
-        maxResults: 10,
-        orderBy: 'startTime',
-      });
-
-      const events = response.result.items;
-      if (events && events.length > 0) {
-        onEventsLoaded(events); // Pass events to CalendarPage
-      } else {
-        onEventsLoaded([]); // Pass an empty array if no events are found
-        console.log('No upcoming events found.');
-      }
+      const response = await gapi.client.calendar.calendarList.list();
+      const calendars = response.result.items || [];
+      console.log("Calendars fetched:", calendars);
+      onCalendarsLoaded(calendars);
     } catch (error) {
-      console.error("Error fetching events:", error);
-      onEventsLoaded([]); // Pass an empty array on error
+      console.error("Error fetching calendars:", error);
+      onError("Failed to fetch calendars. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-
   return (
     <div>
-      {isSignedIn ? (
-        <div>
-          <Button variant="contained" color="primary" onClick={handleSignOut}>
-            Sign Out
-          </Button>
-          <Button variant="contained" color="secondary" onClick={handleGetEvents} disabled={isLoading}>
-            {isLoading ? <CircularProgress size={24} /> : 'Get Events'}
-          </Button>
-        </div>
+      {isLoading ? (
+        <CircularProgress />
+      ) : isSignedIn ? (
+        <Button variant="contained" color="primary" onClick={handleSignOut}>Sign Out</Button>
       ) : (
-        <Button variant="contained" color="primary" onClick={handleSignIn}>
-          Sign In with Google
-        </Button>
+        <Button variant="contained" color="primary" onClick={handleSignIn}>Sign In with Google</Button>
       )}
     </div>
   );

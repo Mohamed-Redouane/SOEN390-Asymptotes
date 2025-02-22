@@ -1,19 +1,35 @@
-import React, { useState } from 'react';
-import GoogleCalendarConnect from '../Components/GoogleCalendarConnect';
-import dayjs from 'dayjs';
-import { Dialog, Transition } from '@headlessui/react';
-import { FaClock, FaMapMarkerAlt, FaInfoCircle } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { gapi } from 'gapi-script';
 import { useMediaQuery, useTheme } from '@mui/material';
+import GoogleCalendarConnect from '../Components/GoogleCalendarConnect';
+import ErrorMessage from '../Components/ErrorMessage';
+import EventDetailsModal from '../Components/EventDetailsModal';
+import CalendarSelector from '../Components/CalendarSelector';
+import WeekView from '../Components/WeekView';
 
 const CalendarPage: React.FC = () => {
+  const [calendars, setCalendars] = useState<any[]>([]);
+  const [selectedCalendarId, setSelectedCalendarId] = useState<string | null>(null);
   const [events, setEvents] = useState<any[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showError, setShowError] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const handleEventsLoaded = (loadedEvents: any[]) => {
-    setEvents(loadedEvents);
+  const handleCalendarsLoaded = (loadedCalendars: any[]) => {
+    setCalendars(loadedCalendars);
+    if (loadedCalendars.length > 0) {
+      setSelectedCalendarId(loadedCalendars[0].id);
+    }
+  };
+
+  const handleAuthChange = (authStatus: boolean) => {
+    setIsAuthenticated(authStatus);
   };
 
   const handleEventClick = (event: any) => {
@@ -21,67 +37,109 @@ const CalendarPage: React.FC = () => {
     setIsOpen(true);
   };
 
+  const handleGetEvents = async (calendarId: string) => {
+    if (!gapi.client || !gapi.client.calendar) {
+      setErrorMessage("Google Calendar API client not initialized.");
+      setShowError(true);
+      setTimeout(() => setShowError(false), 5000);
+      return;
+    }
+  
+    const isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+    if (!isSignedIn) {
+      setErrorMessage("You are not signed in. Please sign in to view your calendars.");
+      setShowError(true);
+      setTimeout(() => setShowError(false), 5000);
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      const today = new Date();
+      const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+      const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 7));
+  
+      const response = await gapi.client.calendar.events.list({
+        calendarId,
+        timeMin: startOfWeek.toISOString(),
+        timeMax: endOfWeek.toISOString(),
+        showDeleted: false,
+        singleEvents: true,
+        maxResults: 100,
+        orderBy: 'startTime',
+      });
+      const events = response.result.items || [];
+      console.log("Fetched Events:", events); // Log the fetched events
+      setEvents(events);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      setErrorMessage("Failed to fetch events. Please check your connection and try again.");
+      setShowError(true);
+      setTimeout(() => setShowError(false), 5000);
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedCalendarId && isAuthenticated) {
+      handleGetEvents(selectedCalendarId);
+    }
+  }, [selectedCalendarId, isAuthenticated]);
+
+  const today = new Date().toISOString().split("T")[0];
+
   return (
-    <div className="min-h-screen bg-gray-100 py-8 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-10 text-gray-900">📅 Your Events</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-10">
+          📅 Course Schedule
+        </h1>
 
-        <GoogleCalendarConnect onEventsLoaded={handleEventsLoaded} />
+        <GoogleCalendarConnect
+          onCalendarsLoaded={handleCalendarsLoaded}
+          onAuthChange={handleAuthChange}
+          onError={(errorMessage) => {
+            setErrorMessage(errorMessage);
+            setShowError(true);
+            setTimeout(() => setShowError(false), 5000);
+          }}
+        />
 
-        {events.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-7 gap-4 text-gray-900">
-            {events.map((event) => (
-              <div
-                key={event.id}
-                className="p-4 rounded-lg shadow-md border bg-white cursor-pointer hover:bg-blue-100"
-                onClick={() => handleEventClick(event)}
-              >
-                <h2 className="text-lg font-bold text-center mb-2">{event.summary}</h2>
-                <p className="text-sm text-gray-500">
-                  {event.start.dateTime
-                    ? dayjs(event.start.dateTime).format('MMMM D, YYYY h:mm A')
-                    : dayjs(event.start.date).format('MMMM D, YYYY')}
-                </p>
-                <p className="text-sm text-gray-500">{event.location}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-500 text-center">No events to display.</p>
+        <ErrorMessage
+          message={errorMessage || "An unknown error occurred."}
+          show={showError}
+        />
+
+        {isAuthenticated && calendars.length > 0 && (
+          <CalendarSelector
+            calendars={calendars}
+            selectedCalendarId={selectedCalendarId}
+            onSelectCalendar={(calendarId) => setSelectedCalendarId(calendarId)}
+          />
         )}
-      </div>
 
-      <Transition appear show={isOpen} as={React.Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={() => setIsOpen(false)}>
-          <div className="fixed inset-0 bg-black bg-opacity-30" />
-          <div className="fixed inset-0 flex items-center justify-center p-4">
-            <Dialog.Panel className="max-w-md w-full bg-white rounded-xl shadow-xl p-6 text-gray-900">
-              <Dialog.Title className="text-2xl font-bold">{selectedEvent?.summary}</Dialog.Title>
-              <div className="mt-4 space-y-2">
-                <p className="flex items-center">
-                  <FaClock className="mr-2" />
-                  {selectedEvent?.start?.dateTime?.split("T")[1]?.substring(0, 5)} -{" "}
-                  {selectedEvent?.end?.dateTime?.split("T")[1]?.substring(0, 5)}
-                </p>
-                <p className="flex items-center">
-                  <FaMapMarkerAlt className="mr-2" />
-                  {selectedEvent?.location || "No location"}
-                </p>
-                <p className="flex items-center">
-                  <FaInfoCircle className="mr-2" />
-                  {selectedEvent?.description || "No description"}
-                </p>
-              </div>
-              <button
-                className="mt-6 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
-                onClick={() => setIsOpen(false)}
-              >
-                Close
-              </button>
-            </Dialog.Panel>
+        {loading ? (
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           </div>
-        </Dialog>
-      </Transition>
+        ) : isAuthenticated && events.length > 0 ? (
+          <WeekView
+            events={events}
+            today={today}
+            onEventClick={handleEventClick}
+          />
+        ) : (
+          <p className="text-gray-500 text-center">No events found.</p>
+        )}
+
+        <EventDetailsModal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          selectedEvent={selectedEvent}
+        />
+      </div>
     </div>
   );
 };
