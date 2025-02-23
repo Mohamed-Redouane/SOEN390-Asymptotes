@@ -14,13 +14,13 @@ const CalendarSelector: React.FC<CalendarSelectorProps> = ({ calendars, selected
       </label>
       <select
         id="calendar-select"
-        className="px-4 py-2 border rounded-lg bg-white shadow-sm"
+        className="px-4 py-2 border rounded-lg bg-white shadow-sm text-gray-900"
         value={selectedCalendarId || ''}
         onChange={(e) => onSelectCalendar(e.target.value)}
       >
         {calendars.map((calendar) => (
           <option key={calendar.id} value={calendar.id}>
-            {calendar.summary}
+        {calendar.summary}
           </option>
         ))}
       </select>
