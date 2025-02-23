@@ -75,7 +75,6 @@ const GoogleCalendarConnect: React.FC<GoogleCalendarConnectProps> = ({
     try {
       const response = await gapi.client.calendar.calendarList.list();
       const calendars = response.result.items || [];
-      console.log("Calendars fetched:", calendars);
       onCalendarsLoaded(calendars);
     } catch (error) {
       console.error("Error fetching calendars:", error);

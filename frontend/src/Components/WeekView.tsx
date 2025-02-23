@@ -7,16 +7,27 @@ interface WeekViewProps {
 }
 
 const WeekView: React.FC<WeekViewProps> = ({ events, today, onEventClick }) => {
+ 
+  const currentDate = new Date();
+  const startOfWeek = new Date(currentDate);
+  startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + (currentDate.getDay() === 0 ? -6 : 1));
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
       {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day, index) => {
-        const date = new Date();
-        date.setDate(date.getDate() - date.getDay() + index + 1);
-        const dateString = date.toISOString().split("T")[0];
+        const date = new Date(startOfWeek);
+        date.setDate(startOfWeek.getDate() + index); 
+        const dateString = date.toLocaleDateString('en-CA'); 
+
         const dayEvents = events.filter((event: any) => {
           const eventStart = event.start?.dateTime || event.start?.date;
-          return eventStart && eventStart.startsWith(dateString);
+          if (!eventStart) return false;
+
+          
+          const eventStartDate = new Date(eventStart).toLocaleDateString('en-CA');
+          return eventStartDate === dateString;
         });
+
         const isToday = dateString === today;
 
         return (
@@ -32,10 +43,10 @@ const WeekView: React.FC<WeekViewProps> = ({ events, today, onEventClick }) => {
             {dayEvents.length > 0 ? (
               dayEvents.map((event: any) => {
                 const startTime = event.start?.dateTime
-                  ? event.start.dateTime.split("T")[1].substring(0, 5)
+                  ? new Date(event.start.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                   : "All Day";
                 const endTime = event.end?.dateTime
-                  ? event.end.dateTime.split("T")[1].substring(0, 5)
+                  ? new Date(event.end.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                   : "All Day";
 
                 return (

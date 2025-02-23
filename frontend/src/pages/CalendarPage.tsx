@@ -44,7 +44,7 @@ const CalendarPage: React.FC = () => {
       setTimeout(() => setShowError(false), 5000);
       return;
     }
-  
+
     const isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
     if (!isSignedIn) {
       setErrorMessage("You are not signed in. Please sign in to view your calendars.");
@@ -52,24 +52,40 @@ const CalendarPage: React.FC = () => {
       setTimeout(() => setShowError(false), 5000);
       return;
     }
-  
+
     setLoading(true);
     try {
       const today = new Date();
-      const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-      const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 7));
-  
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1));
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6); 
+      
+      const timeMin = new Date(
+        startOfWeek.getFullYear(),
+        startOfWeek.getMonth(),
+        startOfWeek.getDate(),
+        0, 0, 0
+      ).toISOString();
+
+      const timeMax = new Date(
+        endOfWeek.getFullYear(),
+        endOfWeek.getMonth(),
+        endOfWeek.getDate(),
+        23, 59, 59
+      ).toISOString();
+
       const response = await gapi.client.calendar.events.list({
         calendarId,
-        timeMin: startOfWeek.toISOString(),
-        timeMax: endOfWeek.toISOString(),
+        timeMin,
+        timeMax,
         showDeleted: false,
         singleEvents: true,
         maxResults: 100,
         orderBy: 'startTime',
       });
+
       const events = response.result.items || [];
-      console.log("Fetched Events:", events); // Log the fetched events
       setEvents(events);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -88,7 +104,7 @@ const CalendarPage: React.FC = () => {
     }
   }, [selectedCalendarId, isAuthenticated]);
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toLocaleDateString('en-CA'); 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
