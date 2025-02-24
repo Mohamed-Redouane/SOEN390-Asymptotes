@@ -15,6 +15,8 @@ import { RegisterPage } from './pages/Auth/RegisterPage';
 import { RequestPasswordResetPage } from './pages/Auth/RequestPasswordResetPage';
 import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage';
 import { VerifyEmailPage } from './pages/Auth/VerifyEmailPage';
+import DirectionsPage from './pages/DirectionsPage';
+import Directions from './pages/Directions';
 
 
 export const router = createBrowserRouter([
@@ -63,7 +65,7 @@ export const router = createBrowserRouter([
         loader: requireAuthLoader,
         element: (
           <div style={{ height: '86vh', width: '100vw' }}>
-            404 Not Found
+            <Directions />
           </div>
         ),
       },
