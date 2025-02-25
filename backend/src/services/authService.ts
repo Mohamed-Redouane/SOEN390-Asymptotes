@@ -1,4 +1,4 @@
-import { randomBytes } from "crypto";
+import { randomBytes, randomInt } from "crypto";
 import { UserRepository } from "../repositories/userRepository.js";
 import { SessionRepository } from "../repositories/sessionRepository.js";
 import { EmailVerificationRepository } from "../repositories/emailVerificationRepository.js";
@@ -8,7 +8,7 @@ import { hashPassword, verifyPassword, verifyPasswordNotPwned } from "./password
 import { verifyEmailInput } from "../utils/emailValidation.js";
 import { PasswordResetRepository } from "../repositories/passwordResetRepository.js";
 import { sendPasswordResetEmail, sendVerificationEmail } from "./emailService.js";
-import { randomInt } from "crypto";
+
 
 export interface UserResponse {
   id: number;
