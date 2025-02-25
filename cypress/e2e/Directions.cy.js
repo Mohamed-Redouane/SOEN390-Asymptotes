@@ -6,15 +6,21 @@ describe('Directions Page', () => {
             statusCode: 200,
             body: { user: { id: "test-user", email: "test@example.com" } }, // Fake authenticated user
         }).as("getCurrentUser");
-        cy.visit("http://localhost:5173/directions");
+
+        cy.visit("http://localhost:5173/directions", { timeout: 20000 });
+        cy.wait(2000); // Ensure app is fully loaded before waiting
+        cy.wait("@getCurrentUser", { timeout: 20000 }).then((interception) => {
+            console.log("Intercepted request:", interception);
+        });
+
 
         cy.window().then((win) => {
             cy.stub(win.navigator.geolocation, "watchPosition").callsFake((success) => {
-              success({
-                coords: { latitude: 45.4949, longitude: -73.5779, accuracy: 10 }, 
-              });
+                success({
+                    coords: { latitude: 45.4949, longitude: -73.5779, accuracy: 10 },
+                });
             });
-          });
+        });
     });
 
 
@@ -51,7 +57,7 @@ describe('Directions Page', () => {
     });
 
     it("the directions page should display route options when the user requests ", () => {
-       //type source and destination location and submit request
+        //type source and destination location and submit request
         cy.get('#start-input').type('1234');
         cy.get('#suggestions-container').children().first().click();
 
@@ -62,7 +68,7 @@ describe('Directions Page', () => {
 
         //check if route options are displayed
         cy.get('#routes-display').should('exist');
-        cy.get('#routes-display').children().should("have.length.at.least", 1);       
+        cy.get('#routes-display').children().should("have.length.at.least", 1);
     });
 
     it("the routes options and the autocomplete suggestions should not be displayed at the same time", () => {
@@ -77,11 +83,11 @@ describe('Directions Page', () => {
 
         //check if route options are displayed
         cy.get('#routes-display').should('exist');
-        cy.get('#routes-display').children().should("have.length.at.least", 1); 
+        cy.get('#routes-display').children().should("have.length.at.least", 1);
 
         //check if suggestions are not displayed
         cy.get('#suggestions-container').should("be.hidden");
     });
-    
+
 
 });
