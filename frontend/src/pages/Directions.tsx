@@ -260,13 +260,14 @@ const Directions = () => {
 
                 <div style={{ height: "86vh", width: "100vw" }}>
                     <Map
+                        id="map"
                         defaultZoom={15}
                         defaultCenter={{ lat: 45.4949, lng: -73.5779 }}
                         mapTypeControl={false}
                         fullscreenControl={false}
                     >
                         {routesAvailable && directions && <DirectionsViewMap directionsInfo={directions} />}
-                        {/* {isUserInsideBuilding && userLocation && <Marker position={userLocation} />} */}
+                        
                     </Map>
                 </div>
 

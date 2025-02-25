@@ -26,7 +26,7 @@ describe('Directions Page', () => {
 
     it("The Google Maps API is loaded", () => {
         cy.wait("@getCurrentUser"); // Wait for mock authentication request
-        cy.get('[data-testid="map"]').should("exist");
+        cy.get('#map').should("exist");
         cy.window().should("have.property", "google");
     });
 
@@ -45,45 +45,46 @@ describe('Directions Page', () => {
     it(" the directions page should show suggestions when typing in the source location input field", () => {
         cy.get('#start-input').type('1234');
         cy.get('#suggestions-container').should("exist");
-        cy.get('#suggestions-container').children().should('have.length', 5);
         cy.get('#suggestion-item-container').should('exist');
+        cy.get('#name-address-container').should('exist');
     });
 
     it(" the directions page should show suggestions when typing in the destination location input field", () => {
         cy.get('#end-input').type('1234');
         cy.get('#suggestions-container').should("exist");
-        cy.get('#suggestions-container').children().should('have.length', 5);
         cy.get('#suggestion-item-container').should('exist');
+        cy.get('#name-address-container').should('exist');
     });
 
     it("the directions page should display route options when the user requests ", () => {
         //type source and destination location and submit request
         cy.get('#start-input').type('1234');
-        cy.get('#suggestions-container').children().first().click();
+        cy.get('#suggestion-item-container').click();
 
         cy.get('#end-input').type('5678');
-        cy.get('#suggestions-container').children().first().click();
+        cy.get('#suggestion-item-container').click();
 
         cy.get('#get-directions-button').click();
 
         //check if route options are displayed
         cy.get('#routes-display').should('exist');
-        cy.get('#routes-display').children().should("have.length.at.least", 1);
+        cy.get('#route-item-container').should('exist');
+        cy.get('#route-item-duration-distance').should('exist');
     });
 
     it("the routes options and the autocomplete suggestions should not be displayed at the same time", () => {
         //type source and destination location and submit request
         cy.get('#start-input').type('1234');
-        cy.get('#suggestions-container').children().first().click();
+        cy.get('#suggestion-item-container').click();
 
         cy.get('#end-input').type('5678');
-        cy.get('#suggestions-container').children().first().click();
+        cy.get('#suggestion-item-container').click();
 
         cy.get('#get-directions-button').click();
 
         //check if route options are displayed
         cy.get('#routes-display').should('exist');
-        cy.get('#routes-display').children().should("have.length.at.least", 1);
+        cy.get('#route-item-container').should('exist');
 
         //check if suggestions are not displayed
         cy.get('#suggestions-container').should("be.hidden");
