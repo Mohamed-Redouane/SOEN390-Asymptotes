@@ -5,27 +5,27 @@ function ToggleCampus({ campus, onClick }: { campus: string, onClick: () => void
         <div data-testid="toggle-button" className="fixed m-4 top-30 right-0 inline-flex items-center z-20">
             <div className="w-[140px] h-[31px] bg-[#eeebeb] rounded-md shadow-[0px_1px_2.799999952316284px_0px_rgba(0,0,0,0.25)] justify-start items-center inline-flex overflow-hidden relative">
                 
-                <div
+                <button
                     data-testid="toggle-button-loyola"
-                    className={`w-[70px] h-[31px] rounded-md justify-center items-center flex overflow-hidden cursor-pointer ${isSGW ? 'bg-[#eeebeb]' : 'bg-[#411a72]'} `}
+                    className={`w-[70px] h-[31px] outline-none rounded-md justify-center items-center flex overflow-hidden cursor-pointer ${isSGW ? 'bg-[#eeebeb]' : 'bg-[#411a72]'} `}
                     onClick={onClick}
                     onKeyDown={(e) => e.key === "Enter" && onClick()} // allow Enter key interaction
-                    role="button" // assistive tech recognizes as button
+                    // role="button" // assistive tech recognizes as button
                     tabIndex={0} // enables focus via keyboard navigation
                 >
-                    <div className={`text-sm font-medium  ${isSGW ? 'text-[#411a72]' : 'text-[#ededed]'}`}>LOYOLA</div>
-                </div>
+                    <div className={`text-sm font-medium ${isSGW ? 'text-[#411a72]' : 'text-[#ededed]'}`}>LOYOLA</div>
+                </button>
 
-                <div
+                <button
                     data-testid="toggle-button-sgw"
-                    className={`w-[70px] h-[31px] rounded-md justify-center items-center flex overflow-hidden cursor-pointer ${isSGW ? 'bg-[#411a72]' : 'bg-[#eeebeb]'}`}
+                    className={`w-[70px] h-[31px] outline-none rounded-md justify-center items-center flex overflow-hidden cursor-pointer ${isSGW ? 'bg-[#411a72]' : 'bg-[#eeebeb]'}`}
                     onClick={onClick}
                     onKeyDown={(e) => e.key === "Enter" && onClick()} 
-                    role="button" 
+                    // role="button" 
                     tabIndex={0}
                 >
                     <div className={`text-sm font-semibold  ${isSGW ? 'text-[#ededed]' : 'text-[#411a72]'} `}>SGW</div>
-                </div>
+                </button>
             </div>
         </div>
     );

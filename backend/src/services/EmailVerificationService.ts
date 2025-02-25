@@ -1,7 +1,7 @@
 
-import { randomBytes } from "crypto";
+import { randomBytes, randomInt } from "crypto";
 import { Pool } from "pg";
-import { randomInt } from "crypto";
+
 
 
 export interface EmailVerificationRequest {
