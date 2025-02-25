@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { checkUserInsideBuilding } from "../utils/CheckIfUserInBuilding";
+import { checkUserInsideBuilding } from "../../utils/CheckIfUserInBuilding";
 
 describe("Location and Highlighting Functions", () => {
   it("should return true if user is inside a building", () => {
