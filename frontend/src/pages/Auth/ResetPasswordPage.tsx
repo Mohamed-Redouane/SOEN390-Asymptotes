@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthService } from '../../services/authService';
-import { isAxiosError, ErrorResponse } from '../../utils/axiosUtils';
+import { handlerResetPassword } from '../../utils/authUtils';
 
 export function ResetPasswordPage() {
   const { handleResetPassword } = useAuthService();
@@ -24,21 +24,8 @@ export function ResetPasswordPage() {
     }
     
     setLoading(true);
-    try {
-      const data = await handleResetPassword(code, newPassword);
-      setMessage(data.message || 'Password reset successful!');
-      setTimeout(() => navigate('/login'), 2000);
-    } catch (err: unknown) {
-      if (isAxiosError<ErrorResponse>(err)) {
-        setError(err.response?.data?.error || 'Reset failed');
-      } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred.');
-      }
-    } finally {
-      setLoading(false);
-    }
+    await handlerResetPassword(handleResetPassword, code, newPassword, setError, setMessage, navigate);
+    setLoading(false);
   }
 
   return (
