@@ -12,7 +12,7 @@ export const fetchPlacePredictions = (searchQuery: string, location: any) => {
                 types: ["establishment", "geocode"],
                 componentRestrictions: { country: "CA" },// restricts the location 
                 //TODO: use the user's location to restrict the search to the area around them
-                locationRestriction: {
+                locationBias: {
                     north: location ? (location.lat + 0.07) : 45.5049,
                     south: location ? location.lat - 0.07 : 45.4849,
                     east: location ? location.lng + 0.07 : -73.5679,
