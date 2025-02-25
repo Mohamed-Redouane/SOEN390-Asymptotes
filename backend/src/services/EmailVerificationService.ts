@@ -1,6 +1,7 @@
 
 import { randomBytes } from "crypto";
 import { Pool } from "pg";
+import { randomInt } from "crypto";
 
 
 export interface EmailVerificationRequest {
@@ -13,7 +14,7 @@ export interface EmailVerificationRequest {
 
 
 function generateRandomOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return randomInt(100000, 999999).toString();
 }
 
 

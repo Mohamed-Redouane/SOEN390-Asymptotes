@@ -8,6 +8,7 @@ import { hashPassword, verifyPassword, verifyPasswordNotPwned } from "./password
 import { verifyEmailInput } from "../utils/emailValidation.js";
 import { PasswordResetRepository } from "../repositories/passwordResetRepository.js";
 import { sendPasswordResetEmail, sendVerificationEmail } from "./emailService.js";
+import { randomInt } from "crypto";
 
 export interface UserResponse {
   id: number;
@@ -101,8 +102,7 @@ export class AuthService {
     }
 
   
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    
+    const code = randomInt(100000, 999999).toString();     
     await this.passwordResetRepo.deleteByUserId(user.id);
 
     const expiresAt = Math.floor(Date.now() / 1000) + 15 * 60; 
