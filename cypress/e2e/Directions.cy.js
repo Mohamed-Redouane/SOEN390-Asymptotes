@@ -65,4 +65,23 @@ describe('Directions Page', () => {
         cy.get('#routes-display').children().should("have.length.at.least", 1);       
     });
 
+    it("the routes options and the autocomplete suggestions should not be displayed at the same time", () => {
+        //type source and destination location and submit request
+        cy.get('#start-input').type('1234');
+        cy.get('#suggestions-container').children().first().click();
+
+        cy.get('#end-input').type('5678');
+        cy.get('#suggestions-container').children().first().click();
+
+        cy.get('#get-directions-button').click();
+
+        //check if route options are displayed
+        cy.get('#routes-display').should('exist');
+        cy.get('#routes-display').children().should("have.length.at.least", 1); 
+
+        //check if suggestions are not displayed
+        cy.get('#suggestions-container').should("be.hidden");
+    });
+    
+
 });
