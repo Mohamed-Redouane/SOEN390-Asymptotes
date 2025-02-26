@@ -125,6 +125,7 @@ const Directions = () => {
             setDirections(directionRequest); //store the directions for the map
         }
 
+        console.log("Routes: ", directionRequest);
         setRoutesAvailable(true);
     };
 
@@ -268,7 +269,7 @@ const Directions = () => {
                             mapTypeControl={false}
                             fullscreenControl={false}
                         >
-                            {routesAvailable && directions && <DirectionsViewMap directionsInfo={directions} />}
+                            
 
                         </Map>
                     </div>

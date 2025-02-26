@@ -7,6 +7,21 @@ describe('Directions Page', () => {
             body: { user: { id: "test-user", email: "test@example.com" } }, // Fake authenticated user
         }).as("getCurrentUser");
 
+        cy.intercept(
+            "GET",
+            "https://maps.googleapis.com/maps/api/place/autocomplete/json*",
+            {
+                statusCode: 200,
+                body: {
+                    predictions: [
+                        { description: "1234 Elm Street, Toronto", place_id: "mock-place-1" },
+                        { description: "1234 Pine Avenue, Vancouver", place_id: "mock-place-2" }
+                    ],
+                    status: "OK"
+                }
+            }
+        ).as("autocomplete");
+
         cy.visit("http://localhost:5173/directions", { timeout: 20000 });
         cy.wait(2000); // Ensure app is fully loaded before waiting
         cy.wait("@getCurrentUser", { timeout: 20000 }).then((interception) => {
@@ -21,6 +36,7 @@ describe('Directions Page', () => {
                 });
             });
         });
+        
     });
 
 
@@ -44,6 +60,10 @@ describe('Directions Page', () => {
 
     it(" the directions page should show suggestions when typing in the source location input field", () => {
         cy.get('#start-input').type('1234');
+
+       
+        // cy.wait("@autocomplete");
+
         cy.get('#suggestions-container').should("exist");
         cy.get('#suggestion-item-container').should('exist');
         cy.get('#name-address-container').should('exist');
