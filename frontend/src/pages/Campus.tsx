@@ -96,6 +96,7 @@ function CampusMap() {
     const [isUserInsideBuilding, setIsUserInsideBuilding] = useState(false);
     const [campus, setCampus] = useState<CampusType>("SGW");
     const [center, setCenter] = useState(CAMPUS_COORDINATES.SGW);
+    const [showBuildings, setShowBuildings] = useState(false); // Visibility of building markers
 
     useEffect(() => {
         fetch("/Building.geojson")
@@ -131,6 +132,12 @@ function CampusMap() {
                 campus={campus}
                 onClick={handleToggle}
             />
+            <button 
+                onClick={() => setShowBuildings(prev => !prev)} 
+                style={{ padding: '5px 10px', fontSize: '12px' }}
+            >
+                {showBuildings ? "Hide Buildings" : "Show Buildings"}
+            </button>
             <APIProvider
                 apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
                 libraries={["geometry"]}>
@@ -143,7 +150,7 @@ function CampusMap() {
                 >
                     {geoJsonData && <MapComponent geoJsonData={geoJsonData} setIsUserInsideBuilding={setIsUserInsideBuilding} />}
                     {isUserInsideBuilding && userLocation && <Marker position={userLocation} />}
-                    {BUILDINGS.filter(building => building.campus === campus).map(building => (
+                    {showBuildings && BUILDINGS.filter(building => building.campus === campus).map(building => (
                         <Marker
                             key={building.abbreviation}
                             position={{ lat: building.lat, lng: building.lng }}
