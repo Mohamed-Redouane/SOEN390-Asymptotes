@@ -4,8 +4,6 @@ import { createBrowserRouter } from 'react-router-dom';
 import App from './App';
 import { requireAuthLoader } from './loaders/authLoader';
 
-import SGWCampus from './pages/SGWCampus';
-import LOYCampus from './pages/LOYCampus';
 import CampusMap from './pages/Campus';
 
 // Public Pages

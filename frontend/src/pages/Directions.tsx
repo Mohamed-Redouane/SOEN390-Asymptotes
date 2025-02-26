@@ -132,8 +132,8 @@ const Directions = () => {
     return (
         <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={["places", "geometry"]}>
             <div className="relative flex flex-col flex-shrink-0 w-full" >
-                <div className=" fixed flex flex-col flex-shrink-0 w-full top-55 z-30 p-2  bg-white ">
-                    <div className="flex flex-row items-center">
+                <div className=" fixed flex flex-col flex-shrink-0 w-full top-55 z-30 bg-white ">
+                    <div className="flex flex-row items-center pl-2 pr-2">
                         <MyLocationIcon />
                         <input
                             id="start-input"
@@ -148,9 +148,9 @@ const Directions = () => {
                             }}
                         >
                         </input>
-                        <p onClick={() => setSourceQuery("")}>x</p>
+                        <p className="text-l font-bold" onClick={() => setSourceQuery("")}>x</p>
                     </div>
-                    <div className="flex flex-row items-center">
+                    <div className="flex flex-row items-center pl-2 pr-2">
                         <RoomIcon style={{ color: "red" }} />
                         <input
                             id="end-input"
@@ -164,7 +164,7 @@ const Directions = () => {
                             }}
                         >
                         </input>
-                        <p onClick={() => setDestinationQuery("")}>x</p>
+                        <p className="text-l font-bold text-gray-700" onClick={() => setDestinationQuery("")}>x</p>
                     </div>
                     {results &&
                         <div className="flex w-full " >
@@ -256,20 +256,25 @@ const Directions = () => {
                         </div>
                     }
 
+
+                    <div
+                        id="map-container"
+                        // className="relative top-55 flex flex-col border-3 border-red-800 flex-shrink-0 w-full h-full z-30">
+                        style={{ height: '86vh', width: '100vw' }}
+                    >
+                        <Map
+                            defaultZoom={15}
+                            defaultCenter={{ lat: 45.4949, lng: -73.5779 }}
+                            mapTypeControl={false}
+                            fullscreenControl={false}
+                        >
+                            {routesAvailable && directions && <DirectionsViewMap directionsInfo={directions} />}
+
+                        </Map>
+                    </div>
+
                 </div>
 
-                <div style={{ height: "86vh", width: "100vw" }}>
-                    <Map
-                        id="map"
-                        defaultZoom={15}
-                        defaultCenter={{ lat: 45.4949, lng: -73.5779 }}
-                        mapTypeControl={false}
-                        fullscreenControl={false}
-                    >
-                        {routesAvailable && directions && <DirectionsViewMap directionsInfo={directions} />}
-                        
-                    </Map>
-                </div>
 
             </div>
         </APIProvider>

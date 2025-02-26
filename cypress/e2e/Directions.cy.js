@@ -26,7 +26,7 @@ describe('Directions Page', () => {
 
     it("The Google Maps API is loaded", () => {
         cy.wait("@getCurrentUser"); // Wait for mock authentication request
-        cy.get('#map').should("exist");
+        cy.get('[data-testid="map"]').should("exist");
         cy.window().should("have.property", "google");
     });
 
@@ -62,7 +62,8 @@ describe('Directions Page', () => {
         cy.get('#suggestion-item-container').click();
 
         cy.get('#end-input').type('5678');
-        cy.get('#suggestion-item-container').click();
+        cy.get('#suggestion-item-container').wait(2000).click();
+
 
         cy.get('#get-directions-button').click();
 
