@@ -5,7 +5,7 @@ import MapComponent from "../Components/MapComponent";
 import ToggleCampus from "../Components/ToggleCampusComponent";
 
 type CampusType = 'SGW' | 'LOYOLA'; // Define a type for campus to ensure only these two values are valid
-console.log("Hello");
+
 // Define the coordinates for each campus
 const CAMPUS_COORDINATES: { [key in CampusType]: { lat: number, lng: number } } = {
     SGW: { lat: 45.4949, lng: -73.5779 },
