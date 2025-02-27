@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import RoomIcon from '@mui/icons-material/Room';
-import { fetchPlacePredictions, fetchPlaceDetails, getSuggestions, getPlaceDetails } from '../services/PlaceServices';
-import { fetchDirections} from '../services/directionsServices';
-import { APIProvider, Map, Marker, useMap } from '@vis.gl/react-google-maps';
+import { getSuggestions, getPlaceDetails } from '../services/PlaceServices';
+import { fetchDirections } from '../services/directionsServices';
+import { APIProvider, Map } from '@vis.gl/react-google-maps';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import AirportShuttleIcon from '@mui/icons-material/AirportShuttle';
-import DirectionsViewMap from '../Components/DirectionsViewMap';
+
 
 interface LocationType {
     name: string;
@@ -33,52 +33,36 @@ const Directions = () => {
     const [routes, setRoutes] = useState<any>();
     const [directions, setDirections] = useState<google.maps.DirectionsResult>();
 
-    const isProgrammaticChange = useRef(false); // Used to prevent infinite loop when setting the value of the input field programmatically
-    let amount = 1;
-    
-    // useEffect(() => {
-    //     const fetchTest = async () => {
-    //         const test = await getSuggestions(query);
-    //         console.log("Test ", amount++, ": ", test);
-    //     };
-    //     fetchTest();
-    // }, [query]);
+    const [selectedResultIndex, setSelectedResultIndex] = useState<number>(-1); // for keyboard navigation of results
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "ArrowDown") {
+            setSelectedResultIndex((prev) => Math.min(prev + 1, results.length - 1));
+        } else if (event.key === "ArrowUp") {
+            setSelectedResultIndex((prev) => Math.max(prev - 1, 0));
+        } else if (event.key === "Enter" && selectedResultIndex !== -1) {
+            handleSelect(selectedResultIndex);
+        }
+    };
 
-    // console.log("Location: ", location);
+    const isProgrammaticChange = useRef(false); // Used to prevent infinite loop when setting the value of the input field programmatically
+
     useEffect(() => {
         if (!isProgrammaticChange.current) {
             setRoutes([]);
             setRoutesAvailable(false);
 
-            if(query === "") {
+            if (query === "") {
                 setResults([]);
                 return;
             }
-            
+
             const predictionsResults = async () => {
                 const predictions = await getSuggestions(query, 45.5049, -73.5779);
                 console.log("Predictions: ", predictions);
                 setResults(predictions as LocationType[]);
             }
             predictionsResults();
-            
 
-            // fetchPlacePredictions(query, null)
-            //     .then(predictions => {
-            //         return Promise.all(
-            //             predictions.map(prediction =>
-            //                 fetchPlaceDetails(prediction.place_id, prediction.description).then(details => ({
-            //                     name: details.name || prediction.description,
-            //                     address: details.address || prediction.description,
-            //                     place_id: prediction.place_id,
-            //                     lat: details.lat, // Placeholder until lat/lng is fetched
-            //                     lng: details.lng // Placeholder until lat/lng is fetched
-            //                 }))
-            //             )
-            //         );
-            //     })
-            //     .then(results => setResults(results))
-            //     .catch(error => console.error("Error fetching places:", error));
         }
         isProgrammaticChange.current = false;
     }, [query]);
@@ -97,9 +81,9 @@ const Directions = () => {
     const handleSelect = async (index: number) => {
         const place = results[index];
         const placeDetails = await getPlaceDetails(place.place_id);
-            console.log("Selected Place: ", placeDetails);
-         // get the details of what was selected
-        
+        console.log("Selected Place: ", placeDetails);
+        // get the details of what was selected
+
 
         isProgrammaticChange.current = true;
 
@@ -154,6 +138,20 @@ const Directions = () => {
     };
 
 
+    // for keyboard navigation of transportation modes
+    const handleTransportKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === "ArrowRight") {
+            setTransportationMode((prev) =>
+                prev === "driving" ? "transit" : prev === "transit" ? "walking" : "driving"
+            );
+        } else if (event.key === "ArrowLeft") {
+            setTransportationMode((prev) =>
+                prev === "walking" ? "transit" : prev === "transit" ? "driving" : "walking"
+            );
+        }
+    };
+
+
     return (
         <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={["places", "geometry"]}>
             <div className="relative flex flex-col flex-shrink-0 w-full" >
@@ -171,6 +169,7 @@ const Directions = () => {
                                 setActive("start");
                                 setSourceQuery(e.target.value);
                             }}
+                            onKeyDown={handleKeyDown}
                         >
                         </input>
                         <p className="text-l font-bold" onClick={() => setSourceQuery("")}>x</p>
@@ -187,6 +186,7 @@ const Directions = () => {
                                 setActive("end");
                                 setDestinationQuery(e.target.value);
                             }}
+                            onKeyDown={handleKeyDown}
                         >
                         </input>
                         <p className="text-l font-bold text-gray-700" onClick={() => setDestinationQuery("")}>x</p>
@@ -197,9 +197,10 @@ const Directions = () => {
                                 {results.map((result, index) => (
                                     <li key={index}
                                         id="suggestion-item-container"
+                                        onKeyDown={(e) => e.key === "Enter" && handleSelect(index)}
                                         onClick={() => {
                                             handleSelect(index);
-                                            setResults([]);
+
                                             console.log("Selected: ", results[index]);
                                         }}
                                         className="flex flex-row items-center m-2 border-2 border-gray-200 rounded-lg w-full pr-4">
@@ -223,6 +224,7 @@ const Directions = () => {
                                 id="get-directions-button"
                                 onClick={getDirections}
                                 className="m-1 border-2 border-gray-200 rounded-lg w-full bg-blue-600 text-white font-bold"
+                                onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && console.log("Getting directions...")}
                             >
                                 Get Directions
                             </button>
@@ -235,7 +237,8 @@ const Directions = () => {
                     {routesAvailable &&
                         <div>
                             {/* TODO: implement the different travel modes */}
-                            <div id="transport-mode-container" className="flex  flex-row justify-between w-full pl-4 pr-4 m-1">
+                            <div id="transport-mode-container" className="flex  flex-row justify-between w-full pl-4 pr-4 m-1" tabIndex={0}
+                                onKeyDown={handleTransportKeyDown}>
                                 <div id="car-option" className="flex flex-row items-center">
                                     <DirectionsCarIcon onClick={() => setTransportationMode("driving")} style={{ color: transportationMode === "driving" ? "#094F6d" : "gray" }} />
                                     <p id='driving-duration' style={{ color: transportationMode === "driving" ? "#094F6d" : "gray" }} ></p>
@@ -293,7 +296,7 @@ const Directions = () => {
                             mapTypeControl={false}
                             fullscreenControl={false}
                         >
-                            
+
 
                         </Map>
                     </div>

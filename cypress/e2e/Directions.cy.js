@@ -161,6 +161,4 @@ describe('Directions Page', () => {
 
     });
 
-
-
 });
