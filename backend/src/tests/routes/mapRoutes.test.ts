@@ -23,7 +23,7 @@ describe('GET /maps/placePredictions', () => {
     let mock: MockAdapter;
 
     beforeEach(() => {
-        mock = new MockAdapter(axios);
+        mock = new MockAdapter(axios as any);
     });
 
     after(() => {
@@ -93,7 +93,7 @@ describe('GET /maps/placeDetails', () => {
     let mock: MockAdapter;
 
   beforeEach(() => {
-    mock = new MockAdapter(axios);
+    mock = new MockAdapter(axios as any);
   });
 
   after(() => {
@@ -167,7 +167,7 @@ describe("GET /maps/directions", () => {
     let mock: MockAdapter;
   
     beforeEach(() => {
-      mock = new MockAdapter(axios);
+      mock = new MockAdapter(axios as any);
     });
   
     after(() => {

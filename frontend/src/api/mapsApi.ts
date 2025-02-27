@@ -1,4 +1,5 @@
 import axios, {AxiosError} from "axios";
+import {extractErrorMessage} from "./authApi";
 
 
 // set up axios with the base URL
@@ -24,9 +25,6 @@ api.interceptors.response.use(
   }
 );
 
-interface ErrorResponse {
-  error?: string;
-}
 
 interface LocationType {
   name: string;
@@ -35,21 +33,7 @@ interface LocationType {
   lat: number;
   lng: number;
 }
-function isAxiosError<T = unknown>(error: unknown): error is AxiosError<T> {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "isAxiosError" in error &&
-    (error as AxiosError).isAxiosError === true
-  );
-}
 
-function extractErrorMessage(error: unknown, fallback: string): string {
-  if (isAxiosError<ErrorResponse>(error)) {
-    return error.response?.data?.error ?? fallback;
-  }
-  return fallback;
-}
 
 // get place predictions from the Google Maps API
 export async function getPlacePredictions(searchQuery:string,  lat:number, lng:number, description?:string,) {
