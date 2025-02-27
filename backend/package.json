@@ -19,6 +19,7 @@
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
     "@types/google.maps": "^3.58.1",
+    "axios-mock-adapter": "^2.1.0",
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

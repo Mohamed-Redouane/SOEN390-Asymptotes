@@ -1,7 +1,5 @@
 import { Router, Request, Response } from 'express';
 import axios from 'axios';
-import { L } from 'vitest/dist/chunks/reporters.QZ837uWx.js';
-import { resolve } from 'path';
 const router = Router();
 
 interface LocationType {
@@ -150,4 +148,10 @@ router.get('/directions', async (req, res) => {
     }
 }
 )
+
+
+
+router.get('/test', (_req: Request, res: Response) => {
+    res.send('maps works');
+});
 export default router;
