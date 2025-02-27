@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import RoomIcon from '@mui/icons-material/Room';
-import { fetchPlacePredictions, fetchPlaceDetails } from '../services/PlaceServices';
+import { fetchPlacePredictions, fetchPlaceDetails, getSuggestions, getPlaceDetails } from '../services/PlaceServices';
+import { fetchDirections} from '../services/directionsServices';
 import { APIProvider, Map, Marker, useMap } from '@vis.gl/react-google-maps';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import AirportShuttleIcon from '@mui/icons-material/AirportShuttle';
-import { fetchDirections } from '../services/directionsServices';
 import DirectionsViewMap from '../Components/DirectionsViewMap';
 
 interface LocationType {
@@ -34,7 +34,15 @@ const Directions = () => {
     const [directions, setDirections] = useState<google.maps.DirectionsResult>();
 
     const isProgrammaticChange = useRef(false); // Used to prevent infinite loop when setting the value of the input field programmatically
-
+    let amount = 1;
+    
+    // useEffect(() => {
+    //     const fetchTest = async () => {
+    //         const test = await getSuggestions(query);
+    //         console.log("Test ", amount++, ": ", test);
+    //     };
+    //     fetchTest();
+    // }, [query]);
 
     // console.log("Location: ", location);
     useEffect(() => {
@@ -42,22 +50,35 @@ const Directions = () => {
             setRoutes([]);
             setRoutesAvailable(false);
 
-            fetchPlacePredictions(query, null)
-                .then(predictions => {
-                    return Promise.all(
-                        predictions.map(prediction =>
-                            fetchPlaceDetails(prediction.place_id, prediction.description).then(details => ({
-                                name: details.name || prediction.description,
-                                address: details.address || prediction.description,
-                                place_id: prediction.place_id,
-                                lat: details.lat, // Placeholder until lat/lng is fetched
-                                lng: details.lng // Placeholder until lat/lng is fetched
-                            }))
-                        )
-                    );
-                })
-                .then(results => setResults(results))
-                .catch(error => console.error("Error fetching places:", error));
+            if(query === "") {
+                setResults([]);
+                return;
+            }
+            
+            const predictionsResults = async () => {
+                const predictions = await getSuggestions(query, 45.5049, -73.5779);
+                console.log("Predictions: ", predictions);
+                setResults(predictions as LocationType[]);
+            }
+            predictionsResults();
+            
+
+            // fetchPlacePredictions(query, null)
+            //     .then(predictions => {
+            //         return Promise.all(
+            //             predictions.map(prediction =>
+            //                 fetchPlaceDetails(prediction.place_id, prediction.description).then(details => ({
+            //                     name: details.name || prediction.description,
+            //                     address: details.address || prediction.description,
+            //                     place_id: prediction.place_id,
+            //                     lat: details.lat, // Placeholder until lat/lng is fetched
+            //                     lng: details.lng // Placeholder until lat/lng is fetched
+            //                 }))
+            //             )
+            //         );
+            //     })
+            //     .then(results => setResults(results))
+            //     .catch(error => console.error("Error fetching places:", error));
         }
         isProgrammaticChange.current = false;
     }, [query]);
@@ -75,21 +96,23 @@ const Directions = () => {
 
     const handleSelect = async (index: number) => {
         const place = results[index];
-        const placeDetails = await fetchPlaceDetails(place.place_id, place.name); // get the details of what was selected
-        console.log("Selected Place: ", placeDetails);
+        const placeDetails = await getPlaceDetails(place.place_id);
+            console.log("Selected Place: ", placeDetails);
+         // get the details of what was selected
+        
 
         isProgrammaticChange.current = true;
 
         //checks which input field is active
         if (active === "start") {
             const s = document.getElementById("start-input") as HTMLInputElement;
-            s.value = placeDetails.name;
-            setSourceQuery(placeDetails.name);
-            setSource(placeDetails);
+            s.value = (placeDetails as LocationType).name;
+            setSourceQuery((placeDetails as LocationType).name);
+            setSource(placeDetails as LocationType);
 
         } else if (active === "end") {
-            setDestinationQuery(placeDetails.name);
-            setDestination(placeDetails);
+            setDestinationQuery((placeDetails as LocationType).name);
+            setDestination(placeDetails as LocationType);
 
         }
 
@@ -111,18 +134,19 @@ const Directions = () => {
         // console.log("Destination id: ", destination?.place_id);
 
         //you get back a result of type google.maps.DirectionsResult
-        const directionRequest = await fetchDirections(source!, destination!, transportationMode).then((result) => {
-            // setRoutes(result.routes);
-            // console.log(" routes: ", result.routes);
-            return result;
-        }).catch((error) => {
-            console.error("Error fetching directions: ", error);
-        });
+        // const directionRequest = await fetchDirections(source!, destination!, transportationMode).then((result) => {
+        //     // setRoutes(result.routes);
+        //     // console.log(" routes: ", result.routes);
+        //     return result;
+        // }).catch((error) => {
+        //     console.error("Error fetching directions: ", error);
+        // });
+        const directionRequest = await fetchDirections(source!, destination!, transportationMode);
         // console.log("driection object ", directionRequest);
 
         if (directionRequest) {
-            setRoutes(directionRequest.routes); // set the routes for displaying
-            setDirections(directionRequest); //store the directions for the map
+            setRoutes(directionRequest); // set the routes for displaying
+            // setDirections(directionRequest); //store the directions for the map
         }
 
         console.log("Routes: ", directionRequest);
