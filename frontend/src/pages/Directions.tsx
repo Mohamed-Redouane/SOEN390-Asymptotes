@@ -172,7 +172,7 @@ const Directions = () => {
                             onKeyDown={handleKeyDown}
                         >
                         </input>
-                        <p className="text-l font-bold" onClick={() => setSourceQuery("")}>x</p>
+                        <button className="text-l font-bold text-gray-700 bg-white p-1" onClick={() => setSourceQuery("")}>x</button>
                     </div>
                     <div className="flex flex-row items-center pl-2 pr-2">
                         <RoomIcon style={{ color: "red" }} />
@@ -189,7 +189,7 @@ const Directions = () => {
                             onKeyDown={handleKeyDown}
                         >
                         </input>
-                        <p className="text-l font-bold text-gray-700" onClick={() => setDestinationQuery("")}>x</p>
+                        <button className="text-l font-bold text-gray-700 bg-white p-1" onClick={() => setDestinationQuery("")}>x</button>
                     </div>
                     {results &&
                         <div className="flex w-full " >
@@ -259,6 +259,8 @@ const Directions = () => {
                             <div id='routes-display' className='flex flex-col border-t-2 overflow-scroll '>
                                 {routes?.map((route: any, index: number) => (
                                     <div key={index}
+                                        tabIndex={0}
+                                        onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && console.log("Selected Route: ", routes[index])}
                                         id="route-item-container"
                                         className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between  align-middle shadow-sm"
                                         onClick={() => {
