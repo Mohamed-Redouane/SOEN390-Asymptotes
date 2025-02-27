@@ -8,6 +8,7 @@ describe('Directions Page', () => {
         }).as("getCurrentUser");
 
         cy.visit("http://localhost:5173/directions", { timeout: 20000 });
+        
     
         cy.intercept("GET", "api/maps/placesPredictions*", {
             statusCode: 200,
@@ -77,11 +78,6 @@ describe('Directions Page', () => {
                 
             ]
         }).as("getDirections");
-        cy.wait(2000); // Ensure app is fully loaded before waiting
-        cy.wait("@getCurrentUser", { timeout: 20000 }).then((interception) => {
-            console.log("Intercepted request:", interception);
-        });
-
 
         cy.window().then((win) => {
             cy.stub(win.navigator.geolocation, "watchPosition").callsFake((success) => {
