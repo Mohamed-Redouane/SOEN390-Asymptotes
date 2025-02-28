@@ -9,6 +9,8 @@ import cookieParser from "cookie-parser";
 
 const app: Application = express();
 
+app.disable('x-powered-by');
+
 app.use(
   cors({
     origin: "http://localhost:5173", 

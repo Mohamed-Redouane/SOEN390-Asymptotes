@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './LoginForm.css';
-import videoSrc from '/src/assets/concordiaa.mp4';
+import videoSrc from "../../assets/concordiaa.mp4";
 
 interface RegisterFormProps {
   onSubmit: (username: string, email: string, password: string) => Promise<void>;
