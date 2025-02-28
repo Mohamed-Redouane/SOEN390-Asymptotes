@@ -10,25 +10,3 @@ export function distanceCalculation(lat1: number, lon1: number, lat2: number, lo
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c; // Distance in kilometers
 }
-
-export function getDistanceFromDestination(userLocation: any, destination: { lat: number, lng: number }): string {
-  if (!userLocation || !destination) {
-    return "0";
-  }
-  else {
-    // console.log("userLocation: ", userLocation);
-    // console.log("destination: ", destination);
-    return distanceCalculation(userLocation.lat, userLocation.lng, destination.lat, destination.lng).toFixed(1);
-  }
-}
-
-export function getDistanceFromSource(destination: { lat: number, lng: number }, source: { lat: number, lng: number }): string {
-  if (!destination || !source) {
-    return "";
-  }
-  else {
-    // console.log("userLocation: ", destination);
-    // console.log("source: ", source);
-    return distanceCalculation(destination.lat, destination.lng, source.lat, source.lng).toFixed(1);
-  }
-}
