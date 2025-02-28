@@ -4,8 +4,6 @@ import { createBrowserRouter } from 'react-router-dom';
 import App from './App';
 import { requireAuthLoader } from './loaders/authLoader';
 
-import SGWCampus from './pages/SGWCampus';
-import LOYCampus from './pages/LOYCampus';
 import CampusMap from './pages/Campus';
 
 // Public Pages
@@ -15,6 +13,7 @@ import { RegisterPage } from './pages/Auth/RegisterPage';
 import { RequestPasswordResetPage } from './pages/Auth/RequestPasswordResetPage';
 import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage';
 import { VerifyEmailPage } from './pages/Auth/VerifyEmailPage';
+import IndoorDirections from './pages/IndoorDirections';
 
 
 export const router = createBrowserRouter([
@@ -31,24 +30,7 @@ export const router = createBrowserRouter([
           </div>
         ),
       },
-      // {
-      //   path: "/SGWcampus",
-      //   loader: requireAuthLoader,
-      //   element: (
-      //     <div style={{ height: '86vh', width: '100vw'}}>
-      //       <SGWCampus/>
-      //     </div>
-      //   ),
-      // },
-      // {
-      //   path: "/LOYcampus",
-      //   loader: requireAuthLoader,
-      //   element: (
-      //     <div style={{ height: '86vh', width: '100vw' }}>
-      //       <CampusMap  />
-      //     </div>
-      //   ),
-      // },
+     
       {
         path: "/shuttle",
         loader: requireAuthLoader,
@@ -63,7 +45,7 @@ export const router = createBrowserRouter([
         loader: requireAuthLoader,
         element: (
           <div style={{ height: '86vh', width: '100vw' }}>
-            404 Not Found
+            <IndoorDirections/>
           </div>
         ),
       },

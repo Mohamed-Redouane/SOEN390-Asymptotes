@@ -43,6 +43,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@mappedin/react-sdk": "^6.0.1-beta.2",
     "@mui/icons-material": "^6.4.3",
     "@mui/material": "^6.4.2",
     "@mui/styled-engine": "^6.4.2",
@@ -50,6 +51,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@turf/turf": "^7.2.0",
     "axios": "^1.7.9",
+    "framer-motion": "^12.4.7",
     "lucide-react": "^0.475.0",
     "react-router-dom": "^7.2.0",
     "typescript-toastify": "^1.0.4"
