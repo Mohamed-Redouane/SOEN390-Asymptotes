@@ -15,6 +15,7 @@ vi.mock("../../routes/authRoutes.js", () => {
 
 
 import router from "../../routes/index.js";
+import { json } from "body-parser";
 
 const createApp = () => {
   const app = express();
@@ -45,5 +46,12 @@ describe("Main Router", () => {
     const response = await request(app).get("/error-test");
     expect(response.status).toBe(500);
     expect(response.text).toBe("Test error from route");
+  });
+
+  test("should mount the mapRoutes under /maps", async () => {
+    
+    const response = await request(app).get("/maps/test");
+    expect(response.status).toBe(200);
+    expect(response.text).toBe("maps works");
   });
 });

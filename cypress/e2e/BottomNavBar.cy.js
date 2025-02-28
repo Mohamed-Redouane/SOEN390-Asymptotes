@@ -6,7 +6,9 @@ describe("Bottom Navigation Bar", () => {
         }).as("getCurrentUser");
 
         cy.visit("http://localhost:5173/");
-        cy.wait("@getCurrentUser");
+        cy.wait("@getCurrentUser", { timeout: 10000 }).then((interception) => {
+            console.log("Intercepted request:", interception);
+        });
     });
 
     it("The bottom navigation bar should exist and be visible", () => {

@@ -7,7 +7,6 @@
     "build": "tsc",
     "dev": "nodemon --watch src --exec \"npm run build && node dist/server.mjs\"",
     "start": "node dist/server.mjs",
-    
     "test": "vitest run --coverage"
   },
   "keywords": [],
@@ -15,9 +14,12 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.4.0",
     "@node-rs/argon2": "^2.0.2",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
+    "@types/google.maps": "^3.58.1",
+    "axios-mock-adapter": "^2.1.0",
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
