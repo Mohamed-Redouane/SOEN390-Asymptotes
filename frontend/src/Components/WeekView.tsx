@@ -50,11 +50,16 @@ const WeekView: React.FC<WeekViewProps> = ({ events, today, onEventClick }) => {
                   : "All Day";
 
                 return (
-                  <div
+                  //refactored to use remove reliability for keyboard listener.
+                    <div
                     key={event.id}
                     className="p-2 mb-2 bg-blue-100 text-blue-900 rounded-md cursor-pointer hover:bg-blue-200 transition duration-300"
                     onClick={() => onEventClick(event)}
-                  >
+                    onKeyDown={(e) => { if (e.key === 'Enter') onEventClick(event); }}
+                    onMouseOver={() => {}}
+                    onFocus={() => {}}
+                    tabIndex={0}
+                    >
                     <p className="font-medium">{event.summary}</p>
                     <p className="text-sm text-blue-700">
                       {startTime} - {endTime}

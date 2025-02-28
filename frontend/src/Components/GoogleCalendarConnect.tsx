@@ -83,16 +83,20 @@ const GoogleCalendarConnect: React.FC<GoogleCalendarConnectProps> = ({
       setIsLoading(false);
     }
   };
+  //refactored to use remove reliability for Sonar - Stop nesting ternaries in JavaScript
+  const renderButton = () => {
+    if (isLoading) {
+      return <CircularProgress />;
+    } else if (isSignedIn) {
+      return <Button variant="contained" color="primary" onClick={handleSignOut}>Sign Out</Button>;
+    } else {
+      return <Button variant="contained" color="primary" onClick={handleSignIn}>Sign In with Google</Button>;
+    }
+  };
 
   return (
     <div>
-      {isLoading ? (
-        <CircularProgress />
-      ) : isSignedIn ? (
-        <Button variant="contained" color="primary" onClick={handleSignOut}>Sign Out</Button>
-      ) : (
-        <Button variant="contained" color="primary" onClick={handleSignIn}>Sign In with Google</Button>
-      )}
+      {renderButton()}
     </div>
   );
 };

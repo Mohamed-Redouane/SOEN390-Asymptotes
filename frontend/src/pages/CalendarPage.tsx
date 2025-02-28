@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { gapi } from 'gapi-script';
-import { useMediaQuery, useTheme } from '@mui/material';
 import GoogleCalendarConnect from '../Components/GoogleCalendarConnect';
 import ErrorMessage from '../Components/ErrorMessage';
 import EventDetailsModal from '../Components/EventDetailsModal';
@@ -18,8 +17,6 @@ const CalendarPage: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleCalendarsLoaded = (loadedCalendars: any[]) => {
     setCalendars(loadedCalendars);
@@ -36,9 +33,9 @@ const CalendarPage: React.FC = () => {
     setSelectedEvent(event);
     setIsOpen(true);
   };
-
+  //refactored to use chain expression for better readability.
   const handleGetEvents = async (calendarId: string) => {
-    if (!gapi.client || !gapi.client.calendar) {
+    if (!gapi.client?.calendar) {
       setErrorMessage("Google Calendar API client not initialized.");
       setShowError(true);
       setTimeout(() => setShowError(false), 5000);
@@ -105,7 +102,7 @@ const CalendarPage: React.FC = () => {
   }, [selectedCalendarId, isAuthenticated]);
 
   const today = new Date().toLocaleDateString('en-CA'); 
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <div className="max-w-6xl mx-auto text-gray-900">
@@ -135,18 +132,22 @@ const CalendarPage: React.FC = () => {
             onSelectCalendar={(calendarId) => setSelectedCalendarId(calendarId)}
           />
         )}
-
-        {loading ? (
+        
+        {loading && (
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           </div>
-        ) : isAuthenticated && events.length > 0 ? (
+        )}
+
+        {!loading && isAuthenticated && events.length > 0 && (
           <WeekView
             events={events}
             today={today}
             onEventClick={handleEventClick}
           />
-        ) : (
+        )}
+
+        {!loading && isAuthenticated && events.length === 0 && (
           <p className="text-gray-500 text-center">No events found.</p>
         )}
 
