@@ -36,7 +36,9 @@ export default function BuildingSelector({ selectedBuilding, onBuildingSelect }:
 
           {isOpen && (
             <>
-              <div className="fixed inset-0 bg-black/20 z-10" onClick={() => setIsOpen(false)} />
+              <div className="fixed inset-0 bg-black/20 z-10" onClick={() => setIsOpen(false)} 
+              onKeyDown={() => setIsOpen(false)}
+              />
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 overflow-hidden" style={glassStyle}>
                 {Object.keys(BUILDINGS).map((building) => (
                   <button
