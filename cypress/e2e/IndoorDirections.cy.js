@@ -5,7 +5,7 @@ describe("Indoor directions", () => {
             body: { user: { id: "test-user", email: "test@example.com" } }, // Fake authenticated user
         }).as("getCurrentUser");
 
-        cy.visit("http://localhost:5173/directions");
+        cy.visit("http://localhost:5173/indoordirections");
     });
 
     // Just testing that the Mappedin API is present
