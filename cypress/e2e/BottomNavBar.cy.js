@@ -24,7 +24,7 @@ describe("Bottom Navigation Bar", () => {
         const navItems = [
             { label: "Shuttle", path: "/shuttle" },
             { label: "Map", path: "/" },
-            { label: "Directions", path: "/directions" },
+            { label: "Directions", path: "/indoordirections" },
             { label: "Schedule", path: "/schedule" },
         ];
 
