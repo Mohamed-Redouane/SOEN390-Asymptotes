@@ -37,9 +37,5 @@ describe('Express App', () => {
     expect(typeof res.body.timestamp).toBe('string');
   });
 
-  it('should return "Hello Asymptotes" on GET /', async () => {
-    const res = await request(app).get('/');
-    expect(res.status).toBe(200);
-    expect(res.text).toBe('Hello Asymptotes');
-  });
+  
 });

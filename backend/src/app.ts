@@ -19,7 +19,7 @@ app.disable('x-powered-by');
 
 +
 app.use(cors({
-  origin: ["https://action-production.up.railway.app", "http://localhost:5173"],
+  origin: ["soen390-asymptotes-production.up.railway.app", "http://localhost:5173"],
   credentials: true,
 }));
 
