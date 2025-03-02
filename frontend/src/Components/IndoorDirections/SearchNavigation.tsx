@@ -1,7 +1,7 @@
 import type React from "react"
 import { useState, useCallback, useEffect, useRef } from "react"
 import { useMap } from "@mappedin/react-sdk"
-import { Search, Navigation2, Loader2, X, CornerDownLeft, AlertCircle, History, ChevronDown } from "lucide-react"
+import { Search, Navigation2, Loader2, X, CornerDownLeft, History, ChevronDown } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface Location {
@@ -90,8 +90,9 @@ export default function SearchNavigation({ accessible = false }: SearchNavigatio
     // Add new marker
     const marker = mapView.Markers.add(space.center, 
       `<div class="location-marker ${isStart ? "start" : "end"}-marker">${space.name}</div>`
-    )
+    ) as any
     marker.type = isStart ? "start" : "end"
+    
     markersRef.current.push(marker)
 
     // Switch floors if needed
@@ -131,7 +132,10 @@ export default function SearchNavigation({ accessible = false }: SearchNavigatio
           id: s.id,
           floorId: s.floor.id,
           coordinates: s.center
+            ? { x: s.center.latitude, y: s.center.longitude } 
+            : undefined
         }))
+        
     },
     [mapData],
   )
@@ -192,7 +196,7 @@ export default function SearchNavigation({ accessible = false }: SearchNavigatio
   const calculateRouteInfo = (directions: any) => {
     const distance = Math.round(directions.distance)
     const duration = Math.round(directions.distance / 1.4)
-    const floors = [...new Set(directions.path.map((p: any) => p.floor.name))]
+const floors = [...new Set(directions.path.map((p: any) => p.floor.name))] as string[]
 
     return {
       distance,
@@ -228,8 +232,7 @@ export default function SearchNavigation({ accessible = false }: SearchNavigatio
 
       const directions = await mapView.getDirections(startLocation, endLocation, {
         accessible,
-        avoidElevators: accessible,
-        avoidEscalators: accessible,
+       
       })
 
       if (!directions) {
@@ -238,44 +241,17 @@ export default function SearchNavigation({ accessible = false }: SearchNavigatio
 
       mapView.Navigation.draw(directions, {
         pathOptions: {
-          nearRadius: 1,                           // Increased from 2 for better visibility
-          farRadius: 1,                            // Increased from 2 for better visibility
-          color: accessible ? "#22c55e" : "#3b82f6",
-          opacity: 0.9,                            // Increased from 0.8 for better visibility
-          outlineColor: "#ffffff",                 // Adding an outline for better contrast
-          outlineWidth: 1,                         // Width of the outline
-          dashArray: accessible ? "none" : "8,4",  // Adding dash pattern for non-accessible routes
-          glow: true,                              // Add glow effect to make paths stand out
-          glowColor: accessible ? "rgba(34,197,94,0.4)" : "rgba(59,130,246,0.4)",
-          glowWidth: 6,                            // Width of the glow effect
-          elevationOptions: {                      // Enhanced elevation visualization
-            color: accessible ? "#15803d" : "#2563eb",
-            opacity: 0.7,
-            width: 5
-          },
-          animated: true,                          // Animate the path drawing
-          animationDuration: 1500,                 // Duration in milliseconds
+          nearRadius: 1,                           
+          farRadius: 1,                            
+          color: accessible ? "rgba(34,197,94,0.9)" : "rgba(59,130,246,0.9)",
+          accentColor: accessible ? "#22c55e" : "#3b82f6", 
+          displayArrowsOnPath: true, 
+          animateArrowsOnPath: true, 
         },
-        startMarkerOptions: {
-          color: "#22c55e",
-          size: 30,                                // Increased from 25
-          pulseEffect: true,                       // Add a pulse animation
-          pulseColor: "rgba(34,197,94,0.3)",
-        },
-        endMarkerOptions: {
-          color: "#ef4444",
-          size: 30,                                // Increased from 25
-          pulseEffect: true,                       // Add a pulse animation
-          pulseColor: "rgba(239,68,68,0.3)",
-        },
-        waypointOptions: {                         // Styling for any waypoints
-          color: "#f59e0b",
-          size: 15,
-          opacity: 0.9
-        }
+        
       })
 
-      mapView.Camera.focusOn(directions.path)
+      mapView.Camera.focusOn(directions.coordinates)
 
       const info = calculateRouteInfo(directions)
       setRouteInfo(info)
@@ -517,6 +493,12 @@ export default function SearchNavigation({ accessible = false }: SearchNavigatio
                   </motion.div>
                 )}
 
+                {/* Error Message (Will show only if there is an error) */}
+                  {error && (
+                    <div className="text-red-500 text-sm mt-2">
+                      {error}
+                    </div>
+                  )}
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-2">
                   <button
@@ -558,70 +540,72 @@ export default function SearchNavigation({ accessible = false }: SearchNavigatio
         )}
       </AnimatePresence>
 
-      <style jsx global>{`
-  .location-marker {
-    padding: 6px 12px;
-    border-radius: 24px;
-    font-size: 14px;
-    font-weight: 500;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    backdrop-filter: blur(4px);
-    transition: all 0.3s ease;
-  }
-  
-  .start-marker {
-    background: rgba(76, 175, 80, 0.9);
-    color: white;
-    border: 2px solid #4CAF50;
-  }
-  
-  .end-marker {
-    background: rgba(244, 67, 54, 0.9);
-    color: white;
-    border: 2px solid #F44336;
-  }
-  
-  /* CSS for path visualization */
-  .mappedIn-path {
-    transition: all 0.3s ease;
-  }
-  
-  .mappedIn-path:hover {
-    stroke-width: 6px;
-    filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.3));
-  }
-  
-  /* Styles for path animations */
-  @keyframes dash {
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-  
-  .mappedIn-path-animated {
-    animation: dash 1.5s linear forwards;
-  }
-  
-  /* Pulse effect for markers */
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.1);
-      opacity: 0.7;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-  
-  .mappedIn-marker {
-    animation: pulse 2s infinite;
-  }
-`}</style>
+      <style>
+      {`
+        .location-marker {
+          padding: 6px 12px;
+          border-radius: 24px;
+          font-size: 14px;
+          font-weight: 500;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+          backdrop-filter: blur(4px);
+          transition: all 0.3s ease;
+        }
+        
+        .start-marker {
+          background: rgba(76, 175, 80, 0.9);
+          color: white;
+          border: 2px solid #4CAF50;
+        }
+        
+        .end-marker {
+          background: rgba(244, 67, 54, 0.9);
+          color: white;
+          border: 2px solid #F44336;
+        }
+        
+        /* CSS for path visualization */
+        .mappedIn-path {
+          transition: all 0.3s ease;
+        }
+        
+        .mappedIn-path:hover {
+          stroke-width: 6px;
+          filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.3));
+        }
+        
+        /* Styles for path animations */
+        @keyframes dash {
+          to {
+            stroke-dashoffset: 0;
+          }
+        }
+        
+        .mappedIn-path-animated {
+          animation: dash 1.5s linear forwards;
+        }
+        
+        /* Pulse effect for markers */
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.1);
+            opacity: 0.7;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        
+        .mappedIn-marker {
+          animation: pulse 2s infinite;
+        }
+      `}
+      </style>
     </>
   )
 

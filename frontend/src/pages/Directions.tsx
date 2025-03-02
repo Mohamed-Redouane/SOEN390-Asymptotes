@@ -7,7 +7,6 @@ import { APIProvider, Map } from '@vis.gl/react-google-maps';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
-import AirportShuttleIcon from '@mui/icons-material/AirportShuttle';
 
 
 interface LocationType {
@@ -31,7 +30,7 @@ const Directions = () => {
     const [destination, setDestination] = useState<LocationType>();
     const [routesAvailable, setRoutesAvailable] = useState<boolean>(false);
     const [routes, setRoutes] = useState<any>();
-    const [directions, setDirections] = useState<google.maps.DirectionsResult>();
+    // const [directions, setDirections] = useState<google.maps.DirectionsResult>();
 
     const [selectedResultIndex, setSelectedResultIndex] = useState<number>(-1); // for keyboard navigation of results
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

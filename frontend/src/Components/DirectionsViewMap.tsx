@@ -1,6 +1,5 @@
+import { useMap } from "@vis.gl/react-google-maps";
 import { useEffect } from "react";
-import { fetchDirectionRenders } from "../services/directionsServices";
-import {APIProvider, useMap} from "@vis.gl/react-google-maps";
 
 interface DirectionViewMapProps {
     directionsInfo: google.maps.DirectionsResult;
@@ -8,11 +7,15 @@ interface DirectionViewMapProps {
 
 function DirectionsViewMap({ directionsInfo }: DirectionViewMapProps) {
     const map = useMap();
-    
-    return (
-       null
-    );
+
+    useEffect(() => {
+        if (map) {
+            console.log("Map is available:", map);
+        }
+        console.log("Directions Info:", directionsInfo);
+    }, [map, directionsInfo]);
+
+    return null;
 }
 
 export default DirectionsViewMap;
-

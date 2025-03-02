@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { gapi } from 'gapi-script';
-import GoogleCalendarConnect from '../Components/GoogleCalendarConnect';
-import ErrorMessage from '../Components/ErrorMessage';
-import EventDetailsModal from '../Components/EventDetailsModal';
-import CalendarSelector from '../Components/CalendarSelector';
-import WeekView from '../Components/WeekView';
+import GoogleCalendarConnect from '../components/GoogleCalendarConnect';
+import ErrorMessage from '../components/ErrorMessage';
+import EventDetailsModal from '../components/EventDetailsModal';
+import CalendarSelector from '../components/CalendarSelector';
+import WeekView from '../components/WeekView';
 
 const CalendarPage: React.FC = () => {
   const [calendars, setCalendars] = useState<any[]>([]);
