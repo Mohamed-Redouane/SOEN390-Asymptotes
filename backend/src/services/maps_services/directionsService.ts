@@ -10,13 +10,18 @@ export const fetchDirections = async (source: string, destination: string, trave
                 destination: `place_id:${destination}`,
                 mode: travelMode,
                 key: process.env.GOOGLE_MAPS_API_KEY,
-                provideRouteAlternatives: true,
+                alternatives: true,
             },
         });
+
+       
 
         if (response.data.status !== 'OK') {
             throw new Error('Error getting directions');
         }
+
+        console.log("response from fetchDirections:" ,response.data.routes.length);
+       
 
         return response.data.routes;
     } catch (error) {
