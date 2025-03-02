@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState } from "react";
 import Modal from "./Modal";
 import { LocationContext } from "./LocationContext";
 import { distanceCalculation } from "../utils/distanceCalculation";

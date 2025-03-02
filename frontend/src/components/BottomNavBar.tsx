@@ -5,7 +5,6 @@ import { Bus, Map, Navigation, Calendar, MapPin, Building } from 'lucide-react';
 const BottomNavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [openMapMenu, setOpenMapMenu] = useState(false);
   const [showDirectionOptions, setShowDirectionOptions] = useState(false);
   const [directionType, setDirectionType] = useState<'indoor' | 'outdoor'>('indoor');
 
@@ -15,7 +14,6 @@ const BottomNavBar = () => {
       const target = event.target as HTMLElement;
       if (!target.closest('.nav-button, .direction-options')) {
         setShowDirectionOptions(false);
-        setOpenMapMenu(false);
       }
     };
 
@@ -26,7 +24,6 @@ const BottomNavBar = () => {
   // Close menus when route changes
   useEffect(() => {
     setShowDirectionOptions(false);
-    setOpenMapMenu(false);
   }, [location.pathname]);
 
   const mapLabel = useMemo(() => {
