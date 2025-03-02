@@ -44,9 +44,9 @@ export async function getPlacesDetails(placeId: string) {
   }
 }
 
-export async function getDirections(source:string, destination: string, travelMode: string) {
+export async function getDirections(source:string, destination: string) {
   try {
-    const response = await api.get("/api/maps/directions", { params: { source, destination, travelMode } });
+    const response = await api.get("/api/maps/directions", { params: { source, destination} });
     console.log("response from getDirections:" ,response);
     return response.data;
   } catch (error: unknown) {

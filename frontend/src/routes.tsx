@@ -14,7 +14,6 @@ import { RequestPasswordResetPage } from './pages/Auth/RequestPasswordResetPage'
 import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage';
 import { VerifyEmailPage } from './pages/Auth/VerifyEmailPage';
 import IndoorDirections from './pages/IndoorDirections';
-import DirectionsPage from './pages/DirectionsPage';
 import Directions from './pages/Directions';
 
 

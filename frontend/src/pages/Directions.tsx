@@ -7,7 +7,7 @@ import { APIProvider, Map } from '@vis.gl/react-google-maps';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
-import AirportShuttleIcon from '@mui/icons-material/AirportShuttle';
+import { DirectionsBike } from '@mui/icons-material';
 
 
 interface LocationType {
@@ -25,12 +25,16 @@ const Directions = () => {
     const [destinationQuery, setDestinationQuery] = useState<string>("");
     const [query, setQuery] = useState<string>("");
     const [results, setResults] = useState<LocationType[]>([]);
-    const [transportationMode, setTransportationMode] = useState<"driving" | "transit" | "walking">("driving");
+    const [transportationMode, setTransportationMode] = useState<"driving" | "transit" | "walking" | "bicycling">("driving");
 
     const [source, setSource] = useState<LocationType>();
     const [destination, setDestination] = useState<LocationType>();
     const [routesAvailable, setRoutesAvailable] = useState<boolean>(false);
     const [routes, setRoutes] = useState<any>();
+    const [drivingRoutes, setDrivingRoutes] = useState<any>();
+    const [transitRoutes, setTransitRoutes] = useState<any>();
+    const [walkingRoutes, setWalkingRoutes] = useState<any>();
+    const [bicyclingRoutes, setBicyclingRoutes] = useState<any>();
     const [directions, setDirections] = useState<google.maps.DirectionsResult>();
 
     const [selectedResultIndex, setSelectedResultIndex] = useState<number>(-1); // for keyboard navigation of results
@@ -104,8 +108,21 @@ const Directions = () => {
         setResults([]);
     };
 
+    useEffect(() => {
+        if (transportationMode === "driving") {
+            setRoutes(drivingRoutes);
+        } else if (transportationMode === "transit") {
+            setRoutes(transitRoutes);
+        } else if (transportationMode === "walking") {
+            setRoutes(walkingRoutes);
+        } else if (transportationMode === "bicycling") {
+            setRoutes(bicyclingRoutes);
+        }
+    }, [transportationMode]);
+
     const getDirections = async () => {
         console.log("Getting Directions...");
+        setTransportationMode("driving");
 
         if (sourceQuery === "" || destinationQuery === "") {
             console.error("Source or Destination is empty");
@@ -114,25 +131,19 @@ const Directions = () => {
             return;
         }
 
-        // console.log("Source id: ", source?.place_id);
-        // console.log("Destination id: ", destination?.place_id);
+        const directionRequest = await fetchDirections(source!, destination!).then((response: any) => {
+            console.log("Response from fetchDirections: ", response);
+            setRoutes(response.driving);
 
-        //you get back a result of type google.maps.DirectionsResult
-        // const directionRequest = await fetchDirections(source!, destination!, transportationMode).then((result) => {
-        //     // setRoutes(result.routes);
-        //     // console.log(" routes: ", result.routes);
-        //     return result;
-        // }).catch((error) => {
-        //     console.error("Error fetching directions: ", error);
-        // });
-        const directionRequest = await fetchDirections(source!, destination!, transportationMode);
-        // console.log("driection object ", directionRequest);
-
-        if (directionRequest) {
-            setRoutes(directionRequest); // set the routes for displaying
-            // setDirections(directionRequest); //store the directions for the map
+            setDrivingRoutes(response.driving);
+            setTransitRoutes(response.transit);
+            setWalkingRoutes(response.walking);
+            setBicyclingRoutes(response.bicycling);
+            return response;
         }
-
+        ).catch((error) => {
+            console.error("Error getting directions: ", error);
+        });
         console.log("Routes: ", directionRequest);
         setRoutesAvailable(true);
     };
@@ -172,7 +183,13 @@ const Directions = () => {
                             onKeyDown={handleKeyDown}
                         >
                         </input>
-                        <button className="text-l font-bold text-gray-700 bg-white p-1" onClick={() => setSourceQuery("")}>x</button>
+                        {sourceQuery &&
+                            <button
+                                className="text-l font-bold text-gray-700 bg-white p-1"
+                                onClick={() => setSourceQuery("")}>
+                                x
+                            </button>
+                        }
                     </div>
                     <div className="flex flex-row items-center pl-2 pr-2">
                         <RoomIcon style={{ color: "red" }} />
@@ -189,7 +206,12 @@ const Directions = () => {
                             onKeyDown={handleKeyDown}
                         >
                         </input>
-                        <button className="text-l font-bold text-gray-700 bg-white p-1" onClick={() => setDestinationQuery("")}>x</button>
+                        {destinationQuery &&
+                            <button
+                                className="text-l font-bold text-gray-700 bg-white p-1"
+                                onClick={() => setDestinationQuery("")}>
+                                x
+                            </button>}
                     </div>
                     {results &&
                         <div className="flex w-full " >
@@ -235,28 +257,49 @@ const Directions = () => {
                     }
 
                     {routesAvailable &&
-                        <div>
-                            {/* TODO: implement the different travel modes */}
-                            <div id="transport-mode-container" className="flex  flex-row justify-between w-full pl-4 pr-4 m-1" tabIndex={0}
+                        <div className="ml-2 mr-2">
+                            <div id="transport-mode-container" className="flex flex-row justify-center w-full" tabIndex={0}
                                 onKeyDown={handleTransportKeyDown}>
-                                <div id="car-option" className="flex flex-row items-center">
-                                    <DirectionsCarIcon onClick={() => setTransportationMode("driving")} style={{ color: transportationMode === "driving" ? "#094F6d" : "gray" }} />
-                                    <p id='driving-duration' style={{ color: transportationMode === "driving" ? "#094F6d" : "gray" }} ></p>
+                                <div id="car-option" className={`flex flex-row items-center justify-center m-2 p-1 truncate rounded-full ${transportationMode === "driving" ? "flex-[2] sm:flex-1 bg-blue-500"  : "flex-1"}`}>
+                                    <DirectionsCarIcon
+                                        onClick={() => setTransportationMode("driving")}
+                                        style={{ color: transportationMode === "driving" ? "white" : "gray" }}
+                                    />
+                                    <p id='driving-duration'  className={`overflow-hidden text-ellipsis`} style={{ color: transportationMode === "driving" ? "white" : "gray" }} >
+                                        {drivingRoutes[0].legs[0].duration.text}
+                                    </p>
                                 </div>
-                                <div id="transit-option" className="flex flex-row items-center">
-                                    <DirectionsBusIcon onClick={() => setTransportationMode("transit")} style={{ color: transportationMode === "transit" ? "#094F6d" : "gray" }} />
-                                    <p id='transit-duration' style={{ color: transportationMode === "transit" ? "#094F6d" : "gray" }}></p>
+                                <div id="transit-option" className={`flex flex-row items-center justify-center  p-2 m-2 truncate rounded-full ${transportationMode === "transit" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}>
+                                    <DirectionsBusIcon
+                                        onClick={() => setTransportationMode("transit")}
+                                        style={{ color: transportationMode === "transit" ? "white" : "gray" }}
+                                    />
+                                    <p id='transit-duration' className={`overflow-hidden text-ellipsis`} style={{ color: transportationMode === "transit" ? "white" : "gray" }}>
+                                        {transitRoutes[0].legs[0].duration.text}
+                                    </p>
                                 </div>
-                                <div id="walking-option" className="flex flex-row items-center">
-                                    <DirectionsWalkIcon onClick={() => setTransportationMode("walking")} style={{ color: transportationMode === "walking" ? "#094F6d" : "gray" }} />
-                                    <p id='walking-duration' style={{ color: transportationMode === "walking" ? "#094F6d" : "gray" }} ></p>
+                                <div id="walking-option" className={`flex flex-row items-center justify-center p-2 m-2 truncate rounded-full ${transportationMode === "walking" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}>
+                                    <DirectionsWalkIcon
+                                        onClick={() => setTransportationMode("walking")}
+                                        style={{ color: transportationMode === "walking" ? "white" : "gray" }}
+                                    />
+                                    <p id='walking-duration' className={`overflow-hidden text-ellipsis`}  style={{ color: transportationMode === "walking" ? "white" : "gray" }} >
+                                        {walkingRoutes[0].legs[0].duration.text}
+                                    </p>
                                 </div>
-                                {/* <div id="shuttle-option" className="flex flex-row items-center">
-                        <AirportShuttleIcon onClick={() => setTransportMode("shuttle")} style={{ color: transportMode === "shuttle" ? "#094F6d" : "gray" }} />
-                        <p style={{ color: transportMode === "shuttle" ? "#094F6d" : "gray" }} >0 min</p>
-                    </div> */}
+                                <div id="bicycling-option" 
+                                className={`flex flex-row items-center justify-center p-2 m-2 truncate rounded-full ${transportationMode === "bicycling" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}>
+                                    <DirectionsBike
+                                        onClick={() => setTransportationMode("bicycling")}
+                                        style={{ color: transportationMode === "bicycling" ? "white" : "gray" }}
+                                    />
+                                    <p id='walking-duration'  className={`overflow-hidden text-ellipsis `} style={{ color: transportationMode === "bicycling" ? "white" : "gray" }} >
+                                        {bicyclingRoutes[0].legs[0].duration.text}
+                                    </p>
+                                </div>
+
                             </div>
-                            <div id='routes-display' className='flex flex-col border-t-2 overflow-scroll '>
+                            <div id='routes-display' className='flex flex-col border-t-2 mb-3'>
                                 {routes?.map((route: any, index: number) => (
                                     <div key={index}
                                         tabIndex={0}
@@ -272,14 +315,13 @@ const Directions = () => {
                                             <span className="font-bold text-lg">{route.legs[0].duration.text}</span>
                                             <div className="flex">
                                                 <span className="text-xs">{route.legs[0].distance.text}</span>
-                                                {index === 0 && <span className="text-xs ml-1">Fastest Route</span>}
+                                                {index === 0 && <span className="text-xs ml-1">— Fastest Route</span>}
+                                                { transportationMode === "transit" && <span className="text-xs ml-1">— {route.legs[0].steps.length} stops</span>}
                                             </div>
                                         </div>
                                         <div className="selecting-route-button">
                                             <button className='bg-green-900 text-white font-bold'>Go</button>
                                         </div>
-
-                                        {/* <DirectionRenderer directions={route} /> */}
                                     </div>
                                 ))}
                             </div>

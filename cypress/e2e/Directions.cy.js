@@ -53,31 +53,116 @@ describe('Directions Page', () => {
             },
         }).as("placeDetails1");
         
-        cy.intercept("GET", "/api/maps/directions?source=45y54324rfvd&destination=4556rdfghytrx&travelMode=driving", {
-            statusCode: 200,
-            body: [
-            
-                    {
-                        
-                        duration: 10,
-                        distance: 5,
-                        steps: [
-                            { instruction: "Step 1", distance: 1 },
-                            { instruction: "Step 2", distance: 2 },
-                        ],
-                    },
-                    {
-                        
-                        duration: 15,
-                        distance: 10,
-                        steps: [
-                            { instruction: "Step 1", distance: 1 },
-                            { instruction: "Step 2", distance: 2 },
-                        ],
-                    },
+        cy.intercept("GET", "/api/maps/directions*", {
+                 statusCode: 200,
+                    body: [
+                  {
+                    "summary": "Route 1",
+                    "legs": [
+                      {
+                        "start_address": "Source Location",
+                        "end_address": "Destination Location",
+                        "distance": { "text": "10 km", "value": 10000 },
+                        "duration": { "text": "15 mins", "value": 900 }
+                      }
+                    ],
+                    "overview_polyline": {
+                      "points": "abc123fakePolyline"
+                    }
+                  },
+                  {
+                    "summary": "Route 2",
+                    "legs": [
+                      {
+                        "start_address": "Source Location",
+                        "end_address": "Destination Location",
+                        "distance": { "text": "12 km", "value": 12000 },
+                        "duration": { "text": "18 mins", "value": 1080 }
+                      }
+                    ],
+                    "overview_polyline": {
+                      "points": "xyz456fakePolyline"
+                    }
+                  }
                 
-            ]
-        }).as("getDirections");
+                ]
+        }).as("getDirectionsDriving");
+
+        cy.intercept(
+            "GET",
+            /https:\/\/maps\.googleapis\.com\/maps\/api\/directions\/json\?.*mode=walking.*/,
+            (req) => {
+              req.reply({
+                status: "OK",
+                routes: [
+                  {
+                    summary: "Shortest Walk",
+                    legs: [
+                      {
+                        distance: { text: "3 km", value: 3000 },
+                        duration: { text: "30 mins", value: 1800 },
+                        start_address: "Start Location",
+                        end_address: "End Location",
+                        steps: [
+                          { instructions: "Walk straight for 1 km", distance: { text: "1 km", value: 1000 } },
+                          { instructions: "Turn left at Park Ave", distance: { text: "500 m", value: 500 } },
+                        ],
+                      },
+                    ],
+                  },
+                  {
+                    summary: "Scenic Walk",
+                    legs: [
+                      {
+                        distance: { text: "4 km", value: 4000 },
+                        duration: { text: "40 mins", value: 2400 },
+                        start_address: "Start Location",
+                        end_address: "End Location",
+                        steps: [
+                          { instructions: "Walk along river", distance: { text: "2 km", value: 2000 } },
+                          { instructions: "Turn right at Garden St", distance: { text: "1 km", value: 1000 } },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              });
+            }
+        //      "/https:\/\/maps\.googleapis\.com\/maps\/api\/directions\/travelMode=walking", {
+        //     statusCode: 200,
+        //     body: [
+        //   {
+        //     "summary": "Route 1",
+        //     "legs": [
+        //       {
+        //         "start_address": "Source Location",
+        //         "end_address": "Destination Location",
+        //         "distance": { "text": "10 km", "value": 10000 },
+        //         "duration": { "text": "15 mins", "value": 900 }
+        //       }
+        //     ],
+        //     "overview_polyline": {
+        //       "points": "abc123fakePolyline"
+        //     }
+        //   },
+        //   {
+        //     "summary": "Route 2",
+        //     "legs": [
+        //       {
+        //         "start_address": "Source Location",
+        //         "end_address": "Destination Location",
+        //         "distance": { "text": "12 km", "value": 12000 },
+        //         "duration": { "text": "18 mins", "value": 1080 }
+        //       }
+        //     ],
+        //     "overview_polyline": {
+        //       "points": "xyz456fakePolyline"
+        //     }
+        //   }
+        
+        // ]
+        ).as("getDirectionsWalking");
+
 
         cy.window().then((win) => {
             cy.stub(win.navigator.geolocation, "watchPosition").callsFake((success) => {
@@ -156,9 +241,39 @@ describe('Directions Page', () => {
         cy.wait("@placeDetails1", { timeout: 20000 }).then((interception) => {
             console.log("line 73: Intercepted place details request:", interception);
         });
-
-      
-
     });
 
+    it("should support changing the travel mode to walking", () => {
+        //type source and destination location and submit request
+        cy.get('#start-input').type('1');
+        cy.wait("@autocompletePredictions", { timeout: 20000 }).then((interception) => {
+            console.log("line 73: Intercepted predictions request:", interception);
+        });
+        cy.get('#suggestion-item-container').click();
+        cy.wait("@placeDetails1", { timeout: 20000 }).then((interception) => {
+            console.log("line 73: Intercepted place details request:", interception);
+        });
+
+        cy.get('#end-input').type('5678');
+        cy.wait(2000);
+        cy.wait("@autocompletePredictions", { timeout: 20000 }).then((interception) => {
+            console.log("line 73: Intercepted predictions request:", interception);
+        });
+        cy.get('#suggestions-container').children().last().click();
+        cy.wait("@placeDetails1", { timeout: 20000 }).then((interception) => {
+            console.log("line 73: Intercepted place details request:", interception);
+        });
+
+        cy.get("#get-directions-button").click();
+        cy.wait(2000);
+        cy.wait("@getDirectionsDriving", { timeout: 20000 }).then((interception) => {
+            console.log("line 73: Intercepted directions request:", interception);
+        });
+
+        cy.get('#transport-mode-container').should("exist");
+        cy.get('#walking-option').click();
+        cy.wait("@getDirectionsWalking", { timeout: 20000 }).then((interception) => {
+            console.log("line 73: Intercepted directions request:", interception);
+        });
+    });
 });
