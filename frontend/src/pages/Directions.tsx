@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import RoomIcon from '@mui/icons-material/Room';
 import { getSuggestions, getPlaceDetails } from '../services/PlaceServices';
@@ -7,7 +7,7 @@ import { APIProvider, Map } from '@vis.gl/react-google-maps';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
-
+import { LocationContext } from '../components/LocationContext';
 
 interface LocationType {
     name: string;
@@ -31,6 +31,7 @@ const Directions = () => {
     const [routesAvailable, setRoutesAvailable] = useState<boolean>(false);
     const [routes, setRoutes] = useState<any>();
     // const [directions, setDirections] = useState<google.maps.DirectionsResult>();
+    const {location: userLocation} = useContext(LocationContext);
 
     const [selectedResultIndex, setSelectedResultIndex] = useState<number>(-1); // for keyboard navigation of results
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -46,7 +47,14 @@ const Directions = () => {
     const isProgrammaticChange = useRef(false); // Used to prevent infinite loop when setting the value of the input field programmatically
 
     useEffect(() => {
-        if (!isProgrammaticChange.current) {
+        if (userLocation && userLocation.address && !sourceQuery) {
+            setSourceQuery(userLocation.address);
+            setSource(userLocation); // Set the source to userLocation
+        }
+    }, [userLocation]);
+
+    useEffect(() => {
+        if (!isProgrammaticChange.current && (active === "end" || active === "start") && userLocation || !isProgrammaticChange.current && !userLocation) {
             setRoutes([]);
             setRoutesAvailable(false);
 
@@ -162,16 +170,18 @@ const Directions = () => {
                             type="text"
                             placeholder="Enter your starting location"
                             className=" p-2 m-2 border-2 border-gray-200 rounded-lg w-full"
-                            value={/* useLocation ? 'Your Location' : */sourceQuery}
+                            value={sourceQuery}
                             onChange={(e) => {
-                                // setUseLocation(false); //if user type, we stop using thier location and let them type in the input
-                                setActive("start");
-                                setSourceQuery(e.target.value);
+                                    setActive("start");
+                                    setSourceQuery(e.target.value);
+                                 //if user type, we stop using thier location and let them type in the input
                             }}
                             onKeyDown={handleKeyDown}
                         >
                         </input>
-                        <button className="text-l font-bold text-gray-700 bg-white p-1" onClick={() => setSourceQuery("")}>x</button>
+                        <button className="text-l font-bold text-gray-700 bg-white p-1" onClick={() => {
+                            setSourceQuery("");
+                            setSource(undefined);}}>x</button>
                     </div>
                     <div className="flex flex-row items-center pl-2 pr-2">
                         <RoomIcon style={{ color: "red" }} />
@@ -190,7 +200,7 @@ const Directions = () => {
                         </input>
                         <button className="text-l font-bold text-gray-700 bg-white p-1" onClick={() => setDestinationQuery("")}>x</button>
                     </div>
-                    {results &&
+                    {results && (
                         <div className="flex w-full " >
                             <ul className="w-full" id="suggestions-container">
                                 {results.map((result, index) => (
@@ -215,7 +225,7 @@ const Directions = () => {
                                 ))}
                             </ul>
                         </div>
-                    }
+                    )}
 
                     {results.length == 0 &&
                         <div id='directions-request-container' className="flex flex-col items-center w-full">

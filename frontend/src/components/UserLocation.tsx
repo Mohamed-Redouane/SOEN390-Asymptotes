@@ -2,7 +2,7 @@ import { useEffect, useContext, useState } from "react";
 import Modal from "./Modal";
 import { LocationContext } from "./LocationContext";
 import { distanceCalculation } from "../utils/distanceCalculation";
-
+import { getAddressFromCoords } from "../api/mapsApi";
 
 function UserLocation() {
   const { setLocation, error, setError } = useContext(LocationContext);
@@ -38,8 +38,6 @@ function UserLocation() {
     }
   }, [isOnCampus]);
 
-
-
   const isFarFromCampusBuildings = (userLat: number, userLng: number): boolean => {
     if (!geoJsonData) return false; 
 
@@ -69,7 +67,7 @@ function UserLocation() {
       return;
     }
 
-    const success = (position: GeolocationPosition) => {
+    const success = async (position: GeolocationPosition) => {
       const { latitude, longitude, accuracy } = position.coords;
       console.log(`New Location: Lat: ${latitude}, Lng: ${longitude}, Accuracy: ${accuracy}m`);
 
@@ -83,13 +81,35 @@ function UserLocation() {
         return;
       }
       
-      if (isFarFromCampusBuildings(latitude, longitude)) {
+      const isFar = isFarFromCampusBuildings(latitude, longitude);
+
+      if (isFar) {
         console.warn("User is far from campus buildings.");
         setShowModal(true);
+        setIsOnCampus(false);
         return;
       }
 
-      setLocation({ lat: latitude, lng: longitude });
+      // Check if the user is inside a building
+      if (!isFar) {
+        console.log("User is inside a building.");
+        setIsOnCampus(true);
+
+        // Fetch the address using the Geocoding API
+        try {
+          const {formatted_address, place_id} = await getAddressFromCoords(latitude, longitude);
+          setLocation({name: "", lat: latitude, lng: longitude, address :formatted_address, place_id});
+        } catch (error) {
+          console.error("Failed to fetch address:", error);
+          setLocation({name: "", lat: latitude, lng: longitude, address: "", place_id: "" });
+        }
+      } else {
+        console.log("User is not inside a building.");
+        setIsOnCampus(false);
+        setLocation({name: "", lat: latitude, lng: longitude, address: "", place_id: "" });
+
+      }
+
       setError(null);
       setShowModal(false);
     };

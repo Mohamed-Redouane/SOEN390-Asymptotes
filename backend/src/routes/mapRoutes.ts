@@ -3,6 +3,7 @@ import axios from 'axios';
 const router = Router();
 import { fetchDirections } from '../services/maps_services/directionsService.js';
 import { fetchPlaceDetails, fetchPlacePredictions } from '../services/maps_services/placesServices.js';
+import { fetchAddressFromCoordinates } from '../services/maps_services/locationServices.js';
 
 interface LocationType {
     name: string;
@@ -11,6 +12,28 @@ interface LocationType {
     lat: number;
     lng: number;
 }
+
+router.get('/addressFromCoordinates', async (req: Request, res: Response) => {
+    try {
+        const lat = parseFloat(req.query.lat as string);
+        const lng = parseFloat(req.query.lng as string);
+
+        if (isNaN(lat) || isNaN(lng)) {
+            res.status(400).send('Valid latitude and longitude are required');
+            return;
+        }
+
+        const addressData = await fetchAddressFromCoordinates(lat, lng);
+        res.json(addressData);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).send(error.message);
+        } else {
+            res.status(500).send('Error fetching address from coordinates');
+        }
+    }
+});
+
 router.get('/placesPredictions', async (req, res) => {
     try{
         const searchQuery = req.query.searchQuery as string;
