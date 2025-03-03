@@ -45,10 +45,26 @@ function MapComponent({ geoJsonData, setIsUserInsideBuilding }: MapComponentProp
       const name = event.feature.getProperty("name");
       const Address = event.feature.getProperty("address")
       const content = `
-        <div style="max-width:250px;">
-          <h3 style="margin:0 0 5px 0;">${name}</h3>
-          <p style="margin:0;">${Address}</p>
-        </div>
+        <div style="
+      max-width: 250px;
+      background-color: #FFFFFF;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      color: #333;
+      font-family: 'Roboto', sans-serif;
+    ">
+      <h3 style="
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        color: #5A2DA2; /* Purple accent color */
+      ">
+        ${name}
+      </h3>
+      <p style="margin: 0; font-size: 14px;">
+        ${Address}
+      </p>
+    </div>
       `;
       infoWindow.setContent(content);
       infoWindow.setPosition(event.latLng);
