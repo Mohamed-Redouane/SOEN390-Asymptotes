@@ -1,9 +1,8 @@
 describe("Google Calendar Component", () => {
-  let authInstance = null;
+  let authInstance;
 
   beforeEach(() => {
-    authInstance = null;
-    cy.clock(new Date("2025-03-03T00:00:00Z").getTime());
+    authInstance = null; 
 
     cy.intercept("GET", "/api/auth/me", {
       statusCode: 200,
@@ -12,19 +11,19 @@ describe("Google Calendar Component", () => {
 
     cy.visit("http://localhost:5173/schedule", {
       onBeforeLoad(win) {
-        cy.stub(win.navigator.geolocation, "watchPosition").callsFake((success) => {
-          // Simulate being on campus
-          success({
-            coords: {
-              latitude: 45.4597913,
-              longitude: -73.6390959,
-              accuracy: 10,
-            },
+          cy.stub(win.navigator.geolocation, "watchPosition").callsFake((success) => {
+            // Simulate being on campus
+            success({
+              coords: {
+                latitude: 45.4969316, 
+                longitude: -73.5799272,
+                accuracy: 10, 
+              },
+            });
           });
-        });
-      },
-    });
+        },
 
+    });
     cy.wait("@getCurrentUser");
 
     // Stub Google API globally
@@ -88,14 +87,15 @@ describe("Google Calendar Component", () => {
         },
       };
     });
+    cy.clock(new Date("2025-03-03T00:00:00Z").getTime());
   });
 
   afterEach(() => {
     // Restore all stubs after each test to avoid "already stubbed" errors
     cy.window().then((win) => {
       const auth = win.gapi.auth2.getAuthInstance();
-      if (auth && auth.signIn && auth.signIn.restore) auth.signIn.restore();
-      if (auth && auth.signOut && auth.signOut.restore) auth.signOut.restore();
+      if (auth.signIn.restore) auth.signIn.restore();
+      if (auth.signOut.restore) auth.signOut.restore();
 
       if (win.gapi.client.calendar.events.list.restore) {
         win.gapi.client.calendar.events.list.restore();
@@ -104,6 +104,7 @@ describe("Google Calendar Component", () => {
   });
 
   it("should display the Google sign-in button initially", () => {
+    
     cy.contains("Sign In with Google").should("be.visible");
   });
 
@@ -126,6 +127,7 @@ describe("Google Calendar Component", () => {
         body: { token: "fake-token", user: { email: "test@example.com" } },
       }).as("googleAuth");
       cy.contains("Sign In with Google").click();
+     
 
       // Verify UI updates
       cy.contains("Sign Out").should("be.visible");
@@ -160,6 +162,7 @@ describe("Google Calendar Component", () => {
         },
       });
     });
+  
 
     cy.get("select#calendar-select").select("cal1");
     cy.contains("ENGR 391").should("be.visible");
@@ -178,7 +181,7 @@ describe("Google Calendar Component", () => {
       // Simulate API failure
       win.gapi.client.calendar.events.list.rejects(new Error("API Error"));
     });
-
+   
     cy.get("select#calendar-select").select("cal1");
     cy.contains("Failed to fetch events. Please check your connection and try again.").should("be.visible");
   });
@@ -209,7 +212,7 @@ describe("Google Calendar Component", () => {
         },
       });
     });
-
+    
     cy.get("select#calendar-select").select("cal1");
     cy.contains("ENGR 391").click();
     cy.contains("ENGR 391").should("be.visible");
