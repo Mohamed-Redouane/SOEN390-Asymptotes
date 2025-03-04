@@ -26,11 +26,8 @@ router.get('/addressFromCoordinates', async (req: Request, res: Response) => {
         const addressData = await fetchAddressFromCoordinates(lat, lng);
         res.json(addressData);
     } catch (error) {
-        if (error instanceof Error) {
-            res.status(500).send(error.message);
-        } else {
-            res.status(500).send('Error fetching address from coordinates');
-        }
+        console.error('Error fetching address:', error);
+        res.status(500).send('Error fetching address from coordinates');
     }
 });
 

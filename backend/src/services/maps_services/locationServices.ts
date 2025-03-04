@@ -29,11 +29,17 @@ export const fetchAddressFromCoordinates = async (lat: number, lng: number): Pro
         console.log(response.data.results[0].place_id);
         const {formatted_address, place_id} = response.data.results[0]
         return {formatted_address, place_id}; 
-      } else {
+      } else if (response.data.status === 'ZERO_RESULTS') {
         throw new Error('No address found for the given coordinates.');
+      } else {
+        throw new Error('Failed to fetch address.');
       }
     } catch (error) {
       console.error('Error fetching address:', error);
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+
       throw new Error('Failed to fetch address.');
     }
   };
