@@ -26,18 +26,7 @@ function UserLocation() {
       });
   }, []);
 
-  useEffect(() => {
-    if (isOnCampus !== null) {
-      if (isOnCampus) {
-        setShowOnCampusMessage(true);
-        setTimeout(() => setShowOnCampusMessage(false), 5000);
-      } else {
-        setShowOffCampusMessage(true);
-        setTimeout(() => setShowOffCampusMessage(false), 5000);
-      }
-    }
-  }, [isOnCampus]);
-
+  
   const isFarFromCampusBuildings = (userLat: number, userLng: number): boolean => {
     if (!geoJsonData) return false; 
 
@@ -136,11 +125,15 @@ function UserLocation() {
   const handleConfirm = () => {
     setIsOnCampus(true);
     setShowModal(false);
+    setShowOnCampusMessage(true); // Show on-campus message
+    setTimeout(() => setShowOnCampusMessage(false), 5000);
   };
 
   const handleCancel = () => {
     setIsOnCampus(false);
     setShowModal(false);
+    setShowOffCampusMessage(true); // Show off-campus message
+    setTimeout(() => setShowOffCampusMessage(false), 5000);
     if (watchId !== null) {
       navigator.geolocation.clearWatch(watchId);
       console.log("Location tracking stopped.");
