@@ -1,8 +1,19 @@
 describe("Google Calendar Component", () => {
   let authInstance;
 
+  // Helper function to calculate the next Thursday at 10:00 AM
+  const getNextThursdayAt10AM = () => {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const daysUntilNextThursday = dayOfWeek === 4 ? 7 : (4 - dayOfWeek + 7) % 7; // 4 = Thursday
+    const nextThursday = new Date(now);
+    nextThursday.setDate(now.getDate() + daysUntilNextThursday);
+    nextThursday.setHours(10, 0, 0, 0); // Set time to 10:00 AM
+    return nextThursday.toISOString();
+  };
+
   beforeEach(() => {
-    authInstance = null; 
+    authInstance = null;
 
     cy.intercept("GET", "/api/auth/me", {
       statusCode: 200,
@@ -11,18 +22,17 @@ describe("Google Calendar Component", () => {
 
     cy.visit("http://localhost:5173/schedule", {
       onBeforeLoad(win) {
-          cy.stub(win.navigator.geolocation, "watchPosition").callsFake((success) => {
-            // Simulate being on campus
-            success({
-              coords: {
-                latitude: 45.4969316, 
-                longitude: -73.5799272,
-                accuracy: 10, 
-              },
-            });
+        cy.stub(win.navigator.geolocation, "watchPosition").callsFake((success) => {
+          // Simulate being on campus
+          success({
+            coords: {
+              latitude: 45.4969316,
+              longitude: -73.5799272,
+              accuracy: 10,
+            },
           });
-        },
-
+        });
+      },
     });
     cy.wait("@getCurrentUser");
 
@@ -56,8 +66,8 @@ describe("Google Calendar Component", () => {
                   {
                     id: "event-1",
                     summary: "ENGR 391",
-                    start: { dateTime: "2025-02-27T10:00:00Z" },
-                    end: { dateTime: "2025-02-27T11:00:00Z" },
+                    start: { dateTime: getNextThursdayAt10AM() }, // Use dynamic date
+                    end: { dateTime: new Date(new Date(getNextThursdayAt10AM()).getTime() + 60 * 60 * 1000).toISOString() }, // 1 hour later
                     location: "H540",
                     description: "lecture.",
                   },
@@ -87,7 +97,6 @@ describe("Google Calendar Component", () => {
         },
       };
     });
-    cy.clock(new Date("2025-03-03T00:00:00Z").getTime());
   });
 
   afterEach(() => {
@@ -104,7 +113,6 @@ describe("Google Calendar Component", () => {
   });
 
   it("should display the Google sign-in button initially", () => {
-    
     cy.contains("Sign In with Google").should("be.visible");
   });
 
@@ -127,7 +135,6 @@ describe("Google Calendar Component", () => {
         body: { token: "fake-token", user: { email: "test@example.com" } },
       }).as("googleAuth");
       cy.contains("Sign In with Google").click();
-     
 
       // Verify UI updates
       cy.contains("Sign Out").should("be.visible");
@@ -146,6 +153,12 @@ describe("Google Calendar Component", () => {
         auth.isSignedIn.callback(true);
       }
 
+      // Log the dynamically calculated date
+      const eventStart = getNextThursdayAt10AM();
+      const eventEnd = new Date(new Date(eventStart).getTime() + 60 * 60 * 1000).toISOString();
+      cy.log(`Mocked event start: ${eventStart}`);
+      cy.log(`Mocked event end: ${eventEnd}`);
+
       // Mock event fetching from Google Calendar API
       win.gapi.client.calendar.events.list.resolves({
         result: {
@@ -153,8 +166,8 @@ describe("Google Calendar Component", () => {
             {
               id: "event-1",
               summary: "ENGR 391",
-              start: { dateTime: "2025-02-27T10:00:00Z" },
-              end: { dateTime: "2025-02-27T11:00:00Z" },
+              start: { dateTime: eventStart },
+              end: { dateTime: eventEnd },
               location: "H540",
               description: "lecture.",
             },
@@ -162,9 +175,9 @@ describe("Google Calendar Component", () => {
         },
       });
     });
-  
 
-    cy.get("select#calendar-select").select("cal1");
+    // Select calendar and verify events
+    cy.get("select#calendar-select").should("be.visible").select("cal1");
     cy.contains("ENGR 391").should("be.visible");
   });
 
@@ -181,7 +194,7 @@ describe("Google Calendar Component", () => {
       // Simulate API failure
       win.gapi.client.calendar.events.list.rejects(new Error("API Error"));
     });
-   
+
     cy.get("select#calendar-select").select("cal1");
     cy.contains("Failed to fetch events. Please check your connection and try again.").should("be.visible");
   });
@@ -203,8 +216,8 @@ describe("Google Calendar Component", () => {
             {
               id: "event-1",
               summary: "ENGR 391",
-              start: { dateTime: "2025-02-27T10:00:00Z" },
-              end: { dateTime: "2025-02-27T11:00:00Z" },
+              start: { dateTime: getNextThursdayAt10AM() },
+              end: { dateTime: new Date(new Date(getNextThursdayAt10AM()).getTime() + 60 * 60 * 1000).toISOString() },
               location: "H540",
               description: "lecture.",
             },
@@ -212,7 +225,7 @@ describe("Google Calendar Component", () => {
         },
       });
     });
-    
+
     cy.get("select#calendar-select").select("cal1");
     cy.contains("ENGR 391").click();
     cy.contains("ENGR 391").should("be.visible");
