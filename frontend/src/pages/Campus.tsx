@@ -25,6 +25,7 @@ function CampusMap() {
     const [prevPoiType, setPrevPoiType] = useState("restaurant"); // Store the previous POI type
     const [loading, setLoading] = useState(false);
     const [selectedPoi, setSelectedPoi] = useState<any>(null);
+    const [showPOIs, setShowPOIs] = useState(false); //POI visibility
 
     useEffect(() => {
         fetch("/Building.geojson")
@@ -120,6 +121,10 @@ function CampusMap() {
         setPoiType(event.target.value);
     };
 
+    const togglePOIs = () => {
+        setShowPOIs((prevShowPOIs) => !prevShowPOIs);
+    };
+
     return (
         <div>
             {loading && <div>Loading...</div>}
@@ -151,6 +156,9 @@ function CampusMap() {
                     <option value="school">School</option>
                 </select>
             </div>
+            <button onClick={togglePOIs}>
+                {showPOIs ? "Hide POIs" : "Show POIs"}
+            </button>
             <div
                 style={{ height: '86vh', width: '100vw', zIndex: -1 }}
                 id="map"
@@ -174,7 +182,7 @@ function CampusMap() {
                     >
                         {geoJsonData && <MapComponent geoJsonData={geoJsonData} setIsUserInsideBuilding={setIsUserInsideBuilding} />}
                         {isUserInsideBuilding && userLocation && <Marker position={userLocation} />}
-                        {filterPointsOfInterest().map((poi, index) => (     //Filter POIs based on radius
+                        {showPOIs && filterPointsOfInterest().map((poi, index) => (     //Filter POIs based on radius
                             <Marker 
                                 key={index} 
                                 position={poi.geometry.location} 
