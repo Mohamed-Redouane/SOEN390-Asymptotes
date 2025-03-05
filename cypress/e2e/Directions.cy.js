@@ -53,117 +53,122 @@ describe('Directions Page', () => {
             },
         }).as("placeDetails1");
         
-        cy.intercept("GET", "/api/maps/directions*", {
-                 statusCode: 200,
-                    body: [
-                  {
-                    "summary": "Route 1",
-                    "legs": [
-                      {
-                        "start_address": "Source Location",
-                        "end_address": "Destination Location",
-                        "distance": { "text": "10 km", "value": 10000 },
-                        "duration": { "text": "15 mins", "value": 900 }
-                      }
-                    ],
-                    "overview_polyline": {
-                      "points": "abc123fakePolyline"
-                    }
-                  },
-                  {
-                    "summary": "Route 2",
-                    "legs": [
-                      {
-                        "start_address": "Source Location",
-                        "end_address": "Destination Location",
-                        "distance": { "text": "12 km", "value": 12000 },
-                        "duration": { "text": "18 mins", "value": 1080 }
-                      }
-                    ],
-                    "overview_polyline": {
-                      "points": "xyz456fakePolyline"
-                    }
-                  }
+        // cy.intercept("GET", "/api/maps/directions*", {
+        //          statusCode: 200,
+        //             body: [
+        //           {
+        //             "summary": "Route 1",
+        //             "legs": [
+        //               {
+        //                 "start_address": "Source Location",
+        //                 "end_address": "Destination Location",
+        //                 "distance": { "text": "10 km", "value": 10000 },
+        //                 "duration": { "text": "15 mins", "value": 900 }
+        //               }
+        //             ],
+        //             "overview_polyline": {
+        //               "points": "abc123fakePolyline"
+        //             }
+        //           },
+        //           {
+        //             "summary": "Route 2",
+        //             "legs": [
+        //               {
+        //                 "start_address": "Source Location",
+        //                 "end_address": "Destination Location",
+        //                 "distance": { "text": "12 km", "value": 12000 },
+        //                 "duration": { "text": "18 mins", "value": 1080 }
+        //               }
+        //             ],
+        //             "overview_polyline": {
+        //               "points": "xyz456fakePolyline"
+        //             }
+        //           }
                 
-                ]
-        }).as("getDirectionsDriving");
+        //         ]
+        // }).as("getDirectionsDriving");
 
-        cy.intercept(
-            "GET",
-            /https:\/\/maps\.googleapis\.com\/maps\/api\/directions\/json\?.*mode=walking.*/,
-            (req) => {
-              req.reply({
-                status: "OK",
-                routes: [
-                  {
-                    summary: "Shortest Walk",
-                    legs: [
-                      {
-                        distance: { text: "3 km", value: 3000 },
-                        duration: { text: "30 mins", value: 1800 },
-                        start_address: "Start Location",
-                        end_address: "End Location",
-                        steps: [
-                          { instructions: "Walk straight for 1 km", distance: { text: "1 km", value: 1000 } },
-                          { instructions: "Turn left at Park Ave", distance: { text: "500 m", value: 500 } },
-                        ],
-                      },
-                    ],
-                  },
-                  {
-                    summary: "Scenic Walk",
-                    legs: [
-                      {
-                        distance: { text: "4 km", value: 4000 },
-                        duration: { text: "40 mins", value: 2400 },
-                        start_address: "Start Location",
-                        end_address: "End Location",
-                        steps: [
-                          { instructions: "Walk along river", distance: { text: "2 km", value: 2000 } },
-                          { instructions: "Turn right at Garden St", distance: { text: "1 km", value: 1000 } },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              });
-            }
-        //      "/https:\/\/maps\.googleapis\.com\/maps\/api\/directions\/travelMode=walking", {
-        //     statusCode: 200,
-        //     body: [
-        //   {
-        //     "summary": "Route 1",
-        //     "legs": [
-        //       {
-        //         "start_address": "Source Location",
-        //         "end_address": "Destination Location",
-        //         "distance": { "text": "10 km", "value": 10000 },
-        //         "duration": { "text": "15 mins", "value": 900 }
-        //       }
-        //     ],
-        //     "overview_polyline": {
-        //       "points": "abc123fakePolyline"
+        // cy.intercept(
+        //     "GET",
+        //     /https:\/\/maps\.googleapis\.com\/maps\/api\/directions\/json\?.*mode=walking.*/,
+        //     (req) => {
+        //       req.reply({
+        //         status: "OK",
+        //         routes: [
+        //           {
+        //             summary: "Shortest Walk",
+        //             legs: [
+        //               {
+        //                 distance: { text: "3 km", value: 3000 },
+        //                 duration: { text: "30 mins", value: 1800 },
+        //                 start_address: "Start Location",
+        //                 end_address: "End Location",
+        //                 steps: [
+        //                   { instructions: "Walk straight for 1 km", distance: { text: "1 km", value: 1000 } },
+        //                   { instructions: "Turn left at Park Ave", distance: { text: "500 m", value: 500 } },
+        //                 ],
+        //               },
+        //             ],
+        //           },
+        //           {
+        //             summary: "Scenic Walk",
+        //             legs: [
+        //               {
+        //                 distance: { text: "4 km", value: 4000 },
+        //                 duration: { text: "40 mins", value: 2400 },
+        //                 start_address: "Start Location",
+        //                 end_address: "End Location",
+        //                 steps: [
+        //                   { instructions: "Walk along river", distance: { text: "2 km", value: 2000 } },
+        //                   { instructions: "Turn right at Garden St", distance: { text: "1 km", value: 1000 } },
+        //                 ],
+        //               },
+        //             ],
+        //           },
+        //         ],
+        //       });
         //     }
-        //   },
-        //   {
-        //     "summary": "Route 2",
-        //     "legs": [
-        //       {
-        //         "start_address": "Source Location",
-        //         "end_address": "Destination Location",
-        //         "distance": { "text": "12 km", "value": 12000 },
-        //         "duration": { "text": "18 mins", "value": 1080 }
-        //       }
-        //     ],
-        //     "overview_polyline": {
-        //       "points": "xyz456fakePolyline"
-        //     }
-        //   }
+        // //      "/https:\/\/maps\.googleapis\.com\/maps\/api\/directions\/travelMode=walking", {
+        // //     statusCode: 200,
+        // //     body: [
+        // //   {
+        // //     "summary": "Route 1",
+        // //     "legs": [
+        // //       {
+        // //         "start_address": "Source Location",
+        // //         "end_address": "Destination Location",
+        // //         "distance": { "text": "10 km", "value": 10000 },
+        // //         "duration": { "text": "15 mins", "value": 900 }
+        // //       }
+        // //     ],
+        // //     "overview_polyline": {
+        // //       "points": "abc123fakePolyline"
+        // //     }
+        // //   },
+        // //   {
+        // //     "summary": "Route 2",
+        // //     "legs": [
+        // //       {
+        // //         "start_address": "Source Location",
+        // //         "end_address": "Destination Location",
+        // //         "distance": { "text": "12 km", "value": 12000 },
+        // //         "duration": { "text": "18 mins", "value": 1080 }
+        // //       }
+        // //     ],
+        // //     "overview_polyline": {
+        // //       "points": "xyz456fakePolyline"
+        // //     }
+        // //   }
         
-        // ]
-        ).as("getDirectionsWalking");
+        // // ]
+        // ).as("getDirectionsWalking");
 
-
+        cy.intercept( "GET",
+          "/api/maps/directions?*", 
+          // /https:\/\/maps\.googleapis\.com\/maps\/api\/directions\/json\.*/,
+          {fixture: "mockDirectionResponse.json"}
+        ).as("getDirections");
+        
         cy.window().then((win) => {
             cy.stub(win.navigator.geolocation, "watchPosition").callsFake((success) => {
                 success({
@@ -265,15 +270,14 @@ describe('Directions Page', () => {
         });
 
         cy.get("#get-directions-button").click();
-        cy.wait(2000);
-        cy.wait("@getDirectionsDriving", { timeout: 20000 }).then((interception) => {
+        cy.wait("@getDirections", { timeout: 20000 }).then((interception) => {
             console.log("line 73: Intercepted directions request:", interception);
         });
 
         cy.get('#transport-mode-container').should("exist");
+        cy.get('#driving-option').click();
         cy.get('#walking-option').click();
-        cy.wait("@getDirectionsWalking", { timeout: 20000 }).then((interception) => {
-            console.log("line 73: Intercepted directions request:", interception);
-        });
+        cy.get('#bicycling-option').click();
+        
     });
 });

@@ -12,85 +12,85 @@ app.use('/maps', mapRoutes);
 
 
 describe('GET /maps/test', () => {
-    test('should return 200 and "test works"', async () => {
-        const response = await request(app).get('/maps/test');
-        expect(response.status).toBe(200);
-        expect(response.text).toBe('maps works');
-    });
+  test('should return 200 and "test works"', async () => {
+    const response = await request(app).get('/maps/test');
+    expect(response.status).toBe(200);
+    expect(response.text).toBe('maps works');
+  });
 });
 
 describe('GET /maps/placePredictions', () => {
-    let mock: MockAdapter;
+  let mock: MockAdapter;
 
-    beforeEach(() => {
-        mock = new MockAdapter(axios as any);
+  beforeEach(() => {
+    mock = new MockAdapter(axios as any);
+  });
+
+  after(() => {
+    mock.restore();
+  });
+
+  it("should return detailed place predictions", async () => {
+    const searchQuery = "Montreal";
+
+    // Mock the autocomplete API response
+    mock.onGet("https://maps.googleapis.com/maps/api/place/autocomplete/json").reply(200, {
+      status: "OK",
+      predictions: [
+        {
+          place_id: "1234",
+          description: "Montreal, QC, Canada",
+        },
+      ],
     });
 
-    after(() => {
-        mock.restore();
+    // Mock the place details API response
+    mock.onGet("https://maps.googleapis.com/maps/api/place/details/json").reply(200, {
+      status: "OK",
+      result: {
+        name: "Montreal",
+        formatted_address: "Montreal, QC, Canada",
+        place_id: "1234",
+        geometry: {
+          location: {
+            lat: 45.5017,
+            lng: -73.5673,
+          },
+        },
+      },
     });
 
-    it("should return detailed place predictions", async () => {
-        const searchQuery = "Montreal";
+    const response = await request(app).get("/maps/placesPredictions").query({ searchQuery });
 
-        // Mock the autocomplete API response
-        mock.onGet("https://maps.googleapis.com/maps/api/place/autocomplete/json").reply(200, {
-            status: "OK",
-            predictions: [
-                {
-                    place_id: "1234",
-                    description: "Montreal, QC, Canada",
-                },
-            ],
-        });
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([
+      {
+        name: "Montreal",
+        address: "Montreal, QC, Canada",
+        place_id: "1234",
+        lat: 45.5017,
+        lng: -73.5673,
+      },
+    ]);
+  });
 
-        // Mock the place details API response
-        mock.onGet("https://maps.googleapis.com/maps/api/place/details/json").reply(200, {
-            status: "OK",
-            result: {
-                name: "Montreal",
-                formatted_address: "Montreal, QC, Canada",
-                place_id: "1234",
-                geometry: {
-                    location: {
-                        lat: 45.5017,
-                        lng: -73.5673,
-                    },
-                },
-            },
-        });
+  it("should return 400 if search query is missing", async () => {
+    const response = await request(app).get("/maps/placesPredictions");
+    expect(response.status).toBe(400);
+    expect(response.text).toBe("Search query is required");
+  });
 
-        const response = await request(app).get("/maps/placesPredictions").query({ searchQuery });
-
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual([
-            {
-                name: "Montreal",
-                address: "Montreal, QC, Canada",
-                place_id: "1234",
-                lat: 45.5017,
-                lng: -73.5673,
-            },
-        ]);
-    });
-
-    it("should return 400 if search query is missing", async () => {
-        const response = await request(app).get("/maps/placesPredictions");
-        expect(response.status).toBe(400);
-        expect(response.text).toBe("Search query is required");
-    });
-
-    it("should retrun 500 if there was an error getting predictions", async () => {
-        mock.onGet("https://maps.googleapis.com/maps/api/place/autocomplete/json").reply(500);
-        const response = await request(app).get("/maps/placesPredictions").query({ searchQuery: "Montreal" });
-        expect(response.status).toBe(500);
-        expect(response.text).toBe("Error getting place predictions");
-        }
-    );
+  it("should retrun 500 if there was an error getting predictions", async () => {
+    mock.onGet("https://maps.googleapis.com/maps/api/place/autocomplete/json").reply(500);
+    const response = await request(app).get("/maps/placesPredictions").query({ searchQuery: "Montreal" });
+    expect(response.status).toBe(500);
+    expect(response.text).toBe("Error getting place predictions");
+  }
+  );
 });
 
 describe('GET /maps/placeDetails', () => {
-    let mock: MockAdapter;
+  let mock: MockAdapter;
 
   beforeEach(() => {
     mock = new MockAdapter(axios as any);
@@ -164,95 +164,168 @@ describe('GET /maps/placeDetails', () => {
 });
 
 describe("GET /maps/directions", () => {
-    let mock: MockAdapter;
-  
-    beforeEach(() => {
-      mock = new MockAdapter(axios as any);
-    });
-  
-    after(() => {
-      mock.reset();
-    });
-  
-    it("should return route directions", async () => {
-      const source = "ChIJN1t_tDeuEmsRUsoyG83frY4"; // Example Place ID
-      const destination = "ChIJsXU6z5lZwokRdsjKc_UGGWA"; // Example Place ID
-      const travelMode = "driving";
-  
-      // Mock the API response
-      mock.onGet("https://maps.googleapis.com/maps/api/directions/json").reply(200, {
-        status: "OK",
-        routes: [
-          {
-            summary: "Main Street",
-            legs: [
-              {
-                start_address: "Start Location",
-                end_address: "End Location",
-                distance: { text: "5 km", value: 5000 },
-                duration: { text: "10 mins", value: 600 },
-              },
-            ],
-          },
-        ],
-      });
-  
-      const response = await request(app)
-        .get("/maps/directions")
-        .query({ source, destination, travelMode });
-  
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual([
+  let mock: MockAdapter;
+
+  beforeEach(() => {
+    mock = new MockAdapter(axios as any);
+  });
+
+  after(() => {
+    mock.reset();
+  });
+
+  it("should return route directions", async () => {
+    const source = "ChIJN1t_tDeuEmsRUsoyG83frY4"; // Example Place ID
+    const destination = "ChIJsXU6z5lZwokRdsjKc_UGGWA"; // Example Place ID
+    const travelMode = "driving";
+
+    // Mock the API response
+    mock.onGet("https://maps.googleapis.com/maps/api/directions/json").reply(200, {
+      status: "OK",
+      routes: [
         {
           summary: "Main Street",
           legs: [
             {
-              start_address: "Start Location",
-              end_address: "End Location",
-              distance: { text: "5 km", value: 5000 },
-              duration: { text: "10 mins", value: 600 },
+              "distance": {
+                "text": "5 km",
+                "value": 5000,
+              },
+              "duration": {
+                "text": "10 mins",
+                "value": 600,
+              },
+              "end_address": "End Location",
+              "start_address": "Start Location",
             },
           ],
         },
-      ]);
+      ],
     });
-  
-    it("should return 400 if source or destination is missing", async () => {
-      const response = await request(app).get("/maps/directions");
-  
-      expect(response.status).toBe(400);
-      expect(response.text).toBe("Source, destination, and travel mode are required");
-    });
-  
-    it("should return 500 if API response is not OK", async () => {
-      const source = "ChIJN1t_tDeuEmsRUsoyG83frY4";
-      const destination = "ChIJsXU6z5lZwokRdsjKc_UGGWA";
-      const travelMode = "driving";
-  
-      mock.onGet("https://maps.googleapis.com/maps/api/directions/json").reply(200, {
-        status: "ZERO_RESULTS",
-      });
-  
-      const response = await request(app)
-        .get("/maps/directions")
-        .query({ source, destination, travelMode });
-  
-      expect(response.status).toBe(500);
-      expect(response.text).toBe("Error getting directions");
-    });
-  
-    it("should return 500 if API request fails", async () => {
-      const source = "ChIJN1t_tDeuEmsRUsoyG83frY4";
-      const destination = "ChIJsXU6z5lZwokRdsjKc_UGGWA";
-      const travelMode = "driving";
-  
-      mock.onGet("https://maps.googleapis.com/maps/api/directions/json").networkError();
-  
-      const response = await request(app)
-        .get("/maps/directions")
-        .query({ source, destination, travelMode });
-  
-      expect(response.status).toBe(500);
-      expect(response.text).toBe("Error getting directions");
-    });
+
+    const response = await request(app)
+      .get("/maps/directions")
+      .query({ source, destination });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      {
+        "bicycling": [
+          {
+            "legs": [
+              {
+               "distance": {
+              "text": "5 km",
+              "value": 5000,
+            },
+            "duration": {
+              "text": "10 mins",
+              "value": 600,
+            },
+            "end_address": "End Location",
+            "start_address": "Start Location",
+              },
+            ],
+            "summary": "Main Street",
+          },
+        ],
+        "driving": [
+          {
+            "legs": [
+              {
+                "distance": {
+                  "text": "5 km",
+                  "value": 5000,
+                },
+                "duration": {
+                  "text": "10 mins",
+                  "value": 600,
+                },
+                "end_address": "End Location",
+                "start_address": "Start Location",
+              },
+            ],
+            "summary": "Main Street",
+          },
+        ],
+        "transit": [
+          {
+            "legs": [
+              {
+                "distance": {
+                  "text": "5 km",
+                  "value": 5000,
+                },
+                "duration": {
+                  "text": "10 mins",
+                  "value": 600,
+                },
+                "end_address": "End Location",
+                "start_address": "Start Location",
+              },
+            ],
+            "summary": "Main Street",
+          },
+        ],
+        "walking": [
+          {
+            "legs": [
+              {
+                "distance": {
+                  "text": "5 km",
+                  "value": 5000,
+                },
+                "duration": {
+                  "text": "10 mins",
+                  "value": 600,
+                },
+                "end_address": "End Location",
+                "start_address": "Start Location",
+              },
+            ],
+            "summary": "Main Street",
+          },
+        ],
+      }
+    );
   });
+
+  it("should return 400 if source or destination is missing", async () => {
+    const response = await request(app).get("/maps/directions");
+
+    expect(response.status).toBe(400);
+    expect(response.text).toBe("Source, destination, and travel mode are required");
+  });
+
+  it("should return 500 if API response is not OK", async () => {
+    const source = "ChIJN1t_tDeuEmsRUsoyG83frY4";
+    const destination = "ChIJsXU6z5lZwokRdsjKc_UGGWA";
+    const travelMode = "driving";
+
+    mock.onGet("https://maps.googleapis.com/maps/api/directions/json").reply(200, {
+      status: "ZERO_RESULTS",
+    });
+
+    const response = await request(app)
+      .get("/maps/directions")
+      .query({ source, destination, travelMode });
+
+    expect(response.status).toBe(500);
+    expect(response.text).toBe("Error getting directions");
+  });
+
+  it("should return 500 if API request fails", async () => {
+    const source = "ChIJN1t_tDeuEmsRUsoyG83frY4";
+    const destination = "ChIJsXU6z5lZwokRdsjKc_UGGWA";
+    const travelMode = "driving";
+
+    mock.onGet("https://maps.googleapis.com/maps/api/directions/json").networkError();
+
+    const response = await request(app)
+      .get("/maps/directions")
+      .query({ source, destination, travelMode });
+
+    expect(response.status).toBe(500);
+    expect(response.text).toBe("Error getting directions");
+  });
+});
