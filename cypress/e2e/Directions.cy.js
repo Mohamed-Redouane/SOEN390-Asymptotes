@@ -186,6 +186,30 @@ describe('Directions Page', () => {
         cy.window().should("have.property", "google");
     });
 
+    it("should automatically set the user's current location as the starting point when on campus", () => {
+        cy.wait("@getCurrentUser"); // Wait for mock authentication request
+
+        const mockUserLocation = {
+            name: "Current Location",
+            address: "1234 Current St, Montreal, QC",
+            place_id: "current_location_id",
+            lat: 45.4949,
+            lng: -73.5779,
+        };
+        cy.intercept("GET", "/api/maps/addressFromCoordinates*", {
+            statusCode: 200,
+            body: {
+                formatted_address: mockUserLocation.address,
+                place_id: mockUserLocation.place_id,
+            },
+        }).as("getAddressFromCoords");
+
+        cy.wait("@getAddressFromCoords");
+
+        // Verify that the source input field is populated with the user's current location
+        cy.get('#start-input').should('have.value', mockUserLocation.address);
+    });
+
     it("the directions page has a working input field for source location", () => {
         cy.get('#start-input').should("exist");
         cy.get('#start-input').type('1');

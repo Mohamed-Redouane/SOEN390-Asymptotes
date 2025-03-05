@@ -1,8 +1,11 @@
 import React, { createContext, useState } from "react";
 
 interface Location {
+  name: string;
   lat: number;
   lng: number;
+  address: string;
+  place_id: string;
 }
 
 interface LocationContextType {

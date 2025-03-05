@@ -4,7 +4,7 @@ import { describe, test, expect, it, beforeEach } from 'vitest';
 import request from 'supertest';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { after } from 'node:test';
+import { after, afterEach } from 'node:test';
 
 const app = express();
 app.use(express.json());
@@ -18,6 +18,62 @@ describe('GET /maps/test', () => {
     expect(response.text).toBe('maps works');
   });
 });
+
+describe('GET /maps/addressFromCoordinates', () => {
+  let mock: MockAdapter;
+
+  beforeEach(() => {
+    mock = new MockAdapter(axios as any);
+  });
+
+  afterEach(() => {
+    mock.restore();
+  });
+
+  it('should return formatted_address and place_id', async () => {
+    const latlng = '45.5049,-73.5779';
+
+    mock.onGet('https://maps.googleapis.com/maps/api/geocode/json').reply(200, {
+      status: 'OK',
+      results: [
+        {
+          formatted_address: '123 Main St, Montreal, QC, Canada',
+          place_id: 'ChIJ1234567890',
+          geometry: {
+            location: {
+              lat: 45.5049,
+              lng: -73.5779,
+            },
+          },
+          types: ['street_address'],
+        },
+      ],
+    })
+
+    const response = await request(app).get('/maps/addressFromCoordinates').query({ lat: '45.5049', lng: '-73.5779' });
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      
+        {
+          formatted_address: "123 Main St, Montreal, QC, Canada",
+          place_id: 'ChIJ1234567890',
+        }
+  );
+  })
+
+  it('should return 400 is lat or lng are missing', async () => {
+    const response = await request(app).get('/maps/addressFromCoordinates').query({});
+    expect(response.status).toBe(400);
+    expect(response.text).toBe('Valid latitude and longitude are required');
+  })
+
+  it('should return 500 if there is an error getting the address', async () => {
+    mock.onGet('https://maps.googleapis.com/maps/api/geocode/json').reply(500);
+    const response = await request(app).get('/maps/addressFromCoordinates').query({ lat: '45.5049', lng: '-73.5779' });
+    expect(response.status).toBe(500);
+    expect(response.text).toBe('Error fetching address from coordinates');
+  } )
+})
 
 describe('GET /maps/placePredictions', () => {
   let mock: MockAdapter;
