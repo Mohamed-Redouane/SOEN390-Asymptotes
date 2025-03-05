@@ -1,4 +1,4 @@
-import axios, {AxiosError} from "axios";
+import axios from "axios";
 import {extractErrorMessage} from "./authApi";
 
 
@@ -13,13 +13,13 @@ const api = axios.create({
 
 
 
-interface LocationType {
-  name: string;
-  address: string;
-  place_id: string;
-  lat: number;
-  lng: number;
-}
+  // interface LocationType {
+  //   name: string;
+  //   address: string;
+  //   place_id: string;
+  //   lat: number;
+  //   lng: number;
+  // }
 
 
 // get place predictions from the Google Maps API
@@ -51,6 +51,17 @@ export async function getDirections(source:string, destination: string, travelMo
     return response.data;
   } catch (error: unknown) {
     const message = extractErrorMessage(error, "Failed to get directions.");
+    throw new Error(message);
+  }
+}
+
+export async function getAddressFromCoords(lat: number, lng: number){
+  try{
+    const response = await api.get("/api/maps/addressFromCoordinates", { params: { lat, lng } });
+    console.log("response getAddressFromCoords:", response);
+    return response.data;
+  } catch (error: unknown) {
+    const message = extractErrorMessage(error, "Failed to get address.");
     throw new Error(message);
   }
 }

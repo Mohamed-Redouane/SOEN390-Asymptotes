@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import RoomIcon from '@mui/icons-material/Room';
 import { getSuggestions, getPlaceDetails } from '../services/PlaceServices';
@@ -7,8 +7,7 @@ import { APIProvider, Map } from '@vis.gl/react-google-maps';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
-import AirportShuttleIcon from '@mui/icons-material/AirportShuttle';
-
+import { LocationContext } from '../components/LocationContext';
 
 interface LocationType {
     name: string;
@@ -23,20 +22,24 @@ const Directions = () => {
     const [active, setActive] = useState<string>("");
     const [sourceQuery, setSourceQuery] = useState<any>("");
     const [destinationQuery, setDestinationQuery] = useState<string>("");
-    const [query, setQuery] = useState<string>("");
-    const [results, setResults] = useState<LocationType[]>([]);
+    const [sourceResults, setSourceResults] = useState<LocationType[]>([]); // Suggestions for source
+    const [destinationResults, setDestinationResults] = useState<LocationType[]>([]);
     const [transportationMode, setTransportationMode] = useState<"driving" | "transit" | "walking">("driving");
 
     const [source, setSource] = useState<LocationType>();
     const [destination, setDestination] = useState<LocationType>();
     const [routesAvailable, setRoutesAvailable] = useState<boolean>(false);
     const [routes, setRoutes] = useState<any>();
-    const [directions, setDirections] = useState<google.maps.DirectionsResult>();
+    // const [directions, setDirections] = useState<google.maps.DirectionsResult>();
+    const {location: userLocation} = useContext(LocationContext);
+    const [isResettingStart, setIsResettingStart] = useState(false);
+    const [isUserTyping, setIsUserTyping] = useState(false);
+    const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const [selectedResultIndex, setSelectedResultIndex] = useState<number>(-1); // for keyboard navigation of results
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "ArrowDown") {
-            setSelectedResultIndex((prev) => Math.min(prev + 1, results.length - 1));
+            setSelectedResultIndex((prev) => Math.min(prev + 1, (active === "start" ? sourceResults : destinationResults).length - 1));
         } else if (event.key === "ArrowUp") {
             setSelectedResultIndex((prev) => Math.max(prev - 1, 0));
         } else if (event.key === "Enter" && selectedResultIndex !== -1) {
@@ -47,39 +50,49 @@ const Directions = () => {
     const isProgrammaticChange = useRef(false); // Used to prevent infinite loop when setting the value of the input field programmatically
 
     useEffect(() => {
-        if (!isProgrammaticChange.current) {
+        if (userLocation?.address && !sourceQuery && !isResettingStart && !isUserTyping) {
+            setSourceQuery(userLocation.address);
+            setSource(userLocation); // Set the source to userLocation
+        }
+    }, [userLocation, isResettingStart, isUserTyping]);
+
+    useEffect(() => {
+        if (!isProgrammaticChange.current && active  && (active === "start" ? sourceQuery : destinationQuery)) {
             setRoutes([]);
             setRoutesAvailable(false);
+            let query = "";
+            if (active === "start") {
+                query = sourceQuery;
+            } else if (active === "end") {
+                query = destinationQuery;
+}
+
 
             if (query === "") {
-                setResults([]);
+                if (active === "start") setSourceResults([]);
+                else setDestinationResults([]);
                 return;
             }
 
             const predictionsResults = async () => {
                 const predictions = await getSuggestions(query, 45.5049, -73.5779);
                 console.log("Predictions: ", predictions);
-                setResults(predictions as LocationType[]);
+                if (active === "start") {
+                    setSourceResults(predictions as LocationType[]);
+                } else{
+                    setDestinationResults(predictions as LocationType[]);
+                }
+                
             }
             predictionsResults();
 
         }
         isProgrammaticChange.current = false;
-    }, [query]);
-
-    useEffect(() => {
-        setQuery(sourceQuery);
-        setRoutesAvailable(false);
-    }, [sourceQuery]);
-
-    useEffect(() => {
-        setQuery(destinationQuery);
-        setRoutesAvailable(false);
-    }, [destinationQuery]);
+    }, [sourceQuery, destinationQuery, active]);
 
 
     const handleSelect = async (index: number) => {
-        const place = results[index];
+        const place = (active === "start" ? sourceResults : destinationResults)[index];
         const placeDetails = await getPlaceDetails(place.place_id);
         console.log("Selected Place: ", placeDetails);
         // get the details of what was selected
@@ -93,15 +106,18 @@ const Directions = () => {
             s.value = (placeDetails as LocationType).name;
             setSourceQuery((placeDetails as LocationType).name);
             setSource(placeDetails as LocationType);
+            setSourceResults([]);
 
         } else if (active === "end") {
             setDestinationQuery((placeDetails as LocationType).name);
             setDestination(placeDetails as LocationType);
+            setDestinationResults([]);
 
         }
 
         //after selecting a place, we clear the results
-        setResults([]);
+        //setResults([]);
+        setActive("");
     };
 
     const getDirections = async () => {
@@ -151,57 +167,96 @@ const Directions = () => {
         }
     };
 
+    // handle the clear for the start input
+    const handleClearStart = () => {
+        setSourceQuery("");
+        setSource(undefined);
+        setIsResettingStart(true);
+        setRoutesAvailable(false);
+        setActive("");
+        setSourceResults([]);
+        setDestinationResults([]);
+        setIsUserTyping(false);
+    
+        // Clear any existing timeout
+        if (resetTimeoutRef.current) {
+            clearTimeout(resetTimeoutRef.current);
+        }
+    
+        // Set a new timeout
+        resetTimeoutRef.current = setTimeout(() => {
+            if (userLocation?.address) {
+                isProgrammaticChange.current = true;
+                setSourceQuery(userLocation.address);
+                setSource(userLocation);
+            }
+            setIsResettingStart(false);
+        }, 7000); // 7 seconds delay
+    };
+    
+
+    useEffect(() => {
+        return () => {
+            if (resetTimeoutRef.current) {
+                clearTimeout(resetTimeoutRef.current);
+            }
+        };
+    }, []);
+
 
     return (
         <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={["places", "geometry"]}>
-            <div className="relative flex flex-col flex-shrink-0 w-full" >
-                <div className=" fixed flex flex-col flex-shrink-0 w-full top-55 z-30 bg-white ">
+            <div className="relative flex flex-col flex-shrink-0 w-full">
+                <div className="fixed flex flex-col flex-shrink-0 w-full top-55 z-30 bg-white">
                     <div className="flex flex-row items-center pl-2 pr-2">
                         <MyLocationIcon />
                         <input
                             id="start-input"
                             type="text"
                             placeholder="Enter your starting location"
-                            className=" p-2 m-2 border-2 border-gray-200 rounded-lg w-full"
-                            value={/* useLocation ? 'Your Location' : */sourceQuery}
+                            className="p-2 m-2 border-2 border-gray-200 rounded-lg w-full"
+                            value={sourceQuery}
                             onChange={(e) => {
-                                // setUseLocation(false); //if user type, we stop using thier location and let them type in the input
                                 setActive("start");
                                 setSourceQuery(e.target.value);
+                                setIsUserTyping(true);
+                                if (resetTimeoutRef.current) {
+                                    clearTimeout(resetTimeoutRef.current);
+                                }
                             }}
                             onKeyDown={handleKeyDown}
-                        >
-                        </input>
-                        <button className="text-l font-bold text-gray-700 bg-white p-1" onClick={() => setSourceQuery("")}>x</button>
+                        />
+                        <button className="text-l font-bold text-gray-700 bg-white p-1" onClick={handleClearStart}>x</button>
                     </div>
                     <div className="flex flex-row items-center pl-2 pr-2">
                         <RoomIcon style={{ color: "red" }} />
                         <input
                             id="end-input"
                             type="text"
-                            placeholder="Enter your starting location"
-                            className=" p-2 m-2 border-2 border-gray-200 rounded-lg w-full"
-                            value={/*active === "end" ? query :*/ destinationQuery}
+                            placeholder="Enter your destination location"
+                            className="p-2 m-2 border-2 border-gray-200 rounded-lg w-full"
+                            value={destinationQuery}
                             onChange={(e) => {
                                 setActive("end");
                                 setDestinationQuery(e.target.value);
                             }}
                             onKeyDown={handleKeyDown}
-                        >
-                        </input>
-                        <button className="text-l font-bold text-gray-700 bg-white p-1" onClick={() => setDestinationQuery("")}>x</button>
+                        />
+                        <button className="text-l font-bold text-gray-700 bg-white p-1" onClick={() => {
+                            setDestinationQuery("");
+                            setRoutesAvailable(false); // Hide routes when destination input is cleared
+                        }}>x</button>
                     </div>
-                    {results &&
-                        <div className="flex w-full " >
+                    {(active === "start" ? sourceResults : destinationResults).length > 0 && (
+                        <div className="flex w-full">
                             <ul className="w-full" id="suggestions-container">
-                                {results.map((result, index) => (
+                                {(active === "start" ? sourceResults : destinationResults).map((result, index) => (
                                     <li key={index}
                                         id="suggestion-item-container"
                                         onKeyDown={(e) => e.key === "Enter" && handleSelect(index)}
                                         onClick={() => {
                                             handleSelect(index);
-
-                                            console.log("Selected: ", results[index]);
+                                            console.log("Selected: ", result);
                                         }}
                                         className="flex flex-row items-center m-2 border-2 border-gray-200 rounded-lg w-full pr-4">
                                         <div className="flex flex-col items-center">
@@ -209,16 +264,16 @@ const Directions = () => {
                                             {/* <span className="truncate">{getDistanceFromDestination(userLocation, { lat: result.lat, lng: result.lng })} km</span> */}
                                         </div>
                                         <div id="name-address-container" className="flex flex-col p-2 items-start truncate rounded-lg w-full">
-                                            <span className='truncate font-semibold '>{result.name}</span>
+                                            <span className='truncate font-semibold'>{result.name}</span>
                                             <span className='truncate text-xs'>{result.address}</span>
                                         </div>
                                     </li>
                                 ))}
                             </ul>
                         </div>
-                    }
+                    )}
 
-                    {results.length == 0 &&
+                    {(active === "start" ? sourceResults : destinationResults).length === 0 && (
                         <div id='directions-request-container' className="flex flex-col items-center w-full">
                             <button
                                 id="get-directions-button"
@@ -228,20 +283,17 @@ const Directions = () => {
                             >
                                 Get Directions
                             </button>
-
-
-
                         </div>
-                    }
+                    )}
 
-                    {routesAvailable &&
+                    {routesAvailable && sourceQuery && destinationQuery && ( // Render only if both inputs are filled and routes are available
                         <div>
                             {/* TODO: implement the different travel modes */}
-                            <div id="transport-mode-container" className="flex  flex-row justify-between w-full pl-4 pr-4 m-1" tabIndex={0}
+                            <div id="transport-mode-container" className="flex flex-row justify-between w-full pl-4 pr-4 m-1" tabIndex={0}
                                 onKeyDown={handleTransportKeyDown}>
                                 <div id="car-option" className="flex flex-row items-center">
                                     <DirectionsCarIcon onClick={() => setTransportationMode("driving")} style={{ color: transportationMode === "driving" ? "#094F6d" : "gray" }} />
-                                    <p id='driving-duration' style={{ color: transportationMode === "driving" ? "#094F6d" : "gray" }} ></p>
+                                    <p id='driving-duration' style={{ color: transportationMode === "driving" ? "#094F6d" : "gray" }}></p>
                                 </div>
                                 <div id="transit-option" className="flex flex-row items-center">
                                     <DirectionsBusIcon onClick={() => setTransportationMode("transit")} style={{ color: transportationMode === "transit" ? "#094F6d" : "gray" }} />
@@ -249,25 +301,24 @@ const Directions = () => {
                                 </div>
                                 <div id="walking-option" className="flex flex-row items-center">
                                     <DirectionsWalkIcon onClick={() => setTransportationMode("walking")} style={{ color: transportationMode === "walking" ? "#094F6d" : "gray" }} />
-                                    <p id='walking-duration' style={{ color: transportationMode === "walking" ? "#094F6d" : "gray" }} ></p>
+                                    <p id='walking-duration' style={{ color: transportationMode === "walking" ? "#094F6d" : "gray" }}></p>
                                 </div>
                                 {/* <div id="shuttle-option" className="flex flex-row items-center">
                         <AirportShuttleIcon onClick={() => setTransportMode("shuttle")} style={{ color: transportMode === "shuttle" ? "#094F6d" : "gray" }} />
                         <p style={{ color: transportMode === "shuttle" ? "#094F6d" : "gray" }} >0 min</p>
                     </div> */}
                             </div>
-                            <div id='routes-display' className='flex flex-col border-t-2 overflow-scroll '>
+                            <div id='routes-display' className='flex flex-col border-t-2 overflow-scroll'>
                                 {routes?.map((route: any, index: number) => (
                                     <div key={index}
                                         tabIndex={0}
                                         onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && console.log("Selected Route: ", routes[index])}
                                         id="route-item-container"
-                                        className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between  align-middle shadow-sm"
+                                        className="flex flex-row border-2 border-gray-200 rounded-lg w-full mt-2 p-2 justify-between align-middle shadow-sm"
                                         onClick={() => {
                                             console.log("Selected Route: ", routes[index]);
                                         }}
                                     >
-
                                         <div id='route-item-duration-distance' className="flex flex-col items-start align-middle">
                                             <span className="font-bold text-lg">{route.legs[0].duration.text}</span>
                                             <div className="flex">
@@ -284,8 +335,7 @@ const Directions = () => {
                                 ))}
                             </div>
                         </div>
-                    }
-
+                    )}
 
                     <div
                         id="map-container"
@@ -297,18 +347,11 @@ const Directions = () => {
                             defaultCenter={{ lat: 45.4949, lng: -73.5779 }}
                             mapTypeControl={false}
                             fullscreenControl={false}
-                        >
-
-
-                        </Map>
+                        />
                     </div>
-
                 </div>
-
-
             </div>
         </APIProvider>
-
     );
 }
 export default Directions;
