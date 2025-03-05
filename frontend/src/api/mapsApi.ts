@@ -54,3 +54,14 @@ export async function getDirections(source:string, destination: string, travelMo
     throw new Error(message);
   }
 }
+
+export async function getAddressFromCoords(lat: number, lng: number){
+  try{
+    const response = await api.get("/api/maps/addressFromCoordinates", { params: { lat, lng } });
+    console.log("response getAddressFromCoords:", response);
+    return response.data;
+  } catch (error: unknown) {
+    const message = extractErrorMessage(error, "Failed to get address.");
+    throw new Error(message);
+  }
+}
