@@ -1,8 +1,10 @@
 import { APIProvider, Map, Marker, InfoWindow } from "@vis.gl/react-google-maps";
-import { useState, useContext, useEffect, useRef } from "react";
+import { useState, useContext, useEffect } from "react";
 import { LocationContext } from "../components/LocationContext";
 import MapComponent from "../components/MapComponent";
 import ToggleCampus from "../components/ToggleCampusComponent";
+import { FaStar } from "react-icons/fa";
+import ModalPOI from "../components/ModalPOI";
 
 type CampusType = 'SGW' | 'LOYOLA'; // Define a type for campus to ensure only these two values are valid
 
@@ -26,6 +28,7 @@ function CampusMap() {
     const [loading, setLoading] = useState(false);
     const [selectedPoi, setSelectedPoi] = useState<any>(null);
     const [showPOIs, setShowPOIs] = useState(false); //POI visibility
+    const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
 
     useEffect(() => {
         fetch("/Building.geojson")
@@ -125,40 +128,50 @@ function CampusMap() {
         setShowPOIs((prevShowPOIs) => !prevShowPOIs);
     };
 
+    const toggleModal = () => {
+        setIsModalOpen((prevIsModalOpen) => !prevIsModalOpen);
+    };
+
     return (
         <div>
             {loading && <div>Loading...</div>}
-            <div>
-                <label htmlFor="radius">Select Radius: </label>
-                <select id="radius" value={radius} onChange={handleRadiusChange}>
-                    <option value={100}>100 meters</option>
-                    <option value={200}>200 meters</option>
-                    <option value={500}>500 meters</option>
-                    <option value={1000}>1000 meters</option>
-                </select>
-                <input
-                    type="number"
-                    placeholder="Enter custom radius"
-                    onBlur={(e) => setRadius(Number(e.target.value))}
-                />
-            </div>
-            <div>
-                <label htmlFor="poiType">Select POI Type: </label>
-                <select id="poiType" value={poiType} onChange={handlePoiTypeChange}>
-                    <option value="restaurant">Restaurant</option>
-                    <option value="cafe">Cafe</option>
-                    <option value="library">Library</option>
-                    <option value="park">Park</option>
-                    <option value="store">Store</option>
-                    <option value="gym">Gym</option>
-                    <option value="museum">Museum</option>
-                    <option value="hospital">Hospital</option>
-                    <option value="school">School</option>
-                </select>
-            </div>
-            <button onClick={togglePOIs}>
-                {showPOIs ? "Hide POIs" : "Show POIs"}
+            <button onClick={toggleModal} style={{ display: 'flex', alignItems: 'center', marginTop: '0px' }}>
+                <FaStar style={{ marginRight: '5px' }} />
+                Explore
             </button>
+            <ModalPOI isOpen={isModalOpen} onClose={toggleModal}>
+                <div>
+                    <label htmlFor="radius">Select Radius: </label>
+                    <select id="radius" value={radius} onChange={handleRadiusChange}>
+                        <option value={100}>100 meters</option>
+                        <option value={200}>200 meters</option>
+                        <option value={500}>500 meters</option>
+                        <option value={1000}>1000 meters</option>
+                    </select>
+                    <input
+                        type="number"
+                        placeholder="Enter custom radius"
+                        onBlur={(e) => setRadius(Number(e.target.value))}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="poiType">Select POI Type: </label>
+                    <select id="poiType" value={poiType} onChange={handlePoiTypeChange}>
+                        <option value="restaurant">Restaurant</option>
+                        <option value="cafe">Cafe</option>
+                        <option value="library">Library</option>
+                        <option value="park">Park</option>
+                        <option value="store">Store</option>
+                        <option value="gym">Gym</option>
+                        <option value="museum">Museum</option>
+                        <option value="hospital">Hospital</option>
+                        <option value="school">School</option>
+                    </select>
+                </div>
+                <button onClick={togglePOIs}>
+                    {showPOIs ? "Hide POIs" : "Show POIs"}
+                </button>
+            </ModalPOI>
             <div
                 style={{ height: '86vh', width: '100vw', zIndex: -1 }}
                 id="map"
