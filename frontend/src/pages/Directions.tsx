@@ -24,8 +24,6 @@ const Directions = () => {
     const [destinationQuery, setDestinationQuery] = useState<string>("");
     const [sourceResults, setSourceResults] = useState<LocationType[]>([]); // Suggestions for source
     const [destinationResults, setDestinationResults] = useState<LocationType[]>([]);
-    // const [query, setQuery] = useState<string>("");
-    // const [results, setResults] = useState<LocationType[]>([]);
     const [transportationMode, setTransportationMode] = useState<"driving" | "transit" | "walking">("driving");
 
     const [source, setSource] = useState<LocationType>();
@@ -52,7 +50,7 @@ const Directions = () => {
     const isProgrammaticChange = useRef(false); // Used to prevent infinite loop when setting the value of the input field programmatically
 
     useEffect(() => {
-        if (userLocation && userLocation.address && !sourceQuery && !isResettingStart && !isUserTyping) {
+        if (userLocation?.address && !sourceQuery && !isResettingStart && !isUserTyping) {
             setSourceQuery(userLocation.address);
             setSource(userLocation); // Set the source to userLocation
         }
@@ -84,23 +82,13 @@ const Directions = () => {
                 } else{
                     setDestinationResults(predictions as LocationType[]);
                 }
-                //setResults(predictions as LocationType[]);
+                
             }
             predictionsResults();
 
         }
         isProgrammaticChange.current = false;
     }, [sourceQuery, destinationQuery, active]);
-
-    // useEffect(() => {
-    //     setQuery(sourceQuery);
-    //     setRoutesAvailable(false);
-    // }, [sourceQuery]);
-
-    // useEffect(() => {
-    //     setQuery(destinationQuery);
-    //     setRoutesAvailable(false);
-    // }, [destinationQuery]);
 
 
     const handleSelect = async (index: number) => {
@@ -197,7 +185,7 @@ const Directions = () => {
     
         // Set a new timeout
         resetTimeoutRef.current = setTimeout(() => {
-            if (userLocation && userLocation.address) {
+            if (userLocation?.address) {
                 isProgrammaticChange.current = true;
                 setSourceQuery(userLocation.address);
                 setSource(userLocation);
