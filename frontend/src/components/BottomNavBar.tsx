@@ -5,7 +5,6 @@ import { Bus, Map, Navigation, Calendar, MapPin, Building } from 'lucide-react';
 const BottomNavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [openMapMenu, setOpenMapMenu] = useState(false);
   const [showDirectionOptions, setShowDirectionOptions] = useState(false);
   const [directionType, setDirectionType] = useState<'indoor' | 'outdoor'>('indoor');
 
@@ -15,7 +14,6 @@ const BottomNavBar = () => {
       const target = event.target as HTMLElement;
       if (!target.closest('.nav-button, .direction-options')) {
         setShowDirectionOptions(false);
-        setOpenMapMenu(false);
       }
     };
 
@@ -26,7 +24,6 @@ const BottomNavBar = () => {
   // Close menus when route changes
   useEffect(() => {
     setShowDirectionOptions(false);
-    setOpenMapMenu(false);
   }, [location.pathname]);
 
   const mapLabel = useMemo(() => {
@@ -35,23 +32,25 @@ const BottomNavBar = () => {
     return 'Map';
   }, [location.pathname]);
 
-  // Determine if the current path is the directions page
-  const isDirectionsActive = location.pathname === '/directions';
+  // Determine if the current path is the directions page (indoor or outdoor)
+  const isDirectionsActive = (location.pathname === '/directions' || location.pathname === '/indoordirections');
 
   const handleNavigation = (value: string) => {
     if (value === '/') {
       navigate(value);
-    } else if (value === '/directions') {
-      navigate(value);
+    } else if (value === '/directions' || value === '/indoordirections') {
       
+      if(!(location.pathname === '/directions' || location.pathname === '/indoordirections'))
+      navigate(value);
       // Only toggle direction options if already on directions page
       if (isDirectionsActive) {
         setShowDirectionOptions((prev) => !prev);
-      }
+      } 
     } else {
       navigate(value);
     }
   };
+
 
   // Handle direction type selection
   const handleDirectionTypeChange = (type: 'indoor' | 'outdoor') => {
@@ -63,6 +62,13 @@ const BottomNavBar = () => {
       detail: { type, timestamp: Date.now() } 
     });
     window.dispatchEvent(event);
+
+    // In here I want to switch the URL to the other direction type
+
+    console.log('Direction type changed to:', type);
+    // Navigate to : /directions or /indoordirections
+    navigate(type === 'indoor' ? '/indoordirections' : '/directions');
+
     
     // Don't automatically close the menu to allow for easier toggling
   };
@@ -96,7 +102,7 @@ const BottomNavBar = () => {
       <span className="text-xs font-medium">{label}</span>
       
       {/* Indicator for active direction type when on directions page */}
-      {isActive && value === '/directions' && (
+      {isActive && (value === '/directions' || value === '/indoordirections') && (
         <div className="absolute -top-1 right-2 flex items-center justify-center">
           <span className="text-xs bg-white text-[#4c3ee2] px-2 py-0.5 rounded-full font-medium shadow-sm">
             {directionType === 'indoor' ? 'Indoor' : 'Outdoor'}
@@ -141,12 +147,17 @@ const BottomNavBar = () => {
       <nav className="flex h-16 bg-white shadow-lg backdrop-blur-md">
         <NavButton icon={Bus} label="Shuttle" value="/shuttle" isActive={location.pathname === '/shuttle'} />
         <NavButton icon={Map} label={mapLabel} value="/" isActive={location.pathname === '/' || location.pathname === '/LOYcampus'} />
+        {/* Need to disable the button if we are on /indoordirections or in /directions */}
+        
         <NavButton 
           icon={Navigation} 
           label="Directions" 
-          value="/directions" 
+          value="/indoordirections" 
           isActive={isDirectionsActive}
+
+          
           onClick={() => {
+
             if (isDirectionsActive) {
               setShowDirectionOptions(!showDirectionOptions);
             }

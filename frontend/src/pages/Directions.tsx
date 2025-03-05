@@ -31,6 +31,7 @@ const Directions = () => {
     const [destination, setDestination] = useState<LocationType>();
     const [routesAvailable, setRoutesAvailable] = useState<boolean>(false);
     const [routes, setRoutes] = useState<any>();
+    // const [directions, setDirections] = useState<google.maps.DirectionsResult>();
     const [drivingRoutes, setDrivingRoutes] = useState<any>();
     const [transitRoutes, setTransitRoutes] = useState<any>();
     const [walkingRoutes, setWalkingRoutes] = useState<any>();

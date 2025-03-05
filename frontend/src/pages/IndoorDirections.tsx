@@ -1,36 +1,33 @@
 import { MapView, useMapData } from "@mappedin/react-sdk";
 import "@mappedin/react-sdk/lib/esm/index.css";
 import { useState, useEffect } from "react";
-import BuildingSelector from "../Components/IndoorDirections/BuildingSelector";
-import Labels from "../Components/IndoorDirections/Labels";
-import CameraEvents from "../Components/IndoorDirections/CameraEvents";
-import FloorSelector from "../Components/IndoorDirections/FloorSelector";
-import AccessibleToggle from "../Components/IndoorDirections/AccessibleToggle";
-import IndoorPOI from "../Components/IndoorDirections/IndoorPOI";
-import SearchNavigation from "../Components/IndoorDirections/SearchNavigation";
+import BuildingSelector from "../components/IndoorDirections/BuildingSelector";
+import Labels from "../components/IndoorDirections/Labels";
+import CameraEvents from "../components/IndoorDirections/CameraEvents";
+import FloorSelector from "../components/IndoorDirections/FloorSelector";
+import AccessibleToggle from "../components/IndoorDirections/AccessibleToggle";
+import IndoorPOI from "../components/IndoorDirections/IndoorPOI";
+import SearchNavigation from "../components/IndoorDirections/SearchNavigation";
 
-const BUILDINGS = {
+const BUILDINGS: Record<string, string> = {
   "Hall Building": "67b0241a845fda000bf299cb",
   "EV Building": "67b023355b54d7000b151b86",
 };
 
 export default function IndoorDirections() {
   const [accessible, setAccessible] = useState(false);
-  const [selectedBuilding, setSelectedBuilding] = useState("Hall Building");
+  const [selectedBuilding, setSelectedBuilding] = useState<keyof typeof BUILDINGS>("Hall Building");
   const mapId = BUILDINGS[selectedBuilding]; 
-
-  
 
   const { isLoading, error, mapData } = useMapData({
     key: import.meta.env.VITE_MAPPEDIN_KEY as string,
     secret: import.meta.env.VITE_MAPPEDIN_SECRET as string,
     mapId,
   });
-  
 
   useEffect(() => {
     if (mapData) {
-      console.log(" New Map Data Loaded:", mapData);
+      console.log("New Map Data Loaded:", mapData);
     }
   }, [mapData]);
 
@@ -54,11 +51,7 @@ export default function IndoorDirections() {
           key={mapId} 
           mapData={mapData}
           className="flex-1 w-full relative"
-          options={{ backgroundColor: "#f9fafb" , showWatermark: false }}
-        >
-          {/* Map children components */}
-          
-
+          >
           <div className="absolute top-4 left-0 right-0 px-4 z-50">
             <SearchNavigation accessible={accessible} />
           </div>

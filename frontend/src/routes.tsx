@@ -5,7 +5,7 @@ import App from './App';
 import { requireAuthLoader } from './loaders/authLoader';
 
 import CampusMap from './pages/Campus';
-
+import CalendarPage from './pages/CalendarPage';
 // Public Pages
 //import WelcomePage from './pages/WelcomePage';
 import { LoginPage } from './pages/Auth/LoginPage';
@@ -65,7 +65,7 @@ export const router = createBrowserRouter([
         loader: requireAuthLoader,
         element: (
           <div style={{ height: '86vh', width: '100vw' }}>
-            404 Not Found
+            <CalendarPage/>
           </div>
         ),
       },

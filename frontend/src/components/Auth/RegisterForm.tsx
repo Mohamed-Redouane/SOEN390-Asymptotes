@@ -57,50 +57,49 @@ export function RegisterForm({ onSubmit, error, isLoading }: RegisterFormProps) 
             />
           </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email
+          <div className="mb-4">
+            <label htmlFor="user-email" className="text-gray-800 text-sm font-semibold">
+              Email Address
             </label>
             <input
-              id="email"
+              id="user-email"
               type="email"
-              placeholder="Enter your email"
+              placeholder="yourname@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 bg-white text-black"
+              className="block w-full px-4 py-2 border border-gray-400 rounded-lg shadow-sm 
+                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                disabled:opacity-60 disabled:cursor-not-allowed transition-all bg-gray-50 text-gray-900"
             />
           </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
+          <div className="mb-4">
+            <label htmlFor="user-password" className="text-gray-800 text-sm font-semibold">
+              Secure Password
             </label>
-            <div className="relative">
+            <div className="flex items-center border border-gray-400 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-indigo-500">
               <input
-                id="password"
+                id="user-password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
+                placeholder="********"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                  disabled:opacity-50 disabled:cursor-not-allowed pr-10 transition-all duration-300 bg-white text-black"
+                className="flex-grow px-4 py-2 focus:outline-none bg-gray-50 text-gray-900"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-all duration-300 bg-transparent p-1 rounded"
+                className="p-2 text-indigo-600 hover:text-indigo-800 transition-all duration-300 bg-transparent"
               >
                 {showPassword ? "🙈" : "👁️"}
               </button>
             </div>
           </div>
+
 
           <div className="text-sm text-blue-600 text-center">
             Already have an account? <Link to="/login" className="hover:underline transition-all duration-300">Log in</Link>

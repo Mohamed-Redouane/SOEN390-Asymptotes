@@ -1,13 +1,13 @@
 
 
 import { getPlacePredictions, getPlacesDetails} from '../api/mapsApi';
-interface LocationType {
-    name: string;
-    address: string;
-    place_id: string;
-    lat: number;
-    lng: number;
-}
+    // interface LocationType {
+    //     name: string;
+    //     address: string;
+    //     place_id: string;
+    //     lat: number;
+    //     lng: number;
+    // }
 
 export async function getSuggestions(searchQuery: string, lat: number, lng: number) {
     const predictions = await getPlacePredictions(searchQuery, lat, lng, "Montreal");

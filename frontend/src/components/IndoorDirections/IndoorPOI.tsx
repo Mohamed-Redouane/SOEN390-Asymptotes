@@ -16,32 +16,31 @@ export default function IndoorPOI() {
   const [showLabels, setShowLabels] = useState(true)
 
   useEffect(() => {
-    if (!mapView || !mapData) return
-
+    if (!mapView || !mapData) return;
+  
     if (showLabels) {
-
       for (const space of mapData.getByType("space")) {
         mapView.Labels.add(space.center, space.name, {
           appearance: {
             text: { foregroundColor: "#6C5CE7" },
-            marker: { foregroundColor: "#6C5CE7" },
+            marker: { foregroundColor: { active: "#6C5CE7", inactive: "#A29BFE" } }, // Fixed
           },
-        })
+        });
       }
-
+  
       for (const poi of mapData.getByType("point-of-interest")) {
         mapView.Labels.add(poi.coordinate, poi.name, {
           appearance: {
             text: { foregroundColor: "#74A0F4" },
-            marker: { foregroundColor: "#74A0F4" },
+            marker: { foregroundColor: { active: "#74A0F4", inactive: "#B2DFFC" } }, // Fixed
           },
-        })
+        });
       }
     } else {
-      mapView.Labels.removeAll()
+      mapView.Labels.removeAll();
     }
-  }, [mapView, mapData, showLabels])
-
+  }, [mapView, mapData, showLabels]);
+  
   return (
     <div className="fixed bottom-20 right-4 z-50" style={glassStyle}>
       <button

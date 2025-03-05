@@ -1,6 +1,10 @@
 import { useEvent, useMap } from "@mappedin/react-sdk";
 
-export default function ClickNavigation({ accessible }) {
+interface ClickNavigationProps {
+  accessible: boolean;
+}
+
+export default function ClickNavigation({ accessible }: ClickNavigationProps) {
   const { mapView, mapData } = useMap();
 
   useEvent("click", async (event) => {

@@ -1,5 +1,4 @@
 // src/pages/WelcomePage.tsx
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const WelcomePage = () => {
