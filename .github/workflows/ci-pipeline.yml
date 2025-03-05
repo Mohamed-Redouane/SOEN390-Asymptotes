@@ -46,6 +46,9 @@ jobs:
 
       - name: Run Frontend Unit Tests
         working-directory: ./frontend
+        env:
+          VITE_MAPPEDIN_KEY: ${{ secrets.VITE_MAPPEDIN_KEY }}
+          VITE_MAPPEDIN_SECRET: ${{ secrets.VITE_MAPPEDIN_SECRET }}
         run: npm run test
 
   cypress-tests:
@@ -98,6 +101,8 @@ jobs:
         run: npm run dev &
         env:
           NODE_ENV: test
+          VITE_MAPPEDIN_KEY: ${{ secrets.VITE_MAPPEDIN_KEY }}
+          VITE_MAPPEDIN_SECRET: ${{ secrets.VITE_MAPPEDIN_SECRET }}
 
       - name: Wait for Frontend Server
         run: wait-on http://localhost:5173
@@ -106,4 +111,6 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          VITE_MAPPEDIN_KEY: ${{ secrets.VITE_MAPPEDIN_KEY }}
+          VITE_MAPPEDIN_SECRET: ${{ secrets.VITE_MAPPEDIN_SECRET }}
         run: npx cypress run

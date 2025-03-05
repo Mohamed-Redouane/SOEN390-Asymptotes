@@ -1,6 +1,9 @@
 #root {
   max-width: 1280px;
   text-align: center;
+  --mappedin-blue-dot: #2196F3;
+  --mappedin-blue-dot-pulse: #2196F388;
+  --mappedin-blue-dot-accuracy: #2196F333;
 }
 a[href^="http://maps.google.com/maps"],a[href^="https://maps.google.com/maps"] {
   display: none !important;
@@ -47,4 +50,39 @@ a[href^="http://maps.google.com/maps"],a[href^="https://maps.google.com/maps"] {
 
 #map {
   height: 100%;
+}
+
+
+@media (max-width: 768px) {
+  .map-controls {
+    transform: scale(0.9);
+    transform-origin: bottom right;
+  }
+  
+  .mobile-tooltip {
+    font-size: 0.8rem;
+    padding: 0.5rem;
+  }
+}
+
+.direction-menu-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.direction-menu-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 200ms ease-out;
+}
+
+.direction-menu-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.direction-menu-exit-active {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 200ms ease-in;
 }
