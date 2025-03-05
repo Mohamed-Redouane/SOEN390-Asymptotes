@@ -134,6 +134,11 @@ function CampusMap() {
                     <option value="cafe">Cafe</option>
                     <option value="library">Library</option>
                     <option value="park">Park</option>
+                    <option value="store">Store</option>
+                    <option value="gym">Gym</option>
+                    <option value="museum">Museum</option>
+                    <option value="hospital">Hospital</option>
+                    <option value="school">School</option>
                 </select>
             </div>
             <div
