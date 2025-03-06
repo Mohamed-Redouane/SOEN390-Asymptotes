@@ -52,7 +52,8 @@ function CampusMap() {
         }
     }, [radius, userLocation, poiType]);
 
-    const handleMapLoad = (map: google.maps.Map) => {
+    const handleMapLoad = (event: any) => {
+        const map = event.target as google.maps.Map; // target to google.maps.Map
         if (userLocation) {
             performNearbySearch(userLocation, map);
         }
@@ -191,7 +192,7 @@ function CampusMap() {
                         mapTypeControl={false}
                         fullscreenControl={false}
                         onCenterChanged={onChange}
-                        onLoad={handleMapLoad}
+                        onTilesLoaded={handleMapLoad} 
                     >
                         {geoJsonData && <MapComponent geoJsonData={geoJsonData} setIsUserInsideBuilding={setIsUserInsideBuilding} />}
                         {isUserInsideBuilding && userLocation && <Marker position={userLocation} />}
