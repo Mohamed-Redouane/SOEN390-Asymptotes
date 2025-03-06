@@ -36,7 +36,7 @@ const Directions = () => {
     const [transitRoutes, setTransitRoutes] = useState<any>();
     const [walkingRoutes, setWalkingRoutes] = useState<any>();
     const [bicyclingRoutes, setBicyclingRoutes] = useState<any>();
-    
+
     const { location: userLocation } = useContext(LocationContext);
     const [isResettingStart, setIsResettingStart] = useState(false);
     const [isUserTyping, setIsUserTyping] = useState(false);
@@ -152,6 +152,7 @@ const Directions = () => {
         const directionRequest = await fetchDirections(source!, destination!).then((response: any) => {
             console.log("Response from fetchDirections: ", response);
 
+
             setRoutes(response.driving);
 
             setDrivingRoutes(response.driving);
@@ -219,8 +220,8 @@ const Directions = () => {
 
     return (
         <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={["places", "geometry"]}>
-            <div className="relative flex flex-col flex-shrink-0 w-full">
-                <div className="fixed flex flex-col flex-shrink-0 w-full top-55 bg-whitez-30">
+            <div className="relative flex flex-col flex-shrink-0 w-full" >
+                <div className=" fixed flex flex-col flex-shrink-0 w-full top-55 z-30 bg-white ">
                     <div className="flex flex-row items-center pl-2 pr-2">
                         <MyLocationIcon />
                         <input
@@ -286,7 +287,6 @@ const Directions = () => {
                                         className="flex flex-row items-center m-2 border-2 border-gray-200 rounded-lg w-full pr-4">
                                         <div className="flex flex-col items-center">
                                             <RoomIcon style={{ color: "gray" }} />
-                                            {/* <span className="truncate">{getDistanceFromDestination(userLocation, { lat: result.lat, lng: result.lng })} km</span> */}
                                         </div>
                                         <div id="name-address-container" className="flex flex-col p-2 items-start truncate rounded-lg w-full">
                                             <span className='truncate font-semibold'>{result.name}</span>
@@ -313,54 +313,51 @@ const Directions = () => {
 
                     {routesAvailable && sourceQuery && destinationQuery && // Render only if both inputs are filled and routes are available
                         <div>
-                            {/* TODO: implement the different travel modes */}
                             <div id="transport-mode-container" className="flex flex-row justify-between w-full pl-4 pr-4 m-1" tabIndex={0}
                                 onKeyDown={handleTransportKeyDown}>
-                                <button id="driving-option"
-                                    onClick={() => setTransportationMode("driving")}
-                                    className={`flex flex-row  bg-white items-center justify-center  focus:outline-none m-2 p-1 truncate  rounded-full ${transportationMode === "driving" ? "flex-[2] sm:flex-1 bg-blue-500" : "flex-1"}`}>
-                                    <DirectionsCarIcon
-                                        // onClick={() => setTransportationMode("driving")}
-                                        style={{ color: transportationMode === "driving" ? "white" : "gray" }}
-                                    />
-                                    <p id='driving-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "driving" ? "white" : "gray" }} >
-                                        {drivingRoutes.length > 0 ? drivingRoutes[0].legs[0].duration.text : " none "}
-                                    </p>
-                                </button>
-                                <button id="transit-option"
-                                    onClick={() => setTransportationMode("transit")}
-                                    className={`flex flex-row items-center bg-white focus:outline-none  justify-center  p-2 m-2 truncate rounded-full ${transportationMode === "transit" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}>
-                                    <DirectionsBusIcon
-                                        // onClick={() => setTransportationMode("transit")}
-                                        style={{ color: transportationMode === "transit" ? "white" : "gray" }}
-                                    />
-                                    <p id='transit-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "transit" ? "white" : "gray" }}>
-                                        {transitRoutes.length > 0 ? transitRoutes[0].legs[0].duration.text : " none "}
-                                    </p>
-                                </button>
-                                <button id="walking-option"
-                                    onClick={() => setTransportationMode("walking")}
-                                    className={`flex flex-row  bg-white items-center justify-center focus:outline-none p-2 m-2 truncate rounded-full ${transportationMode === "walking" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}>
-                                    <DirectionsWalkIcon
-                                        // onClick={() => setTransportationMode("walking")}
-                                        style={{ color: transportationMode === "walking" ? "white" : "gray" }}
-                                    />
-                                    <p id='walking-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "walking" ? "white" : "gray" }} >
-                                        {walkingRoutes.length > 0 ? walkingRoutes[0].legs[0].duration.text : " none "}
-                                    </p>
-                                </button>
-
-                                <button id="bicycling-option"
-                                    onClick={() => setTransportationMode("bicycling")}
-                                    className={`flex flex-row items-center justify-center focus:outline-none  bg-white  p-2 m-2 truncate rounded-full ${transportationMode === "bicycling" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}>
-                                    <DirectionsBike
-                                        // onClick={() => setTransportationMode("bicycling")}
-                                        style={{ color: transportationMode === "bicycling" ? "white" : "gray" }}
-                                    />
-                                    <p id='bicycling-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "bicycling" ? "white" : "gray" }} >
-                                        {bicyclingRoutes.length > 0 ? bicyclingRoutes[0].legs[0].duration.text : "-"}
-                                    </p>
-                                </button>
+                                 <button id="driving-option"
+                                        onClick={() => setTransportationMode("driving")}
+                                        className={`flex flex-row  bg-white items-center justify-center  focus:outline-none m-2 p-1 truncate  rounded-full ${transportationMode === "driving" ? "flex-[2] sm:flex-1 bg-blue-500" : "flex-1"}`}>
+                                        <DirectionsCarIcon
+                                            style={{ color: transportationMode === "driving" ? "white" : "gray" }}
+                                        />
+                                        <p id='driving-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "driving" ? "white" : "gray" }} >
+                                            {drivingRoutes.length > 0 ? drivingRoutes[0].legs[0].duration.text : " none "}
+                                        </p>
+                                    </button>
+                                   
+                                    <button id="transit-option"
+                                        onClick={() => setTransportationMode("transit")}
+                                        className={`flex flex-row items-center bg-white focus:outline-none  justify-center  p-2 m-2 truncate rounded-full ${transportationMode === "transit" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}>
+                                        <DirectionsBusIcon
+                                            style={{ color: transportationMode === "transit" ? "white" : "gray" }}
+                                        />
+                                        <p id='transit-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "transit" ? "white" : "gray" }}>
+                                            {transitRoutes.length > 0 ? transitRoutes[0].legs[0].duration.text : " none "}
+                                        </p>
+                                    </button>
+                                    <button id="walking-option"
+                                        onClick={() => setTransportationMode("walking")}
+                                        className={`flex flex-row  bg-white items-center justify-center focus:outline-none p-2 m-2 truncate rounded-full ${transportationMode === "walking" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}>
+                                        <DirectionsWalkIcon
+                                            style={{ color: transportationMode === "walking" ? "white" : "gray" }}
+                                        />
+                                        <p id='walking-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "walking" ? "white" : "gray" }} >
+                                            {walkingRoutes.length > 0 ? walkingRoutes[0].legs[0].duration.text : " none "}
+                                        </p>
+                                    </button>
+                                    <button id="bicycling-option"
+                                        onClick={() => setTransportationMode("bicycling")}
+                                        className={`flex flex-row items-center justify-center focus:outline-none  bg-white  p-2 m-2 truncate rounded-full ${transportationMode === "bicycling" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}
+                                    >
+                                        <DirectionsBike
+                                            style={{ color: transportationMode === "bicycling" ? "white" : "gray" }}
+                                        />
+                                        <p id='bicycling-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "bicycling" ? "white" : "gray" }} >
+                                            {bicyclingRoutes.length > 0 ? bicyclingRoutes[0].legs[0].duration.text : "-"}
+                                        </p>
+                                    </button>
+                               
 
                             </div>
                             <div id='routes-display' className='flex flex-col border-t-2 mb-3 over'>
@@ -388,19 +385,16 @@ const Directions = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <p  className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between  align-middle shadow-sm" 
-                                        key={index}>No routes available</p>
+                                        <p className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between  align-middle shadow-sm"
+                                            key={index}>No routes available</p>
                                     )
                                 ))}
-                                
+
                             </div>
                         </div>
                     }
 
-
-                    <div
-                        id="map-container"
-                        // className="relative top-55 flex flex-col border-3 border-red-800 flex-shrink-0 w-full h-full z-30">
+                    <div id="map-container"
                         style={{ height: '86vh', width: '100vw' }}
                     >
                         <Map
