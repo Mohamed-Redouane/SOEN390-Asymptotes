@@ -17,6 +17,7 @@ const CAMPUS_COORDINATES: { [key in CampusType]: { lat: number, lng: number } } 
 function CampusMap() {
     const [geoJsonData, setGeoJsonData] = useState<any>(null);
     const { location: userLocation } = useContext(LocationContext);
+    //const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW);   //TEST LOCATION
     const [isUserInsideBuilding, setIsUserInsideBuilding] = useState(false);
     const [campus, setCampus] = useState<CampusType>("SGW");
     const [center, setCenter] = useState(CAMPUS_COORDINATES[campus]);
@@ -60,6 +61,11 @@ function CampusMap() {
     };
 
     const performNearbySearch = (location: { lat: number, lng: number }, map?: google.maps.Map) => {
+        if (!google.maps || !google.maps.places) {
+            console.error("Google Maps API is not fully loaded.");
+            return;
+        }
+
         setLoading(true);
         console.log("Performing nearby search with radius:", radius, "and type:", poiType);
         if (radius < prevRadius || poiType !== prevPoiType) {
@@ -181,6 +187,7 @@ function CampusMap() {
                 <ToggleCampus
                     campus={campus}
                     onClick={handleToggle}
+                    data-testid="toggle-button" 
                 />
                 <APIProvider
                     apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
@@ -192,7 +199,7 @@ function CampusMap() {
                         mapTypeControl={false}
                         fullscreenControl={false}
                         onCenterChanged={onChange}
-                        onTilesLoaded={handleMapLoad} 
+                        onTilesLoaded={handleMapLoad}
                     >
                         {geoJsonData && <MapComponent geoJsonData={geoJsonData} setIsUserInsideBuilding={setIsUserInsideBuilding} />}
                         {isUserInsideBuilding && userLocation && <Marker position={userLocation} />}
