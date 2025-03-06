@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { orderRoutes } from '../../utils/orderRoutes.js';
-import fs from 'fs';
 
 export const fetchDirections = async (source: string, destination: string) => {
 

@@ -81,7 +81,6 @@ router.get('/directions', async (req, res) => {
             res.status(400).send('Source, destination, and travel mode are required');
             return;
         }
-
         const response = await fetchDirections(source, destination);
         res.json(response);
     } catch (error) {
@@ -90,8 +89,6 @@ router.get('/directions', async (req, res) => {
     }
 }
 )
-
-
 
 router.get('/test', (_req: Request, res: Response) => {
     res.send('maps works');
