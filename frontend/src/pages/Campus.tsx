@@ -222,10 +222,7 @@ function CampusMap() {
     return (
         <div>
             {loading && <div>Loading...</div>}
-            <button onClick={toggleModal} style={{ display: 'flex', alignItems: 'center', marginTop: '0px' }}>
-                <FaStar style={{ marginRight: '5px' }} />
-                Explore
-            </button>
+
             <ModalPOI isOpen={isModalOpen} onClose={toggleModal}>
                 <div>
                     <label htmlFor="radius">Select Radius: </label>
@@ -255,7 +252,7 @@ function CampusMap() {
                         <option value="school">School</option>
                     </select>
                 </div>
-                <button onClick={togglePOIs}>
+                <button onClick={togglePOIs} >
                     {showPOIs ? "Hide POIs" : "Show POIs"}
                 </button>
             </ModalPOI>
@@ -270,12 +267,34 @@ function CampusMap() {
                     data-testid="toggle-button" 
                 />
               
-              <button 
-                onClick={() => setShowBuildings(prev => !prev)} 
-                style={{ padding: '5px 10px', fontSize: '12px' }}
-            >
-                {showBuildings ? "Hide Buildings" : "Show Buildings"}
-            </button>
+              <div style={{ display: 'flex', alignItems: 'left', justifyContent: 'left', flexWrap: 'wrap' }}>
+                <button 
+                    onClick={toggleModal} 
+                    style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        marginTop: '0px', 
+                        marginLeft: '10px', 
+                        padding: '5px 10px', 
+                        fontSize: '14px' 
+                    }}
+                >
+                    <FaStar style={{ marginRight: '5px' }} />
+                    Explore
+                </button>
+                <button 
+                    onClick={() => setShowBuildings(prev => !prev)} 
+                    style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        marginTop: '0px', 
+                        padding: '5px 10px', 
+                        fontSize: '14px' 
+                    }}
+                >
+                    {showBuildings ? "Hide Buildings" : "Show Buildings"}
+                </button>
+              </div>
               
                 <APIProvider
                     apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
