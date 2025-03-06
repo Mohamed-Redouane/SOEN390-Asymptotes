@@ -49,6 +49,11 @@ jobs:
         env:
           VITE_MAPPEDIN_KEY: ${{ secrets.VITE_MAPPEDIN_KEY }}
           VITE_MAPPEDIN_SECRET: ${{ secrets.VITE_MAPPEDIN_SECRET }}
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.VITE_GOOGLE_CLIENT_SECRET }}
+          VITE_GOOGLE_API_KEY: ${{ secrets.VITE_GOOGLE_API_KEY }}
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_API_KEY }}
+
         run: npm run test
 
   cypress-tests:
@@ -72,7 +77,7 @@ jobs:
 
       - name: Install wait-on
         run: npm install -g wait-on
-        
+
       - name: Install nodemon
         run: npm install -g nodemon
 
@@ -92,7 +97,8 @@ jobs:
           PORT: 3000
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY}}
+
       - name: Wait for Backend Server
         run: wait-on http://localhost:3000/health
 
@@ -103,6 +109,11 @@ jobs:
           NODE_ENV: test
           VITE_MAPPEDIN_KEY: ${{ secrets.VITE_MAPPEDIN_KEY }}
           VITE_MAPPEDIN_SECRET: ${{ secrets.VITE_MAPPEDIN_SECRET }}
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.VITE_GOOGLE_CLIENT_SECRET }}
+          VITE_GOOGLE_API_KEY: ${{ secrets.VITE_GOOGLE_API_KEY }}
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY}}
+
 
       - name: Wait for Frontend Server
         run: wait-on http://localhost:5173
@@ -113,4 +124,9 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           VITE_MAPPEDIN_KEY: ${{ secrets.VITE_MAPPEDIN_KEY }}
           VITE_MAPPEDIN_SECRET: ${{ secrets.VITE_MAPPEDIN_SECRET }}
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.VITE_GOOGLE_CLIENT_SECRET }}
+          VITE_GOOGLE_API_KEY: ${{ secrets.VITE_GOOGLE_API_KEY }}
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY}}
+
         run: npx cypress run
