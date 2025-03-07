@@ -23,11 +23,11 @@ api.interceptors.response.use(
   }
 );
 
-interface ErrorResponse {
+export interface ErrorResponse {
   error?: string;
 }
 
-function isAxiosError<T = unknown>(error: unknown): error is AxiosError<T> {
+export function isAxiosError<T = unknown>(error: unknown): error is AxiosError<T> {
   return (
     typeof error === "object" &&
     error !== null &&
@@ -36,7 +36,7 @@ function isAxiosError<T = unknown>(error: unknown): error is AxiosError<T> {
   );
 }
 
-function extractErrorMessage(error: unknown, fallback: string): string {
+export function extractErrorMessage(error: unknown, fallback: string): string {
   if (isAxiosError<ErrorResponse>(error)) {
     return error.response?.data?.error ?? fallback;
   }
