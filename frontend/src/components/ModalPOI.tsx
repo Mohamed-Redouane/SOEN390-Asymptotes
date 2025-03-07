@@ -30,7 +30,7 @@ const ModalPOI: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 
     return (
         <div className="modal-overlay" onClick={onClose} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onClose()}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && e.stopPropagation()}>
                 {children}
             </div>
         </div>
