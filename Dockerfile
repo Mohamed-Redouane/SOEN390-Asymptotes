@@ -6,11 +6,13 @@ WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm install
 
-# We'll pass in a single ARG from Railway
+# Define build arguments
 ARG GOOGLE_MAPS_API_KEY
+ARG API_BASE_URL  # Added API_BASE_URL argument
 
-# Expose that ARG to the frontend build with a VITE_ prefix
+# Expose those arguments to the frontend build environment
 ENV VITE_GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 COPY frontend ./
 RUN npm run build
