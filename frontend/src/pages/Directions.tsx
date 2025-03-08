@@ -64,7 +64,6 @@ const Directions = () => {
     }, [userLocation, isResettingStart, isUserTyping]);
 
     useEffect(() => {
-<<<<<<< HEAD
         if (locationFromEventContext.state) {
             if (userLocation) {
                 setSourceQuery(userLocation.address);
@@ -76,10 +75,7 @@ const Directions = () => {
         
         if (!isProgrammaticChange.current 
                 && active  
-                && (active === "start" ? sourceQuery : destinationQuery)) { 
-=======
-        if (!isProgrammaticChange.current && active && (active === "start" ? sourceQuery : destinationQuery)) {
->>>>>>> 292aa9dfffe62610ac9bcdfac1ade493934b7a1e
+                && (active === "start" ? sourceQuery : destinationQuery)) {
             setRoutes([]);
             setRoutesAvailable(false);
             let query = "";
@@ -340,7 +336,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "driving" ? "white" : "gray" }}
                                     />
                                     <p id='driving-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "driving" ? "white" : "gray" }} >
-                                        {drivingRoutes.length > 0 ? drivingRoutes[0].legs[0].duration.text : " none "}
+                                        {drivingRoutes && drivingRoutes.length > 0 ? drivingRoutes[0].legs[0].duration.text : " none "}
                                     </p>
                                 </button>
 
@@ -351,7 +347,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "transit" ? "white" : "gray" }}
                                     />
                                     <p id='transit-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "transit" ? "white" : "gray" }}>
-                                        {transitRoutes.length > 0 ? transitRoutes[0].legs[0].duration.text : " none "}
+                                        {transitRoutes && transitRoutes.length > 0 ? transitRoutes[0].legs[0].duration.text : " none "}
                                     </p>
                                 </button>
                                 <button id="walking-option"
@@ -361,7 +357,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "walking" ? "white" : "gray" }}
                                     />
                                     <p id='walking-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "walking" ? "white" : "gray" }} >
-                                        {walkingRoutes.length > 0 ? walkingRoutes[0].legs[0].duration.text : " none "}
+                                        {walkingRoutes && walkingRoutes.length > 0 ? walkingRoutes[0].legs[0].duration.text : " none "}
                                     </p>
                                 </button>
                                 <button id="bicycling-option"
@@ -372,7 +368,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "bicycling" ? "white" : "gray" }}
                                     />
                                     <p id='bicycling-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "bicycling" ? "white" : "gray" }} >
-                                        {bicyclingRoutes.length > 0 ? bicyclingRoutes[0].legs[0].duration.text : "-"}
+                                        {bicyclingRoutes && bicyclingRoutes.length > 0 ? bicyclingRoutes[0].legs[0].duration.text : "-"}
                                     </p>
                                 </button>
 
