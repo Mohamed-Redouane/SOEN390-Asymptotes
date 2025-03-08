@@ -12,15 +12,19 @@
         "addr:housenumber": "1455",
         "addr:province": "Quebec",
         "addr:street": "Boulevard de Maisonneuve Ouest",
+        "addrress": "1455 Boulevard de Maisonneuve Ouest, Montréal, QC H3G 1M8, Canada",
         "building": "university",
         "building:levels": "13",
         "building:levels:underground": "2",
         "height": "51.2064",
         "learning": "university",
-        "name": "H - Henry F. Hall Building",
+        "name": "Henry F. Hall Building",
         "wheelchair": "yes",
         "wikidata": "Q20006830",
-        "wikipedia": "en:Henry F. Hall Building"
+        "wikipedia": "en:Henry F. Hall Building",
+        "campus": "SGW", 
+        "label": "H"
+        
       },
       "geometry": {
         "type": "Polygon",
@@ -90,7 +94,10 @@
         "building": "university",
         "building:levels": "19",
         "material": "concrete",
-        "name": "EV - Engineering, Computer Science and Visual Arts Integrated Complex"
+        "address": "1515 St. Catherine W.",
+        "name": "Engineering, Computer Science and Visual Arts Integrated Complex",
+        "campus": "SGW", 
+        "label": "EV"
       },
       "geometry": {
         "type": "Polygon",
@@ -214,9 +221,12 @@
         "addr:province": "Quebec",
         "addr:street": "Boulevard De Maisonneuve Ouest",
         "building": "university",
+        "address": "1535 Boulevard De Maisonneuve Ouest, Montréal, QC H3G 1M8, Canada",
         "building:levels": "11",
-        "name": "LS - Concordia Learning Square",
-        "roof:shape": "flat"
+        "name": "Concordia Learning Square",
+        "roof:shape": "flat",
+        "campus":"SGW",
+        "label": "LS"
       },
       "geometry": {
         "type": "Polygon",
@@ -261,7 +271,10 @@
         "@id": "way/22080581",
         "building": "university",
         "building:levels": "15",
-        "name": "MB - John Molson School of Business"
+        "name": "John Molson School of Business",
+        "address": "1450 Guy St, Montreal, QC H3H 1J5",
+        "campus":"SGW",
+        "label": "MB"
       },
       "geometry": {
         "type": "Polygon",
@@ -359,8 +372,11 @@
         "building": "university",
         "building:levels": "3",
         "name": "CL Building",
+        "address": "1665 St. Catherine W.",
         "roof:levels": "0",
-        "roof:shape": "flat"
+        "roof:shape": "flat",
+        "campus":"SGW",
+        "label": "CL"
       },
       "geometry": {
         "type": "Polygon",
@@ -413,7 +429,11 @@
         "@id": "way/103248058",
         "building": "yes",
         "building:levels": "12",
-        "name": "FB - Faubourg Tower"
+        "name": "Faubourg Tower",
+        "address": "1515 St. Catherine W.",
+        "campus":"SGW",
+        "label": "FB"
+        
       },
       "geometry": {
         "type": "Polygon",
@@ -521,8 +541,11 @@
       "properties": {
         "@id": "way/103521746",
         "building": "university",
-        "name": "VA - Visual Arts Building",
-        "source": "Bing"
+        "name": "Visual Arts Building",
+        "address": "1395 Rene Levesque W.",
+        "source": "Bing",
+        "campus":"SGW",
+        "label": "VA"
       },
       "geometry": {
         "type": "Polygon",
@@ -584,7 +607,12 @@
         "addr:housenumber": "105",
         "addr:street": "улица Шевченко",
         "building": "university",
-        "name": "Webster Library"
+        "address": "1400 Maisonneuve Blvd. W., Montreal, QC H3G 1M8, Canada",
+        "campus":"SGW",
+        "name": "Webster Library",
+        "label": "LB"
+    
+
       },
       "geometry": {
         "type": "Polygon",
@@ -623,9 +651,13 @@
         "addr:housenumber": "1550",
         "addr:postcode": "H3G 1N2",
         "addr:street": "Boulevard De Maisonneuve Ouest",
+        "address": "1550 De Maisonneuve W., Montreal, QC H3G 1N2, Canada",
         "building": "yes",
         "building:levels": "11",
-        "name": "GM - Guy Metro Building"
+        "name": "GM - Guy-De Maisonneuve Building",
+        "campus":"SGW",
+        "label": "GM"
+
       },
       "geometry": {
         "type": "Polygon",
@@ -686,8 +718,10 @@
         "@id": "way/103248050",
         "building": "retail",
         "building:levels": "3",
-        "name": "FG - Le Faubourg",
-        "roof:levels": "0"
+        "name": "Le Faubourg",
+        "address": "1610 St. Catherine W.",
+        "roof:levels": "0",
+        "label": "FG"
       },
       "geometry": {
         "type": "Polygon",
@@ -756,7 +790,10 @@
         "@id": "way/103248058",
         "building": "yes",
         "building:levels": "12",
-        "name": "FB - Faubourg Tower"
+        "name": "Faubourg Tower",
+        "address": "1250 Guy St, Montreal, QC H3H 2T4",
+        "campus":"SGW",
+        "label": "FB"
       },
       "geometry": {
         "type": "Polygon",
@@ -863,7 +900,11 @@
       "type": "Feature",
       "properties": {
         "@id": "way/103892926",
-        "building": "yes"
+        "building": "yes",
+        "label": "Z",
+        "name": "Z Annex",
+        "address": "2090 Mackay St, Montreal, QC H3G 2J1",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -926,7 +967,11 @@
       "type": "Feature",
       "properties": {
         "@id": "way/103892927",
-        "building": "yes"
+        "building": "yes",
+        "label": "MU",
+        "name": "MU Annex",
+        "address": "2170 Bishop St, Montreal, QC H3G 2E9",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -969,7 +1014,11 @@
       "type": "Feature",
       "properties": {
         "@id": "way/103892928",
-        "building": "yes"
+        "building": "yes",
+        "label": "X",
+        "name": "X Annex",
+        "address": "2080 Mackay St, Montreal, QC H3G 2J1",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1004,7 +1053,11 @@
       "type": "Feature",
       "properties": {
         "@id": "way/103892930",
-        "building": "yes"
+        "building": "yes",
+        "label": "B",
+        "name": "B Annex",
+        "address": "2160 Bishop St, Montreal, QC H3G 2E9",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1063,7 +1116,11 @@
       "type": "Feature",
       "properties": {
         "@id": "way/103892931",
-        "building": "yes"
+        "building": "yes",
+        "label": "V",
+        "name": "V Annex",
+        "address": "2110 Mackay St, Montreal, QC H3G 2J1", 
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1111,7 +1168,10 @@
       "properties": {
         "@id": "way/103892934",
         "building": "yes",
-        "name": "School of Public Affairs"
+        "name": "CL Annex",
+        "label": "CL",
+        "address": "2149 Mackay St, Montreal, QC H3G 2J2",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1166,7 +1226,11 @@
       "type": "Feature",
       "properties": {
         "@id": "way/103892935",
-        "building": "yes"
+        "building": "yes",
+        "label": "R",
+        "name": "R Annex",
+        "address": "2050 Mackay St, Montreal, QC H3G 2J1",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1203,7 +1267,11 @@
         "@id": "way/103892936",
         "addr:housenumber": "2020",
         "addr:street": "Rue Mackay",
-        "building": "university"
+        "building": "university",
+        "label": "P",
+        "name": "P Annex",
+        "address": "2020 Mackay St, Montreal, QC H3G 2J1",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1242,7 +1310,11 @@
       "type": "Feature",
       "properties": {
         "@id": "way/103892938",
-        "building": "yes"
+        "building": "yes",
+        "label": "K",
+        "name": "K Annex",
+        "address": "2150 Bishop St, Montreal, QC H3G 2E9",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1295,7 +1367,11 @@
         "@id": "way/103892939",
         "addr:housenumber": "2030",
         "addr:street": "Rue Mackay",
-        "building": "university"
+        "building": "university",
+        "label": "T",
+        "name": "T Annex",
+        "address": "2030 Mackay St, Montreal, QC H3G 2J1",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1330,7 +1406,11 @@
       "type": "Feature",
       "properties": {
         "@id": "way/103892942",
-        "building": "yes"
+        "building": "yes",
+        "label": "FA",
+        "name": "FA Annex",
+        "address": "2060 Mackay St, Montreal, QC H3G 2J1",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1371,7 +1451,11 @@
         "@id": "way/103892957",
         "addr:housenumber": "2010",
         "addr:street": "Rue Mackay",
-        "building": "university"
+        "building": "university",
+        "label": "Q",
+        "name": "Q Annex",
+        "address": "2010 Mackay St, Montreal, QC H3G 2J1",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1410,7 +1494,11 @@
       "type": "Feature",
       "properties": {
         "@id": "way/103892958",
-        "building": "yes"
+        "building": "yes",
+        "label": "D",
+        "name": "D Annex",
+        "address": "2140 Bishop St, Montreal, QC H3G 2E9",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1449,7 +1537,11 @@
       "type": "Feature",
       "properties": {
         "@id": "way/103892959",
-        "building": "yes"
+        "building": "yes",
+        "label": "PR",
+        "name": "PR Annex",
+        "address": "2100 Mackay St, Montreal, QC H3G 2J1",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1536,7 +1628,12 @@
       "type": "Feature",
       "properties": {
         "@id": "way/103892960",
-        "building": "yes"
+        "building": "yes",
+        "label": "MI",
+        "name": "MI Annex",
+        "address": "2130 Bishop St, Montreal, QC H3G 2E9",
+        "campus":"SGW"
+
       },
       "geometry": {
         "type": "Polygon",
@@ -1603,7 +1700,11 @@
       "type": "Feature",
       "properties": {
         "@id": "way/103892967",
-        "building": "yes"
+        "building": "yes",
+        "label": "M",
+        "name": "M Annex",
+        "address": "2135 Mackay St, Montreal, QC H3G 2J2",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1658,7 +1759,11 @@
       "type": "Feature",
       "properties": {
         "@id": "way/103892969",
-        "building": "yes"
+        "building": "yes",
+        "label": "S",
+        "name": "S Annex",
+        "address": "2145 Mackay St, Montreal, QC H3G 2J2",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1719,7 +1824,11 @@
         "@id": "way/103892971",
         "addr:housenumber": "2040",
         "addr:street": "Rue Mackay",
-        "building": "university"
+        "building": "university",
+        "label": "RR",
+        "name": "RR Annex",
+        "address": "2040 Mackay St, Montreal, QC H3G 2J1",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1769,7 +1878,11 @@
         "addr:housenumber": "2155",
         "addr:street": "Rue Guy",
         "building": "yes",
-        "building:levels": "13"
+        "building:levels": "13",
+        "label": "ER",
+        "name": "ER Building",
+        "address": "2155 Guy St, Montreal, QC H3H 2R9",
+        "campus":"SGW"
       },
       "geometry": {
         "type": "Polygon",
@@ -1834,6 +1947,7 @@
         "tiger:reviewed": "no",
         "tiger:zip_left": "06001",
         "tiger:zip_right": "06001"
+        
       },
       "geometry": {
         "type": "LineString",
@@ -1942,7 +2056,11 @@
         "building:levels": "3",
         "canvec:CODE": "2010252",
         "name": "Richard J Renaud Science Complex (SP)",
-        "source": "CanVec_Import_2009"
+        "source": "CanVec_Import_2009",
+        "label": "SP",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
+        
       },
       "geometry": {
         "type": "Polygon",
@@ -2166,7 +2284,10 @@
         "canvec:CODE": "2010392",
         "name": "Saint Ignatius of Loyola Church (SI)",
         "religion": "christian",
-        "source": "CanVec_Import_2009"
+        "source": "CanVec_Import_2009",
+        "label": "SI",
+        "address": "4455 West Broadway, Montreal, QC H4B 2A7",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -2322,7 +2443,10 @@
         "canvec:CODE": "2010392",
         "name": "F.C. Smith Building (FC)",
         "source": "CanVec_Import_2009",
-        "website": "http://www.concordia.ca/arts/venues/fc-smith-auditorium.html"
+        "website": "http://www.concordia.ca/arts/venues/fc-smith-auditorium.html",
+        "label": "FC",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -2472,7 +2596,10 @@
         "name": "Recreation and Athletics Complex (RA)",
         "name_1": "Ed Meagher Arena",
         "sport": "multi",
-        "website": "http://www.concordia.ca/campus-life/recreation/facilities/athletic-complex.html"
+        "website": "http://www.concordia.ca/campus-life/recreation/facilities/athletic-complex.html",
+        "label": "RA",
+        "address": "7200 Sherbrooke St W, Montreal, QC H4B 1R2",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -2559,7 +2686,10 @@
         "building": "university",
         "canvec:CODE": "2010252",
         "name": "Physical Services (PS)",
-        "source": "CanVec_Import_2009"
+        "source": "CanVec_Import_2009",
+        "label": "PS",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -2630,7 +2760,10 @@
         "canvec:CODE": "2010252",
         "name": "Communication Studies and Journalism Building (CJ)",
         "source": "CanVec_Import_2009",
-        "website": "http://www.concordia.ca/artsci/coms.html"
+        "website": "http://www.concordia.ca/artsci/coms.html",
+        "label": "CJ",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -2793,7 +2926,10 @@
         "building": "university",
         "canvec:CODE": "2010252",
         "name": "Student Centre (SC)",
-        "source": "CanVec_Import_2009"
+        "source": "CanVec_Import_2009",
+        "label": "SC",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -2874,7 +3010,10 @@
         "@id": "way/129437733",
         "building": "university",
         "name": "Jesuit Residence (JR)",
-        "website": "http://www.concordia.ca/students/housing/residences/jesuit-residence.html"
+        "website": "http://www.concordia.ca/students/housing/residences/jesuit-residence.html",
+        "label": "JR",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -2960,8 +3099,11 @@
         "building": "shelter",
         "covered": "yes",
         "layer": "1",
-        "name": "Stinger Dome (SD)",
-        "seasonal": "yes"
+        "name": "Stinger Dome",
+        "seasonal": "yes",
+        "label": "DO",
+        "address": "7200 Sherbrooke St W, Montreal, QC H4B 1R3",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -3038,7 +3180,10 @@
         "@id": "way/352622186",
         "building": "university",
         "building:levels": "1",
-        "name": "Solar House (SH)"
+        "name": "Solar House (SH)",
+        "label": "SH", 
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -3077,7 +3222,10 @@
         "addr:housenumber": "7079",
         "addr:street": "Rue de Terrebonne",
         "building": "university",
-        "name": "Concordia Terrebonne Building (TA)"
+        "name": "Concordia Terrebonne Building (TA)",
+        "label": "TA",
+        "address": "7075 Rue de Terrebonne, Montreal, QC H4B 2Z3",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -3114,7 +3262,10 @@
         "@id": "way/545014554",
         "building": "university",
         "name": "Centre for Structural and Functional Genomics (GE)",
-        "website": "http://www.concordia.ca/research/genomics.html"
+        "website": "http://www.concordia.ca/research/genomics.html",
+        "label": "GE",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -3183,7 +3334,10 @@
         "addr:street": "Rue Sherbrooke Ouest",
         "building": "university",
         "name": "PERFORM Centre (PC)",
-        "website": "http://www.concordia.ca/research/perform.html"
+        "website": "http://www.concordia.ca/research/perform.html",
+        "label": "PC",
+        "address": "7200 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -3223,7 +3377,10 @@
       "properties": {
         "@id": "way/604324438",
         "building": "university",
-        "name": "Hingston Hall (HC)"
+        "name": "Hingston Hall (HC)",
+        "label": "HC",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -3289,7 +3446,10 @@
         "addr:street": "Avenue Belmore",
         "building": "university",
         "name": "Concordia BB Annex (BB)",
-        "website": "https://lesptitsprofs.wordpress.com/"
+        "website": "https://lesptitsprofs.wordpress.com/",
+        "label": "BB",
+        "address": "3602 Avenue Belmore, Montreal, QC H4B 2B9",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -3331,7 +3491,10 @@
         "addr:street": "Avenue Belmore",
         "building": "university",
         "name": "Concordia BH Annex (BH)",
-        "website": "https://lesptitsprofs.wordpress.com/"
+        "website": "https://lesptitsprofs.wordpress.com/",
+        "label": "BH",
+        "address": "3600 Avenue Belmore, Montreal, QC H4B 2B9",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -3367,7 +3530,10 @@
       "properties": {
         "@id": "way/604324441",
         "building": "university",
-        "name": "Vanier Extension (VE)"
+        "name": "Vanier Extension (VE)",
+        "label": "VE",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -3406,7 +3572,10 @@
         "building": "university",
         "name": "Vanier Library (VL)",
         "opening_hours": "Mo - Th 09:00 - 22:00, Fr 09:00 - 21:00, Sa - Su 10:00 - 21:00",
-        "website": "https://library.concordia.ca/"
+        "website": "https://library.concordia.ca/",
+        "label": "VL",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -3536,7 +3705,10 @@
         "amenity": "theatre",
         "building": "university",
         "name": "Oscar Peterson Concert Hall (PT)",
-        "website": "http://www.concordia.ca/arts/venues/oscar-peterson.html"
+        "website": "http://www.concordia.ca/arts/venues/oscar-peterson.html",
+        "label": "PT",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -3589,7 +3761,10 @@
         "@id": "way/604324455",
         "building": "university",
         "name": "Loyola Jesuit Hall and Conference Center (RF)",
-        "website": "http://www.concordia.ca/hospitality/hospitality-venues/loyola-jesuit-hall-conference-centre.html"
+        "website": "http://www.concordia.ca/hospitality/hospitality-venues/loyola-jesuit-hall-conference-centre.html",
+        "label": "RF",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -3686,7 +3861,10 @@
         "@id": "way/604324456",
         "building": "university",
         "name": "Central Building (CC)",
-        "website": "csu.concordia.ca"
+        "website": "csu.concordia.ca",
+        "label": "CC",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -3808,7 +3986,10 @@
         "addr:street": "Rue Sherbrooke Ouest",
         "building": "university",
         "name": "Administration Building (AD)",
-        "website": "http://www.concordia.ca/artsci.html"
+        "website": "http://www.concordia.ca/artsci.html",
+        "label": "AD",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -4044,7 +4225,10 @@
       "properties": {
         "@id": "way/607123369",
         "leisure": "park",
-        "name": "Loyola Quadrangle (QA)"
+        "name": "Loyola Quadrangle (QA)",
+        "label": "QA",
+        "address": "7147 Sherbrooke St W, Montreal, QC H4B 1R2",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -4152,7 +4336,10 @@
       "properties": {
         "@id": "way/795012497",
         "building": "university",
-        "name": "Applied Science Hub (HU)"
+        "name": "Applied Science Hub (HU)",
+        "label": "HU",
+        "address": "7141 Sherbrooke St W, Montreal, QC H4B 1R6",
+        "campus":"LOY"
       },
       "geometry": {
         "type": "Polygon",
@@ -4225,7 +4412,8 @@
         "@id": "way/17887803",
         "highway": "residential",
         "name": "River Ranch Road",
-        "surface": "asphalt"
+        "surface": "asphalt",
+        "label": "XX"
       },
       "geometry": {
         "type": "LineString",
@@ -4340,7 +4528,8 @@
         "building": "university",
         "building:levels": "10",
         "learning": "university",
-        "name": "LB - J. W. McConnell Building (Library Building)"
+        "name": "LB - J. W. McConnell Building (Library Building)",
+        "label": "LB"
       },
       "geometry": {
         "type": "Polygon",
