@@ -3,11 +3,13 @@ import MyLocationIcon from '@mui/icons-material/MyLocation';
 import RoomIcon from '@mui/icons-material/Room';
 import { getSuggestions, getPlaceDetails } from '../services/PlaceServices';
 import { fetchDirections } from '../services/directionsServices';
-import { APIProvider, Map } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import { LocationContext } from '../components/LocationContext'; import { DirectionsBike } from '@mui/icons-material';
+import { display } from '@mui/system';
+import { getDirections } from '../api';
 
 
 interface LocationType {
@@ -384,7 +386,15 @@ const Directions = () => {
                                                     </div>
                                                 </div>
                                                 <div className="selecting-route-button">
-                                                    <button className='bg-green-900 text-white font-bold'>Go</button>
+                                                    <button
+                                                        className='bg-green-900 text-white font-bold'
+                                                        onClick={() => {
+                                                            console.log("Selected Route: ", routes[index]);
+                                                            // Set the selected route
+                                                            setRoutes([route]);
+                                                        }}>
+                                                        Go
+                                                    </button>
                                                 </div>
                                             </div>
                                         ) : (
@@ -410,10 +420,55 @@ const Directions = () => {
                             mapTypeControl={false}
                             fullscreenControl={false}
                         />
+                        <RenderRoutes />
                     </div>
                 </div>
             </div>
         </APIProvider>
     );
 }
+
+function RenderRoutes() {
+    const map = useMap();
+    const routesLibrary = useMapsLibrary('routes');
+    const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService>();
+    const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer>();
+    const [routes, setRoutes] = useState<google.maps.DirectionsRoute[]>([]); //DONT FORGET ARRAY HERE
+    const [routeIndex] = useState(0);
+    const selected = routes[routeIndex]; // keep track of what is selected
+    const leg = selected?.legs[0]; // get the first leg of the selected route
+
+    useEffect(() => {
+        if (!routesLibrary || !map) return;
+        setDirectionsService(new google.maps.DirectionsService());
+        setDirectionsRenderer(new google.maps.DirectionsRenderer({map}));
+    }, [routesLibrary, map]);
+
+    useEffect(() => {
+        if(!directionsService || !directionsRenderer) {
+            return; 
+        }
+        // Set the directions to render
+        //get Selected Route from Directions
+
+
+        directionsService.route({
+            origin: "12325 Av. Rita-Levi-Montalcini, Montréal, QC H1E 4P8, Canada",
+            destination: "Faubourg Tower",
+            travelMode: google.maps.TravelMode.DRIVING,
+            provideRouteAlternatives: true,
+        }).then(response => {
+            directionsRenderer.setDirections(response);
+            setRoutes(response.routes);
+        });
+
+    },[directionsService, directionsRenderer]);
+
+    console.log("Routes: ", routes);
+    if (!leg){
+        return null;
+    }
+}
+
+
 export default Directions;
