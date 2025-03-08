@@ -76,14 +76,12 @@ router.get('/directions', async (req, res) => {
     try {
         const source = req.query.source as string;
         const destination = req.query.destination as string;
-        const travelMode = (req.query.travelMode as string) || 'driving';
 
-        if (!source || !destination || !travelMode) {
+        if (!source || !destination) {
             res.status(400).send('Source, destination, and travel mode are required');
             return;
         }
-
-        const response = await fetchDirections(source, destination, travelMode);
+        const response = await fetchDirections(source, destination);
         res.json(response);
     } catch (error) {
         console.error('Error getting directions:', error);
@@ -91,8 +89,6 @@ router.get('/directions', async (req, res) => {
     }
 }
 )
-
-
 
 router.get('/test', (_req: Request, res: Response) => {
     res.send('maps works');
