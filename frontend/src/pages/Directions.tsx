@@ -7,8 +7,8 @@ import { APIProvider, Map, useMap, useMapsLibrary } from '@vis.gl/react-google-m
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
-import { LocationContext } from '../components/LocationContext'; import { DirectionsBike } from '@mui/icons-material';
-
+import { LocationContext } from '../components/LocationContext';
+import { DirectionsBike } from '@mui/icons-material';
 
 interface LocationType {
     name: string;
@@ -82,7 +82,7 @@ const Directions = () => {
 
             const predictionsResults = async () => {
                 const predictions = await getSuggestions(query, 45.5049, -73.5779);
-                console.log("Predictions: ", predictions);
+               // console.log("Predictions: ", predictions);
                 if (active === "start") {
                     setSourceResults(predictions as LocationType[]);
                 } else {
@@ -211,6 +211,13 @@ const Directions = () => {
         }, 7000); // 7 seconds delay
     };
 
+
+    const handleClearDestination = () => {
+        setDestinationQuery("");
+        setDestination(undefined);
+        setRoutesAvailable(false);
+    }
+
     useEffect(() => {
         return () => {
             if (resetTimeoutRef.current) {
@@ -218,6 +225,10 @@ const Directions = () => {
             }
         };
     }, []);
+
+    // Add a state variable to track the selected route index
+    const [selectedRouteIndex, setSelectedRouteIndex] = useState<number>(0);
+
 
     return (
         <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={["places", "geometry"]}>
@@ -235,6 +246,8 @@ const Directions = () => {
                                 setActive("start");
                                 setSourceQuery(e.target.value);
                                 setIsUserTyping(true);
+                                setRoutes([]); // Reset routes
+                                setRoutesAvailable(false); // Reset routesAvailable
                                 if (resetTimeoutRef.current) {
                                     clearTimeout(resetTimeoutRef.current);
                                 }
@@ -260,16 +273,16 @@ const Directions = () => {
                             onChange={(e) => {
                                 setActive("end");
                                 setDestinationQuery(e.target.value);
+                                setRoutes([]); // Reset routes
+                                setRoutesAvailable(false); // Reset routesAvailable
                             }}
                             onKeyDown={handleKeyDown}
                         />
                         {destinationQuery &&
                             <button
                                 className="text-l font-bold text-gray-700 bg-white p-1"
-                                onClick={() => {
-                                    setDestinationQuery("");
-                                    setRoutesAvailable(false); // Hide routes when destination input is cleared
-                                }}>
+                                onClick={handleClearDestination}
+                            >
                                 x
                             </button>
                         }
@@ -362,45 +375,44 @@ const Directions = () => {
 
                             </div>
                             <div id='routes-display' className='flex flex-col border-t-2 mb-3 over'>
-                                <div id='routes-display' className='flex flex-col border-t-2 mb-3 over'>
-                                    {routes?.map((route: any, index: number) => (
-                                        route.legs ? (
-                                            <div key={index}
-                                                tabIndex={0}
-                                                onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && console.log("Selected Route: ", routes[index])}
-                                                id="route-item-container"
-                                                className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between  align-middle shadow-sm"
-                                                onClick={() => {
-                                                    console.log("Selected Route: ", routes[index]);
-                                                }}
-                                            >
-                                                <div id='route-item-duration-distance' className="flex flex-col items-start align-middle">
-                                                    <span className="font-bold text-lg">{route.legs[0].duration.text}</span>
-                                                    <div className="flex">
-                                                        <span className="text-xs">{route.legs[0].distance.text}</span>
-                                                        {index === 0 && <span className="text-xs ml-1">— Fastest Route</span>}
-                                                        {transportationMode === "transit" && <span className="text-xs ml-1">— {route.legs[0].steps.length} stops</span>}
-                                                    </div>
-                                                </div>
-                                                <div className="selecting-route-button">
-                                                    <button
-                                                        className='bg-green-900 text-white font-bold'
-                                                        
-                                                        >
-                                                        Go
-                                                    </button>
+                                {routes?.map((route: any, index: number) => (
+                                    route.legs ? (
+                                        <div key={index}
+                                            tabIndex={0}
+                                            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && console.log("Selected Route: ", routes[index])}
+                                            id="route-item-container"
+                                            className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between  align-middle shadow-sm"
+                                          
+                                        >
+                                            <div id='route-item-duration-distance' className="flex flex-col items-start align-middle">
+                                                <span className="font-bold text-lg">{route.legs[0].duration.text}</span>
+                                                <div className="flex">
+                                                    <span className="text-xs">{route.legs[0].distance.text}</span>
+                                                    {index === 0 && <span className="text-xs ml-1">— Fastest Route</span>}
+                                                    {transportationMode === "transit" && <span className="text-xs ml-1">— {route.legs[0].steps.length} stops</span>}
                                                 </div>
                                             </div>
-                                        ) : (
-                                            <p className="text-blue-800"
-                                                key={index}>No routes available
-                                            </p>
-                                        )
-                                    ))}
+                                            <div className="selecting-route-button">
+                                            <button
+                                                className='bg-green-900 text-white font-bold'
+                                                onClick={() => {
+                                                    console.log("Selected Route: ", routes[index]);
+                                                    setSelectedRouteIndex(index); // Update selected route index
+                                                }}
+                                            >
+                                            Go
+                                        </button>
 
-                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p className="text-blue-800"
+                                            key={index}>No routes available
+                                        </p>
+                                    )
+                                ))}
+
                             </div>
-
                         </div>
                     }
 
@@ -408,55 +420,88 @@ const Directions = () => {
                     <div id="map-container"
                         style={{ height: '86vh', width: '100vw' }}
                     >
-                        <Map
-                            defaultZoom={15}
-                            defaultCenter={{ lat: 45.4949, lng: -73.5779 }}
-                            mapTypeControl={false}
-                            fullscreenControl={false}
-                        />
-                        <RenderRoutes
-                            source={source}
-                            destination={destination}
-                            transportationMode={transportationMode}
-                            routes={routes}
- />
+                      <MapWrapper source={source} destination={destination} selectedRouteIndex={selectedRouteIndex}  transportationMode={transportationMode}  />
                     </div>
                 </div>
             </div>
         </APIProvider>
     );
 }
+// New MapWrapper component
+function MapWrapper({ source, destination, selectedRouteIndex, transportationMode }: { source: LocationType | undefined, destination: LocationType | undefined, selectedRouteIndex: number, transportationMode: "driving" | "transit" | "walking" | "bicycling"  }) {
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    const [mapKey, setMapKey] = useState(Date.now());
 
-function RenderRoutes({ source, destination, transportationMode }: {
+     useEffect(() => {
+        setMapKey(Date.now()); // Update the key
+    }, [source, destination, selectedRouteIndex, transportationMode]); //include transportationMode
+
+    return (
+        <APIProvider apiKey={apiKey} libraries={["places", "geometry"]}>
+            <Map
+                key={mapKey}  // Use the dynamic key here
+                defaultZoom={15}
+                defaultCenter={{ lat: 45.4949, lng: -73.5779 }}
+                mapTypeControl={false}
+                fullscreenControl={false}
+             >
+            <RenderRoutes
+                key={`${source?.place_id}-${destination?.place_id}-${selectedRouteIndex}`}
+                source={source}
+                destination={destination}
+                selectedRouteIndex={selectedRouteIndex}
+                transportationMode = {transportationMode}
+            />
+            </Map>
+         </APIProvider>
+    );
+}
+
+
+function RenderRoutes({ source, destination, selectedRouteIndex, transportationMode }: {
     source: LocationType | undefined;
     destination: LocationType | undefined;
+    selectedRouteIndex: number;
     transportationMode: "driving" | "transit" | "walking" | "bicycling";
-    routes: any; 
+
 }) {
     const map = useMap();
     const routesLibrary = useMapsLibrary('routes');
     const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService>();
     const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer>();
     const [displayedRoute, setDisplayedRoute] = useState<google.maps.DirectionsResult | null>(null);
-    useEffect(() => {
+
+     useEffect(() => {
         if (!routesLibrary || !map) return;
+
+        
         setDirectionsService(new google.maps.DirectionsService());
         const renderer = new google.maps.DirectionsRenderer({ map: map });
         setDirectionsRenderer(renderer);
-    }, [routesLibrary, map]);
+
+        // Cleanup function to clear the renderer when the component unmounts or dependencies change.
+        return () => {
+            
+            renderer.setMap(null);
+        };
+    }, [routesLibrary, map]);  // Run only when routesLibrary or map changes
 
     useEffect(() => {
         if (!directionsService || !directionsRenderer || !source || !destination) {
+           
+            if(directionsRenderer) {
+              directionsRenderer.setMap(null);
+            }
             return;
         }
-
-        const travelModeMap = {
+         const travelModeMap = {
             driving: google.maps.TravelMode.DRIVING,
             transit: google.maps.TravelMode.TRANSIT,
             walking: google.maps.TravelMode.WALKING,
             bicycling: google.maps.TravelMode.BICYCLING,
         };
 
+        //console.log("RenderRoutes: Rendering directions");
         directionsService.route(
             {
                 origin: { lat: source.lat, lng: source.lng },
@@ -466,21 +511,20 @@ function RenderRoutes({ source, destination, transportationMode }: {
             },
             (response, status) => {
                 if (status === "OK") {
+                    //console.log("RenderRoutes: Directions request OK");
                     setDisplayedRoute(response);
-                    directionsRenderer.setDirections(response);
-
+                   directionsRenderer.setDirections(response);
+                   directionsRenderer.setRouteIndex(selectedRouteIndex); // Set the selected route
                 } else {
                     console.error("Directions request failed due to " + status);
                     setDisplayedRoute(null);
-                    // Optionally display an error message to the user
                 }
             }
         );
-    }, [directionsService, directionsRenderer, source, destination, transportationMode]);
+    }, [directionsService, directionsRenderer, source, destination, selectedRouteIndex, transportationMode]); // Add selectedRouteIndex as a dependency
 
-    console.log("Displayed Route: ", displayedRoute); //will use later, multi-route selection
-    return null; // The renderer handles the display, so no need to return anything
+    //console.log("Displayed Route: ", displayedRoute);
+    return null;
 }
-
 
 export default Directions;
