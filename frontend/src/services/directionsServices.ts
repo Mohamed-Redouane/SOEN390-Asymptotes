@@ -1,3 +1,5 @@
+import { getDirections } from '../api/mapsApi';
+
 interface LocationType {
    name: string;
    address: string;
@@ -7,8 +9,7 @@ interface LocationType {
 }
 
 
-import { getDirections } from '../api/mapsApi';
-export async function fetchDirections(source: LocationType, destination: LocationType, travelMode: string) {
-   const directions = await getDirections(source.place_id, destination.place_id, travelMode);
+export async function fetchDirections(source: LocationType, destination: LocationType) {
+   const directions = await getDirections(source.place_id, destination.place_id);
    return directions;
 }
