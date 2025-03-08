@@ -221,7 +221,6 @@ const Directions = () => {
         };
     }, []);
 
-
     return (
         <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={["places", "geometry"]}>
             <div className="relative flex flex-col flex-shrink-0 w-full" >
@@ -388,11 +387,8 @@ const Directions = () => {
                                                 <div className="selecting-route-button">
                                                     <button
                                                         className='bg-green-900 text-white font-bold'
-                                                        onClick={() => {
-                                                            console.log("Selected Route: ", routes[index]);
-                                                            // Set the selected route
-                                                            setRoutes([route]);
-                                                        }}>
+                                                        
+                                                        >
                                                         Go
                                                     </button>
                                                 </div>
@@ -420,7 +416,12 @@ const Directions = () => {
                             mapTypeControl={false}
                             fullscreenControl={false}
                         />
-                        <RenderRoutes />
+                        <RenderRoutes
+                            source={source}
+                            destination={destination}
+                            transportationMode={transportationMode}
+                            routes={routes}
+ />
                     </div>
                 </div>
             </div>
@@ -428,46 +429,59 @@ const Directions = () => {
     );
 }
 
-function RenderRoutes() {
+function RenderRoutes({ source, destination, transportationMode }: {
+    source: LocationType | undefined;
+    destination: LocationType | undefined;
+    transportationMode: "driving" | "transit" | "walking" | "bicycling";
+    routes: any; 
+}) {
     const map = useMap();
     const routesLibrary = useMapsLibrary('routes');
     const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService>();
     const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer>();
-    const [routes, setRoutes] = useState<google.maps.DirectionsRoute[]>([]); //DONT FORGET ARRAY HERE
-    const [routeIndex] = useState(0);
-    const selected = routes[routeIndex]; // keep track of what is selected
-    const leg = selected?.legs[0]; // get the first leg of the selected route
-
+    const [displayedRoute, setDisplayedRoute] = useState<google.maps.DirectionsResult | null>(null);
     useEffect(() => {
         if (!routesLibrary || !map) return;
         setDirectionsService(new google.maps.DirectionsService());
-        setDirectionsRenderer(new google.maps.DirectionsRenderer({map}));
+        const renderer = new google.maps.DirectionsRenderer({ map: map });
+        setDirectionsRenderer(renderer);
     }, [routesLibrary, map]);
 
     useEffect(() => {
-        if(!directionsService || !directionsRenderer) {
-            return; 
+        if (!directionsService || !directionsRenderer || !source || !destination) {
+            return;
         }
-        // Set the directions to render
-        //get Selected Route from Directions
 
+        const travelModeMap = {
+            driving: google.maps.TravelMode.DRIVING,
+            transit: google.maps.TravelMode.TRANSIT,
+            walking: google.maps.TravelMode.WALKING,
+            bicycling: google.maps.TravelMode.BICYCLING,
+        };
 
-        directionsService.route({
-            origin: "12325 Av. Rita-Levi-Montalcini, Montréal, QC H1E 4P8, Canada",
-            destination: "Faubourg Tower",
-            travelMode: google.maps.TravelMode.DRIVING,
-            provideRouteAlternatives: true,
-        }).then(response => {
-            directionsRenderer.setDirections(response);
-            setRoutes(response.routes);
-        });
+        directionsService.route(
+            {
+                origin: { lat: source.lat, lng: source.lng },
+                destination: { lat: destination.lat, lng: destination.lng },
+                travelMode: travelModeMap[transportationMode],
+                provideRouteAlternatives: true,
+            },
+            (response, status) => {
+                if (status === "OK") {
+                    setDisplayedRoute(response);
+                    directionsRenderer.setDirections(response);
 
-    },[directionsService, directionsRenderer]);
+                } else {
+                    console.error("Directions request failed due to " + status);
+                    setDisplayedRoute(null);
+                    // Optionally display an error message to the user
+                }
+            }
+        );
+    }, [directionsService, directionsRenderer, source, destination, transportationMode]);
 
-    console.log("Routes: ", routes);
-    if (!leg){
-        return null;
-    }
+    console.log("Displayed Route: ", displayedRoute); //will use later, multi-route selection
+    return null; // The renderer handles the display, so no need to return anything
 }
 
 
