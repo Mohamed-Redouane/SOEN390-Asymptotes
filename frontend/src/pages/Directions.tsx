@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import RoomIcon from '@mui/icons-material/Room';
 import { getSuggestions, getPlaceDetails } from '../services/PlaceServices';
@@ -25,7 +26,6 @@ const Directions = () => {
     const [sourceResults, setSourceResults] = useState<LocationType[]>([]); // Suggestions for source
     const [destinationResults, setDestinationResults] = useState<LocationType[]>([]);
     const [transportationMode, setTransportationMode] = useState<"driving" | "transit" | "walking">("driving");
-
     const [source, setSource] = useState<LocationType>();
     const [destination, setDestination] = useState<LocationType>();
     const [routesAvailable, setRoutesAvailable] = useState<boolean>(false);
@@ -35,6 +35,7 @@ const Directions = () => {
     const [isResettingStart, setIsResettingStart] = useState(false);
     const [isUserTyping, setIsUserTyping] = useState(false);
     const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const locationFromEventContext = useLocation();
 
     const [selectedResultIndex, setSelectedResultIndex] = useState<number>(-1); // for keyboard navigation of results
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -48,7 +49,7 @@ const Directions = () => {
     };
 
     const isProgrammaticChange = useRef(false); // Used to prevent infinite loop when setting the value of the input field programmatically
-
+    
     useEffect(() => {
         if (userLocation?.address && !sourceQuery && !isResettingStart && !isUserTyping) {
             setSourceQuery(userLocation.address);
@@ -57,7 +58,18 @@ const Directions = () => {
     }, [userLocation, isResettingStart, isUserTyping]);
 
     useEffect(() => {
-        if (!isProgrammaticChange.current && active  && (active === "start" ? sourceQuery : destinationQuery)) {
+        if (locationFromEventContext.state) {
+            if (userLocation) {
+                setSourceQuery(userLocation.address);
+                
+            }
+            setDestinationQuery(locationFromEventContext.state.locationName);
+            
+        }
+        
+        if (!isProgrammaticChange.current 
+                && active  
+                && (active === "start" ? sourceQuery : destinationQuery)) { 
             setRoutes([]);
             setRoutesAvailable(false);
             let query = "";
