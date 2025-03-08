@@ -26,10 +26,11 @@ const BottomNavBar = () => {
     setShowDirectionOptions(false);
   }, [location.pathname]);
 
-  const mapLabel = useMemo(() => {
-    if (location.pathname === '/') return 'Map: SGW';
-    if (location.pathname === '/LOYcampus') return 'Map: Loyola';
-    return 'Map';
+
+  const directionLabel = useMemo(() => {
+    if (location.pathname === '/directions') return 'Directions: Outdoor';
+    if (location.pathname === '/indoordirections') return 'Directions: Indoor';
+    return 'Directions';
   }, [location.pathname]);
 
   // Determine if the current path is the directions page (indoor or outdoor)
@@ -39,13 +40,13 @@ const BottomNavBar = () => {
     if (value === '/') {
       navigate(value);
     } else if (value === '/directions' || value === '/indoordirections') {
-      
-      if(!(location.pathname === '/directions' || location.pathname === '/indoordirections'))
-      navigate(value);
+
+      if (!(location.pathname === '/directions' || location.pathname === '/indoordirections'))
+        navigate(value);
       // Only toggle direction options if already on directions page
       if (isDirectionsActive) {
         setShowDirectionOptions((prev) => !prev);
-      } 
+      }
     } else {
       navigate(value);
     }
@@ -55,11 +56,11 @@ const BottomNavBar = () => {
   // Handle direction type selection
   const handleDirectionTypeChange = (type: 'indoor' | 'outdoor') => {
     setDirectionType(type);
-    
+
     // Use a more robust state management approach
     // Dispatch a custom event with the selected direction type
-    const event = new CustomEvent('directionTypeChanged', { 
-      detail: { type, timestamp: Date.now() } 
+    const event = new CustomEvent('directionTypeChanged', {
+      detail: { type, timestamp: Date.now() }
     });
     window.dispatchEvent(event);
 
@@ -69,20 +70,20 @@ const BottomNavBar = () => {
     // Navigate to : /directions or /indoordirections
     navigate(type === 'indoor' ? '/indoordirections' : '/directions');
 
-    
+
     // Don't automatically close the menu to allow for easier toggling
   };
 
-  const NavButton = ({ 
-    icon: Icon, 
-    label, 
-    value, 
+  const NavButton = ({
+    icon: Icon,
+    label,
+    value,
     isActive,
     onClick
-  }: { 
-    icon: React.ElementType; 
-    label: string; 
-    value: string; 
+  }: {
+    icon: React.ElementType;
+    label: string;
+    value: string;
     isActive: boolean;
     onClick?: () => void;
   }) => (
@@ -100,15 +101,6 @@ const BottomNavBar = () => {
     >
       <Icon className={`h-6 w-6 mb-1 transition-all duration-300 ${isActive ? 'scale-110' : 'scale-100'}`} />
       <span className="text-xs font-medium">{label}</span>
-      
-      {/* Indicator for active direction type when on directions page */}
-      {isActive && (value === '/directions' || value === '/indoordirections') && (
-        <div className="absolute -top-1 right-2 flex items-center justify-center">
-          <span className="text-xs bg-white text-[#4c3ee2] px-2 py-0.5 rounded-full font-medium shadow-sm">
-            {directionType === 'indoor' ? 'Indoor' : 'Outdoor'}
-          </span>
-        </div>
-      )}
     </button>
   );
 
@@ -121,8 +113,8 @@ const BottomNavBar = () => {
             <button
               onClick={() => handleDirectionTypeChange('indoor')}
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 transition-all duration-200
-                ${directionType === 'indoor' 
-                  ? 'bg-[#4c3ee2] text-white' 
+                ${directionType === 'indoor'
+                  ? 'bg-[#4c3ee2] text-white'
                   : 'text-gray-700 hover:bg-gray-100'}`}
             >
               <Building className="h-5 w-5" />
@@ -132,8 +124,8 @@ const BottomNavBar = () => {
             <button
               onClick={() => handleDirectionTypeChange('outdoor')}
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 transition-all duration-200
-                ${directionType === 'outdoor' 
-                  ? 'bg-[#4c3ee2] text-white' 
+                ${directionType === 'outdoor'
+                  ? 'bg-[#4c3ee2] text-white'
                   : 'text-gray-700 hover:bg-gray-100'}`}
             >
               <MapPin className="h-5 w-5" />
@@ -146,16 +138,16 @@ const BottomNavBar = () => {
 
       <nav className="flex h-16 bg-white shadow-lg backdrop-blur-md">
         <NavButton icon={Bus} label="Shuttle" value="/shuttle" isActive={location.pathname === '/shuttle'} />
-        <NavButton icon={Map} label={mapLabel} value="/" isActive={location.pathname === '/' || location.pathname === '/LOYcampus'} />
+        <NavButton icon={Map} label="Map" value="/" isActive={location.pathname === '/' || location.pathname === '/LOYcampus'} />
         {/* Need to disable the button if we are on /indoordirections or in /directions */}
-        
-        <NavButton 
-          icon={Navigation} 
-          label="Directions" 
-          value="/indoordirections" 
+
+        <NavButton
+          icon={Navigation}
+          label={directionLabel}
+          value="/indoordirections"
           isActive={isDirectionsActive}
 
-          
+
           onClick={() => {
 
             if (isDirectionsActive) {
