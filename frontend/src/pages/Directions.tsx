@@ -63,16 +63,7 @@ const Directions = () => {
         }
     }, [userLocation, isResettingStart, isUserTyping]);
 
-    useEffect(() => {
-        if (locationFromEventContext.state) {
-            if (userLocation) {
-                setSourceQuery(userLocation.address);
-                
-            }
-            setDestinationQuery(locationFromEventContext.state.locationName);
-            
-        }
-        
+    useEffect(() => {        
         if (!isProgrammaticChange.current 
                 && active  
                 && (active === "start" ? sourceQuery : destinationQuery)) {
@@ -107,7 +98,24 @@ const Directions = () => {
         }
         isProgrammaticChange.current = false;
     }, [sourceQuery, destinationQuery, active]);
-
+    
+    // Responsible for setting the destination to the user's next 
+    // class. Another `useEffect` function is responsible for setting 
+    // the user's current location.
+    useEffect(() => {
+        async function setupNextClassDirections() {
+            if (locationFromEventContext.state) {
+                const name = locationFromEventContext.state.locationName;
+                const details = (await getSuggestions(name, 
+                    userLocation.lat, userLocation.lng))[0];
+                setDestination(details as LocationType)
+                setDestinationQuery(details.address);
+                
+            }
+        }
+        
+        setupNextClassDirections();
+    }, [locationFromEventContext]);
 
     const handleSelect = async (index: number) => {
         const place = (active === "start" ? sourceResults : destinationResults)[index];
