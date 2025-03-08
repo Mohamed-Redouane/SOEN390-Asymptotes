@@ -64,7 +64,7 @@ const Directions = () => {
     }, [userLocation, isResettingStart, isUserTyping]);
 
     useEffect(() => {
-<<<<<<< HEAD
+
         if (locationFromEventContext.state) {
             if (userLocation) {
                 setSourceQuery(userLocation.address);
@@ -73,13 +73,9 @@ const Directions = () => {
             setDestinationQuery(locationFromEventContext.state.locationName);
             
         }
-        
-        if (!isProgrammaticChange.current 
-                && active  
-                && (active === "start" ? sourceQuery : destinationQuery)) { 
-=======
+
         if (!isProgrammaticChange.current && active && (active === "start" ? sourceQuery : destinationQuery)) {
->>>>>>> 292aa9dfffe62610ac9bcdfac1ade493934b7a1e
+
             setRoutes([]);
             setRoutesAvailable(false);
             let query = "";
