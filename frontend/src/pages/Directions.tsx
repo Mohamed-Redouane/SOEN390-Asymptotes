@@ -8,8 +8,6 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import { LocationContext } from '../components/LocationContext'; import { DirectionsBike } from '@mui/icons-material';
-import { display } from '@mui/system';
-import { getDirections } from '../api';
 
 
 interface LocationType {
