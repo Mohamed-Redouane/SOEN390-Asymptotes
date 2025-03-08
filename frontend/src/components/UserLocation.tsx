@@ -1,4 +1,5 @@
 import { useEffect, useContext, useState } from "react";
+import { useLocation } from 'react-router-dom';
 import Modal from "./Modal";
 import { LocationContext } from "./LocationContext";
 import { distanceCalculation } from "../utils/distanceCalculation";
@@ -13,7 +14,8 @@ function UserLocation() {
   const [geoJsonData, setGeoJsonData] = useState<any>(null);
   const [showOnCampusMessage, setShowOnCampusMessage] = useState<boolean>(false);
   const [showOffCampusMessage, setShowOffCampusMessage] = useState<boolean>(false);
-
+  const paramLocation = useLocation();
+  const { locationName } = paramLocation.state || {};
 
   useEffect(() => {
     fetch("/Building.geojson")

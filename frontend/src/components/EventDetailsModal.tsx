@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import { FaClock, FaMapMarkerAlt, FaInfoCircle } from 'react-icons/fa';
 
@@ -9,6 +10,9 @@ interface EventDetailsModalProps {
 }
 
 const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ isOpen, onClose, selectedEvent }) => {
+  const navigate = useNavigate();
+  const locationName = selectedEvent?.location;
+  
   return (
     <Transition appear show={isOpen} as={React.Fragment}>
       <Dialog as="div" className="relative z-10" onClose={onClose}>
@@ -31,7 +35,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ isOpen, onClose, 
               <div className="flex items-center">
                 <FaMapMarkerAlt className="mr-2" />
                 <span>
-                  <strong>Location:</strong> {selectedEvent?.location || "No location"}
+                  <strong>Location:</strong> {locationName || "No location"}
                 </span>
               </div>
               <div className="flex items-start">
@@ -44,6 +48,13 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ isOpen, onClose, 
             </div>
             <button
               className="mt-6 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+              onClick={() => navigate('/directions', 
+                { state: { locationName } })}
+            >
+              Get Directions
+            </button>
+            <button
+              className="mt-3 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
               onClick={onClose}
             >
               Close
