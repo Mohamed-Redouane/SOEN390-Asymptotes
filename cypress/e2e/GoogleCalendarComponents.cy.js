@@ -1,16 +1,21 @@
 describe("Google Calendar Component", () => {
   let authInstance;
 
-  // Helper function to calculate the next Thursday at 10:00 AM
-  const getNextThursdayAt10AM = () => {
-    const now = new Date();
+   // Helper function to calculate Thursday at 10:00 AM
+   const getNextThursdayAt10AM= () => {
+    const now = new Date(); 
     const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-    const daysUntilNextThursday = dayOfWeek === 4 ? 7 : (4 - dayOfWeek + 7) % 7; // 4 = Thursday
-    const nextThursday = new Date(now);
-    nextThursday.setDate(now.getDate() + daysUntilNextThursday);
-    nextThursday.setHours(10, 0, 0, 0); // Set time to 10:00 AM
-    return nextThursday.toISOString();
-  };
+    let targetThursday = new Date(now);
+
+    if (dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0) { // Friday, Saturday, or Sunday
+        targetThursday.setDate(now.getDate() - (dayOfWeek - 4)); // Previous Thursday
+    } else { // Monday to Thursday
+        targetThursday.setDate(now.getDate() - (dayOfWeek - 4)); // Current week's Thursday
+    }
+
+    targetThursday.setHours(10, 0, 0, 0); // Set time to 10:00 AM
+    return targetThursday.toISOString();
+};
 
   beforeEach(() => {
     authInstance = null;
