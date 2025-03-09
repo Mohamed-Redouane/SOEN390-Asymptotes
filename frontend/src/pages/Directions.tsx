@@ -18,6 +18,49 @@ interface LocationType {
     lng: number;
 }
 
+interface MapclickListenerProps {
+    onMapClick: (destination: LocationType) => void;
+}
+
+const MapClickListener: React.FC<MapclickListenerProps> = ({ onMapClick }) => {
+    const map = useMap();
+  useEffect(() => {
+    if (map) {
+      console.log("Map instance available in MapClickListener:", map);
+      const clickListener = map.addListener("click", (e: google.maps.MapMouseEvent) => {
+        if (!e.latLng) {
+          console.error("No latLng found in event", e);
+          return;
+        }
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
+        console.log("Map clicked at:", lat, lng);
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+          if (status === "OK" && results && results.length > 0) {
+            const result = results[0];
+            const destinationLocation: LocationType = {
+              name: result.formatted_address,
+              address: result.formatted_address,
+              place_id: result.place_id || "",
+              lat,
+              lng,
+            };
+            console.log("Reverse geocoded destination:", destinationLocation);
+            onMapClick(destinationLocation);
+          } else {
+            console.error("Geocoder failed with status:", status);
+          }
+        });
+      });
+      return () => {
+        google.maps.event.removeListener(clickListener);
+      };
+    }
+  }, [map, onMapClick]);
+  return null;
+} ;
+
 const Directions = () => {
     const [active, setActive] = useState<string>("");
     const [sourceQuery, setSourceQuery] = useState<string>("");
@@ -408,7 +451,13 @@ const Directions = () => {
                     <div id="map-container"
                         style={{ height: '86vh', width: '100vw' }}
                     >
-                      <MapWrapper source={source} destination={destination} selectedRouteIndex={selectedRouteIndex}  transportationMode={transportationMode}  />
+                      <MapWrapper source={source} destination={destination} selectedRouteIndex={selectedRouteIndex}  transportationMode={transportationMode}  
+                        onMapClick={(dest: LocationType) => {
+                            setDestination(dest);
+                            setDestinationQuery(dest.name);
+                            setActive("end");
+                        }}
+                      />
                     </div>
                 </div>
             </div>
@@ -416,7 +465,16 @@ const Directions = () => {
     );
 }
 
-function MapWrapper({ source, destination, selectedRouteIndex, transportationMode }: { source: LocationType | undefined, destination: LocationType | undefined, selectedRouteIndex: number, transportationMode: "driving" | "transit" | "walking" | "bicycling"  }) {
+interface MapWrapperProps {
+    source: LocationType | undefined;
+    destination: LocationType | undefined;
+    selectedRouteIndex: number;
+    transportationMode: "driving" | "transit" | "walking" | "bicycling";
+    onMapClick: (destination: LocationType) => void;
+}
+
+
+function MapWrapper({ source, destination, selectedRouteIndex, transportationMode, onMapClick }: MapWrapperProps) {
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     const [mapKey, setMapKey] = useState(Date.now());
 
@@ -440,6 +498,7 @@ function MapWrapper({ source, destination, selectedRouteIndex, transportationMod
                 selectedRouteIndex={selectedRouteIndex}
                 transportationMode = {transportationMode}
             />
+            <MapClickListener onMapClick={onMapClick} />
             </Map>
          </APIProvider>
     );
