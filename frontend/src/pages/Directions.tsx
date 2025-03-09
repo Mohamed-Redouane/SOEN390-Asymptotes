@@ -104,7 +104,7 @@ const Directions = () => {
     // the user's current location.
     useEffect(() => {
         async function setupNextClassDirections() {
-            if (locationFromEventContext.state) {
+            if (locationFromEventContext.state && userLocation) {
                 const name = locationFromEventContext.state.locationName;
                 const details = (await getSuggestions(name, 
                     userLocation.lat, userLocation.lng))[0];
