@@ -1,4 +1,4 @@
-# ====== FRONTEND STAGE ======
+# ====== FRONTEND STAGE ====== 
 FROM node:18-alpine AS frontend-builder
 
 WORKDIR /app
@@ -7,12 +7,16 @@ COPY frontend/package.json frontend/package-lock.json ./
 RUN npm install
 
 # Define build arguments
-ARG GOOGLE_MAPS_API_KEY
-ARG API_BASE_URL  # Added API_BASE_URL argument
+ARG VITE_GOOGLE_MAPS_API_KEY
+ARG VITE_API_BASE_URL
+ARG VITE_GOOGLE_CLIENT_SECRET
+ARG VITE_GOOGLE_CLIENT_ID
 
 # Expose those arguments to the frontend build environment
-ENV VITE_GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
+ENV VITE_GOOGLE_MAPS_API_KEY=${VITE_GOOGLE_MAPS_API_KEY}
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+ENV VITE_GOOGLE_CLIENT_SECRET=${VITE_GOOGLE_CLIENT_SECRET}
+ENV VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
 
 COPY frontend ./
 RUN npm run build
