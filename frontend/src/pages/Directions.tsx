@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
+import { useLocation } from 'react-router-dom'; 
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import RoomIcon from '@mui/icons-material/Room';
 import { getSuggestions, getPlaceDetails } from '../services/PlaceServices';
@@ -19,9 +20,11 @@ interface LocationType {
 }
 
 const Directions = () => {
+    const location = useLocation(); //useLocation to get the state
+    const destinationFromState = location.state?.destination || ""; // Get destination from state
     const [active, setActive] = useState<string>("");
     const [sourceQuery, setSourceQuery] = useState<string>("");
-    const [destinationQuery, setDestinationQuery] = useState<string>("");
+    const [destinationQuery, setDestinationQuery] = useState<string>(destinationFromState);
     const [sourceResults, setSourceResults] = useState<LocationType[]>([]);
     const [destinationResults, setDestinationResults] = useState<LocationType[]>([]);
     const [transportationMode, setTransportationMode] = useState<"driving" | "transit" | "walking" | "bicycling">("driving");
@@ -93,6 +96,17 @@ const Directions = () => {
         }
     }, [userLocation, isResettingStart, isUserTyping]);
 
+    useEffect(() => {
+        if (destinationFromState) {
+            setDestinationQuery(destinationFromState); // Set destination query
+            //poi details for the destination address
+            getPlaceDetails(destinationFromState).then((placeDetails) => {
+                setDestination(placeDetails as LocationType);
+            }).catch((error) => {
+                console.error("Error fetching place details:", error);
+            });
+        }
+    }, [destinationFromState]);
 
     // No longer need the useEffect for fetching suggestions.  It's handled by handleDebouncedSuggestions
 
@@ -275,10 +289,10 @@ const Directions = () => {
                         }
                     </div>
 
-                   {(active === "start" ? sourceResults : destinationResults).length > 0 && (
+                   {(active === "start" ? sourceResults : destinationResults)?.length > 0 && (
                         <div className="flex w-full">
                             <ul className="w-full" id="suggestions-container">
-                                {(active === "start" ? sourceResults : destinationResults).map((result, index) => (
+                                {(active === "start" ? sourceResults : destinationResults)?.map((result, index) => (
                                     <li key={index}
                                         id="suggestion-item-container"
                                         onKeyDown={(e) => e.key === "Enter" && handleSelect(index)}
@@ -300,7 +314,7 @@ const Directions = () => {
                         </div>
                     )}
 
-                      {(active === "start" ? sourceResults : destinationResults).length === 0 && (
+                      {(active === "start" ? sourceResults : destinationResults)?.length === 0 && (
                         <div id='directions-request-container' className="flex flex-col items-center w-full">
                             <button
                                 id="get-directions-button"
