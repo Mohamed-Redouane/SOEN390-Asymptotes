@@ -42,7 +42,9 @@ const Directions = () => {
 
     // Debounce ref
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
-    const DEBOUNCE_DELAY = 500; // 500ms delay (adjust as needed)
+    // Get debounce delay from environment variable, default to 300ms
+    const DEBOUNCE_DELAY = parseInt(import.meta.env.VITE_DEBOUNCE_DELAY || "300");
+
 
     // Debounced suggestion fetching function (KEY CHANGE)
     const handleDebouncedSuggestions = (query: string, activeField: string) => {
@@ -51,8 +53,7 @@ const Directions = () => {
         }
 
         debounceRef.current = setTimeout(() => {
-            //start predicting after 3 letters
-            if (query.trim().length > 2) {
+            if (query.trim().length > 0) {
                 getSuggestions(query, 45.5049, -73.5779)
                     .then(predictions => {
                         if (activeField === "start") {
@@ -69,7 +70,7 @@ const Directions = () => {
                             setDestinationResults([]);
                         }
             }
-        }, DEBOUNCE_DELAY);
+        }, DEBOUNCE_DELAY); // Use the environment variable here
     };
 
 
