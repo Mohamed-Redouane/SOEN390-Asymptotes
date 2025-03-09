@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import RoomIcon from '@mui/icons-material/Room';
 import { getSuggestions, getPlaceDetails } from '../services/PlaceServices';
@@ -26,7 +27,6 @@ const Directions = () => {
     const [sourceResults, setSourceResults] = useState<LocationType[]>([]); // Suggestions for source
     const [destinationResults, setDestinationResults] = useState<LocationType[]>([]);
     const [transportationMode, setTransportationMode] = useState<"driving" | "transit" | "walking" | "bicycling">("driving");
-
     const [source, setSource] = useState<LocationType>();
     const [destination, setDestination] = useState<LocationType>();
     const [routesAvailable, setRoutesAvailable] = useState<boolean>(false);
@@ -41,6 +41,7 @@ const Directions = () => {
     const [isResettingStart, setIsResettingStart] = useState(false);
     const [isUserTyping, setIsUserTyping] = useState(false);
     const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const locationFromEventContext = useLocation();
 
     const [selectedResultIndex, setSelectedResultIndex] = useState<number>(-1); // for keyboard navigation of results
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -54,7 +55,7 @@ const Directions = () => {
     };
 
     const isProgrammaticChange = useRef(false); // Used to prevent infinite loop when setting the value of the input field programmatically
-
+    
     useEffect(() => {
         if (userLocation?.address && !sourceQuery && !isResettingStart && !isUserTyping) {
             setSourceQuery(userLocation.address);
@@ -62,8 +63,10 @@ const Directions = () => {
         }
     }, [userLocation, isResettingStart, isUserTyping]);
 
-    useEffect(() => {
-        if (!isProgrammaticChange.current && active && (active === "start" ? sourceQuery : destinationQuery)) {
+    useEffect(() => {        
+        if (!isProgrammaticChange.current 
+                && active  
+                && (active === "start" ? sourceQuery : destinationQuery)) {
             setRoutes([]);
             setRoutesAvailable(false);
             let query = "";
@@ -95,7 +98,24 @@ const Directions = () => {
         }
         isProgrammaticChange.current = false;
     }, [sourceQuery, destinationQuery, active]);
-
+    
+    // Responsible for setting the destination to the user's next 
+    // class. Another `useEffect` function is responsible for setting 
+    // the user's current location.
+    useEffect(() => {
+        async function setupNextClassDirections() {
+            if (locationFromEventContext.state && userLocation) {
+                const name = locationFromEventContext.state.locationName;
+                const details = (await getSuggestions(name, 
+                    userLocation.lat, userLocation.lng))[0];
+                setDestination(details as LocationType)
+                setDestinationQuery(details.address);
+                
+            }
+        }
+        
+        setupNextClassDirections();
+    }, [locationFromEventContext]);
 
     const handleSelect = async (index: number) => {
         const place = (active === "start" ? sourceResults : destinationResults)[index];
@@ -324,7 +344,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "driving" ? "white" : "gray" }}
                                     />
                                     <p id='driving-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "driving" ? "white" : "gray" }} >
-                                        {drivingRoutes.length > 0 ? drivingRoutes[0].legs[0].duration.text : " none "}
+                                        {drivingRoutes && drivingRoutes.length > 0 ? drivingRoutes[0].legs[0].duration.text : " none "}
                                     </p>
                                 </button>
 
@@ -335,7 +355,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "transit" ? "white" : "gray" }}
                                     />
                                     <p id='transit-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "transit" ? "white" : "gray" }}>
-                                        {transitRoutes.length > 0 ? transitRoutes[0].legs[0].duration.text : " none "}
+                                        {transitRoutes && transitRoutes.length > 0 ? transitRoutes[0].legs[0].duration.text : " none "}
                                     </p>
                                 </button>
                                 <button id="walking-option"
@@ -345,7 +365,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "walking" ? "white" : "gray" }}
                                     />
                                     <p id='walking-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "walking" ? "white" : "gray" }} >
-                                        {walkingRoutes.length > 0 ? walkingRoutes[0].legs[0].duration.text : " none "}
+                                        {walkingRoutes && walkingRoutes.length > 0 ? walkingRoutes[0].legs[0].duration.text : " none "}
                                     </p>
                                 </button>
                                 <button id="bicycling-option"
@@ -356,7 +376,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "bicycling" ? "white" : "gray" }}
                                     />
                                     <p id='bicycling-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "bicycling" ? "white" : "gray" }} >
-                                        {bicyclingRoutes.length > 0 ? bicyclingRoutes[0].legs[0].duration.text : "-"}
+                                        {bicyclingRoutes && bicyclingRoutes.length > 0 ? bicyclingRoutes[0].legs[0].duration.text : "-"}
                                     </p>
                                 </button>
 

@@ -1,5 +1,5 @@
 import type React from "react"
-import { useState, useCallback, useEffect, useRef } from "react"
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useMap } from "@mappedin/react-sdk"
 import { Search, Navigation2, Loader2, X, CornerDownLeft, History, ChevronDown } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -26,7 +26,7 @@ const glassStyle = {
 }
 
 interface SearchNavigationProps {
-  accessible: boolean
+  accessible: boolean;
 }
 
 const RECENT_SEARCHES_KEY = "recentSearches"
@@ -47,7 +47,7 @@ export default function SearchNavigation({ accessible = false }: SearchNavigatio
   const containerRef = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(true)
   const markersRef = useRef<any[]>([])
-
+  
   // Load recent searches
   useEffect(() => {
     const saved = localStorage.getItem(RECENT_SEARCHES_KEY)
