@@ -6,6 +6,7 @@ import ToggleCampus from "../components/ToggleCampusComponent";
 import { FaStar } from "react-icons/fa";
 import ModalPOI from "../components/ModalPOI";
 import BuildingMarkers from "../components/BuildingMarkers";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 type CampusType = 'SGW' | 'LOYOLA'; // Define a type for campus to ensure only these two values are valid
 
@@ -32,7 +33,8 @@ function CampusMap() {
     const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
     const [center, setCenter] = useState(CAMPUS_COORDINATES.SGW);
     const [showBuildings, setShowBuildings] = useState(false); // Visibility of building markers
-
+    const [destination, setDestination] = useState<string>(""); // Store the destination address
+    const navigate = useNavigate(); 
 
     useEffect(() => {
         fetch("/Building.geojson")
@@ -266,6 +268,15 @@ function CampusMap() {
                                             style={{ width: '100%', height: 'auto', borderRadius: '5px' }}
                                         />
                                     )}
+                                    <button
+                                    style={{ marginTop: '10px', padding: '5px 10px', fontSize: '14px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px' }}
+                                    onClick={() => {
+                                        setDestination(selectedPoi.vicinity); //Set the destination adress
+                                        navigate('/directions', { state: { destination: selectedPoi.vicinity + ' ' } }); // Navigate to directions page with destination address
+                                    }}
+                                >
+                                    Get Directions
+                                </button>
                                 </div>
                             </InfoWindow>
                         )}
