@@ -42,6 +42,7 @@ const Directions = () => {
     const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [selectedResultIndex, setSelectedResultIndex] = useState<number>(-1);
     const isProgrammaticChange = useRef(false);
+    
 
     // Debounce ref
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -99,12 +100,20 @@ const Directions = () => {
     useEffect(() => {
         if (destinationFromState) {
             setDestinationQuery(destinationFromState); // Set destination query
-            //poi details for the destination address
-            getPlaceDetails(destinationFromState).then((placeDetails) => {
-                setDestination(placeDetails as LocationType);
-            }).catch((error) => {
-                console.error("Error fetching place details:", error);
-            });
+            handleDebouncedSuggestions(destinationFromState, "end"); // Call debounced function
+
+            // Automatically selecst the first suggestion
+            const selectFirstSuggestion = async () => {
+                const predictions = await getSuggestions(destinationFromState, 45.5049, -73.5779);
+                if (predictions.length > 0) {
+                    const placeDetails = await getPlaceDetails(predictions[0].place_id);
+                    setDestination(placeDetails as LocationType);
+                    setDestinationQuery((placeDetails as LocationType).name);
+                    setDestinationResults([]);
+                }
+            };
+
+            selectFirstSuggestion().catch(error => console.error('Error selecting first suggestion:', error));
         }
     }, [destinationFromState]);
 
@@ -172,6 +181,7 @@ const Directions = () => {
         });
         console.log("Routes: ", directionRequest);
         setRoutesAvailable(true);
+        setDestinationResults([]); //clear the destination results
     };
 
 
@@ -339,7 +349,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "driving" ? "white" : "gray" }}
                                     />
                                     <p id='driving-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "driving" ? "white" : "gray" }} >
-                                        {drivingRoutes.length > 0 ? drivingRoutes[0].legs[0].duration.text : " none "}
+                                        {drivingRoutes?.length > 0 ? drivingRoutes[0].legs[0].duration.text : " none "}
                                     </p>
                                 </button>
 
@@ -350,7 +360,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "transit" ? "white" : "gray" }}
                                     />
                                     <p id='transit-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "transit" ? "white" : "gray" }}>
-                                        {transitRoutes.length > 0 ? transitRoutes[0].legs[0].duration.text : " none "}
+                                        {transitRoutes?.length > 0 ? transitRoutes[0].legs[0].duration.text : " none "}
                                     </p>
                                 </button>
                                 <button id="walking-option"
@@ -360,7 +370,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "walking" ? "white" : "gray" }}
                                     />
                                     <p id='walking-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "walking" ? "white" : "gray" }} >
-                                        {walkingRoutes.length > 0 ? walkingRoutes[0].legs[0].duration.text : " none "}
+                                        {walkingRoutes?.length > 0 ? walkingRoutes[0].legs[0].duration.text : " none "}
                                     </p>
                                 </button>
                                 <button id="bicycling-option"
@@ -371,7 +381,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "bicycling" ? "white" : "gray" }}
                                     />
                                     <p id='bicycling-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "bicycling" ? "white" : "gray" }} >
-                                        {bicyclingRoutes.length > 0 ? bicyclingRoutes[0].legs[0].duration.text : "-"}
+                                        {bicyclingRoutes?.length > 0 ? bicyclingRoutes[0].legs[0].duration.text : "-"}
                                     </p>
                                 </button>
 
