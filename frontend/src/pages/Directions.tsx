@@ -100,7 +100,7 @@ const Directions = () => {
     useEffect(() => {
         if (destinationFromState) {
             setDestinationQuery(destinationFromState); // Set destination query
-            handleDebouncedSuggestions(destinationFromState, "end"); // Call debounced function
+           // handleDebouncedSuggestions(destinationFromState, "end"); // Call debounced function
 
             // Automatically selecst the first suggestion
             const selectFirstSuggestion = async () => {
@@ -109,7 +109,12 @@ const Directions = () => {
                     const placeDetails = await getPlaceDetails(predictions[0].place_id);
                     setDestination(placeDetails as LocationType);
                     setDestinationQuery((placeDetails as LocationType).name);
-                    setDestinationResults([]);
+                    setDestinationResults([]); //clear destination results
+                    setSourceResults([]); // Clear the source results
+                    setActive(""); // Reset active field
+
+                    // Select the first suggestion
+                    handleSelect(0);
                 }
             };
 
@@ -135,7 +140,9 @@ const Directions = () => {
             setDestination(placeDetails as LocationType);
             setDestinationResults([]);
         }
-        setActive("");
+        setActive(""); 
+        setSourceResults([]);
+        setDestinationResults([]);
     };
 
     useEffect(() => {
@@ -181,9 +188,18 @@ const Directions = () => {
         });
         console.log("Routes: ", directionRequest);
         setRoutesAvailable(true);
-        setDestinationResults([]); //clear the destination results
+        setSourceResults([]); // Clear the source results
+        setDestinationResults([]); // Clear the destination results
+        setActive(""); // Reset active field
     };
 
+        // Ensure suggestions are hidden when the route is displayed
+    /*useEffect(() => {
+        if (routesAvailable) {
+            setSourceResults([]);
+            setDestinationResults([]);
+        }
+    }, [routesAvailable]);*/
 
 
     const handleTransportKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {

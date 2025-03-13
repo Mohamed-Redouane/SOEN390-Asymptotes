@@ -271,8 +271,9 @@ function CampusMap() {
                                     <button
                                     style={{ marginTop: '10px', padding: '5px 10px', fontSize: '14px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px' }}
                                     onClick={() => {
-                                        setDestination(selectedPoi.vicinity); //Set the destination adress
-                                        navigate('/directions', { state: { destination: selectedPoi.vicinity} }); // Navigate to directions page with destination address
+                                        const modifiedAddress = `${selectedPoi.vicinity} `;
+                                        setDestination(modifiedAddress); // Set the destination address
+                                        navigate('/directions', { state: { destination: modifiedAddress } }); // Navigate to directions page with destination address
                                     }}
                                 >
                                     Get Directions
