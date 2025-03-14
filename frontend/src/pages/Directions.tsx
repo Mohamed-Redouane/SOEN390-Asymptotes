@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
+import { useLocation } from 'react-router-dom'; 
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import RoomIcon from '@mui/icons-material/Room';
 import { getSuggestions, getPlaceDetails } from '../services/PlaceServices';
@@ -19,9 +20,11 @@ interface LocationType {
 }
 
 const Directions = () => {
+    const location = useLocation(); //useLocation to get the state
+    const destinationFromState = location.state?.destination || ""; // Get destination from state
     const [active, setActive] = useState<string>("");
     const [sourceQuery, setSourceQuery] = useState<string>("");
-    const [destinationQuery, setDestinationQuery] = useState<string>("");
+    const [destinationQuery, setDestinationQuery] = useState<string>(destinationFromState);
     const [sourceResults, setSourceResults] = useState<LocationType[]>([]);
     const [destinationResults, setDestinationResults] = useState<LocationType[]>([]);
     const [transportationMode, setTransportationMode] = useState<"driving" | "transit" | "walking" | "bicycling">("driving");
@@ -39,6 +42,7 @@ const Directions = () => {
     const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [selectedResultIndex, setSelectedResultIndex] = useState<number>(-1);
     const isProgrammaticChange = useRef(false);
+    
 
     // Debounce ref
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -93,6 +97,30 @@ const Directions = () => {
         }
     }, [userLocation, isResettingStart, isUserTyping]);
 
+    useEffect(() => {
+        if (destinationFromState) {
+            setDestinationQuery(destinationFromState); // Set destination query
+           // handleDebouncedSuggestions(destinationFromState, "end"); // Call debounced function
+
+            // Automatically selecst the first suggestion
+            const selectFirstSuggestion = async () => {
+                const predictions = await getSuggestions(destinationFromState, 45.5049, -73.5779);
+                if (predictions.length > 0) {
+                    const placeDetails = await getPlaceDetails(predictions[0].place_id);
+                    setDestination(placeDetails as LocationType);
+                    setDestinationQuery((placeDetails as LocationType).name);
+                    setDestinationResults([]); //clear destination results
+                    setSourceResults([]); // Clear the source results
+                    setActive(""); // Reset active field
+
+                    // Select the first suggestion
+                    handleSelect(0);
+                }
+            };
+
+            selectFirstSuggestion().catch(error => console.error('Error selecting first suggestion:', error));
+        }
+    }, [destinationFromState]);
 
     // No longer need the useEffect for fetching suggestions.  It's handled by handleDebouncedSuggestions
 
@@ -112,7 +140,9 @@ const Directions = () => {
             setDestination(placeDetails as LocationType);
             setDestinationResults([]);
         }
-        setActive("");
+        setActive(""); 
+        setSourceResults([]);
+        setDestinationResults([]);
     };
 
     useEffect(() => {
@@ -158,8 +188,18 @@ const Directions = () => {
         });
         console.log("Routes: ", directionRequest);
         setRoutesAvailable(true);
+        setSourceResults([]); // Clear the source results
+        setDestinationResults([]); // Clear the destination results
+        setActive(""); // Reset active field
     };
 
+        // Ensure suggestions are hidden when the route is displayed
+    /*useEffect(() => {
+        if (routesAvailable) {
+            setSourceResults([]);
+            setDestinationResults([]);
+        }
+    }, [routesAvailable]);*/
 
 
     const handleTransportKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -275,10 +315,10 @@ const Directions = () => {
                         }
                     </div>
 
-                   {(active === "start" ? sourceResults : destinationResults).length > 0 && (
+                   {(active === "start" ? sourceResults : destinationResults)?.length > 0 && (
                         <div className="flex w-full">
                             <ul className="w-full" id="suggestions-container">
-                                {(active === "start" ? sourceResults : destinationResults).map((result, index) => (
+                                {(active === "start" ? sourceResults : destinationResults)?.map((result, index) => (
                                     <li key={index}
                                         id="suggestion-item-container"
                                         onKeyDown={(e) => e.key === "Enter" && handleSelect(index)}
@@ -300,7 +340,7 @@ const Directions = () => {
                         </div>
                     )}
 
-                      {(active === "start" ? sourceResults : destinationResults).length === 0 && (
+                      {(active === "start" ? sourceResults : destinationResults)?.length === 0 && (
                         <div id='directions-request-container' className="flex flex-col items-center w-full">
                             <button
                                 id="get-directions-button"
@@ -325,7 +365,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "driving" ? "white" : "gray" }}
                                     />
                                     <p id='driving-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "driving" ? "white" : "gray" }} >
-                                        {drivingRoutes.length > 0 ? drivingRoutes[0].legs[0].duration.text : " none "}
+                                        {drivingRoutes?.length > 0 ? drivingRoutes[0].legs[0].duration.text : " none "}
                                     </p>
                                 </button>
 
@@ -336,7 +376,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "transit" ? "white" : "gray" }}
                                     />
                                     <p id='transit-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "transit" ? "white" : "gray" }}>
-                                        {transitRoutes.length > 0 ? transitRoutes[0].legs[0].duration.text : " none "}
+                                        {transitRoutes?.length > 0 ? transitRoutes[0].legs[0].duration.text : " none "}
                                     </p>
                                 </button>
                                 <button id="walking-option"
@@ -346,7 +386,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "walking" ? "white" : "gray" }}
                                     />
                                     <p id='walking-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "walking" ? "white" : "gray" }} >
-                                        {walkingRoutes.length > 0 ? walkingRoutes[0].legs[0].duration.text : " none "}
+                                        {walkingRoutes?.length > 0 ? walkingRoutes[0].legs[0].duration.text : " none "}
                                     </p>
                                 </button>
                                 <button id="bicycling-option"
@@ -357,7 +397,7 @@ const Directions = () => {
                                         style={{ color: transportationMode === "bicycling" ? "white" : "gray" }}
                                     />
                                     <p id='bicycling-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "bicycling" ? "white" : "gray" }} >
-                                        {bicyclingRoutes.length > 0 ? bicyclingRoutes[0].legs[0].duration.text : "-"}
+                                        {bicyclingRoutes?.length > 0 ? bicyclingRoutes[0].legs[0].duration.text : "-"}
                                     </p>
                                 </button>
 
@@ -456,7 +496,7 @@ function RenderRoutes({ source, destination, selectedRouteIndex, transportationM
     const routesLibrary = useMapsLibrary('routes');
     const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService>();
     const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer>();
-    const [displayedRoute, setDisplayedRoute] = useState<google.maps.DirectionsResult | null>(null);
+    const [/*displayedRoute*/, setDisplayedRoute] = useState<google.maps.DirectionsResult | null>(null);
 
      useEffect(() => {
         if (!routesLibrary || !map) return;
