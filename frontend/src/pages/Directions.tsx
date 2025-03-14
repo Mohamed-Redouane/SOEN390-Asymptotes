@@ -9,6 +9,7 @@ import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import { LocationContext } from '../components/LocationContext';
 import { DirectionsBike } from '@mui/icons-material';
+import RouteRenderer from '../components/RouteRenderer';
 
 interface LocationType {
     name: string;
@@ -64,11 +65,11 @@ const Directions = () => {
                     })
                     .catch(error => console.error('Error fetching suggestions:', error));
             } else {
-                 if (activeField === "start") {
-                            setSourceResults([]);
-                        } else {
-                            setDestinationResults([]);
-                        }
+                if (activeField === "start") {
+                    setSourceResults([]);
+                } else {
+                    setDestinationResults([]);
+                }
             }
         }, DEBOUNCE_DELAY); // Use the environment variable here
     };
@@ -86,7 +87,7 @@ const Directions = () => {
 
 
 
-  useEffect(() => {
+    useEffect(() => {
         if (userLocation?.address && !sourceQuery && !isResettingStart && !isUserTyping) {
             setSourceQuery(userLocation.address);
             setSource(userLocation); // Set the source to userLocation
@@ -98,17 +99,17 @@ const Directions = () => {
 
 
     const handleSelect = async (index: number) => {
-      const place = (active === "start" ? sourceResults : destinationResults)[index];
-      const placeDetails = await getPlaceDetails(place.place_id);
+        const place = (active === "start" ? sourceResults : destinationResults)[index];
+        const placeDetails = await getPlaceDetails(place.place_id);
         isProgrammaticChange.current = true;
         if (active === "start") {
-             const s = document.getElementById("start-input") as HTMLInputElement;
+            const s = document.getElementById("start-input") as HTMLInputElement;
             s.value = (placeDetails as LocationType).name;
             setSourceQuery((placeDetails as LocationType).name);
             setSource(placeDetails as LocationType);
             setSourceResults([]);
         } else if (active === "end") {
-           setDestinationQuery((placeDetails as LocationType).name);
+            setDestinationQuery((placeDetails as LocationType).name);
             setDestination(placeDetails as LocationType);
             setDestinationResults([]);
         }
@@ -128,7 +129,7 @@ const Directions = () => {
     }, [transportationMode]);
 
 
-     const getDirections = async () => {
+    const getDirections = async () => {
         setRoutesAvailable(false);
         console.log("Getting Directions...");
         setTransportationMode("driving");
@@ -201,7 +202,7 @@ const Directions = () => {
         setDestinationQuery("");
         setDestination(undefined);
         setRoutesAvailable(false);
-          setDestinationResults([]);
+        setDestinationResults([]);
     }
 
     useEffect(() => {
@@ -230,7 +231,7 @@ const Directions = () => {
                             placeholder="Enter your starting location"
                             className="p-2 m-2 border-2 border-gray-200 rounded-lg w-full"
                             value={sourceQuery}
-                           onChange={(e) => {
+                            onChange={(e) => {
                                 setActive("start");
                                 setSourceQuery(e.target.value);
                                 setIsUserTyping(true); // Set typing to true
@@ -256,7 +257,7 @@ const Directions = () => {
                             placeholder="Enter your destination location"
                             className="p-2 m-2 border-2 border-gray-200 rounded-lg w-full"
                             value={destinationQuery}
-                           onChange={(e) => {
+                            onChange={(e) => {
                                 setActive("end");
                                 setDestinationQuery(e.target.value);
                                 setRoutes([]);
@@ -265,7 +266,7 @@ const Directions = () => {
                             }}
                             onKeyDown={handleKeyDown}
                         />
-                         {destinationQuery &&
+                        {destinationQuery &&
                             <button
                                 className="text-l font-bold text-gray-700 bg-white p-1"
                                 onClick={handleClearDestination}
@@ -275,7 +276,7 @@ const Directions = () => {
                         }
                     </div>
 
-                   {(active === "start" ? sourceResults : destinationResults).length > 0 && (
+                    {(active === "start" ? sourceResults : destinationResults).length > 0 && (
                         <div className="flex w-full">
                             <ul className="w-full" id="suggestions-container">
                                 {(active === "start" ? sourceResults : destinationResults).map((result, index) => (
@@ -300,7 +301,7 @@ const Directions = () => {
                         </div>
                     )}
 
-                      {(active === "start" ? sourceResults : destinationResults).length === 0 && (
+                    {(active === "start" ? sourceResults : destinationResults).length === 0 && (
                         <div id='directions-request-container' className="flex flex-col items-center w-full">
                             <button
                                 id="get-directions-button"
@@ -382,15 +383,15 @@ const Directions = () => {
                                                 </div>
                                             </div>
                                             <div className="selecting-route-button">
-                                            <button
-                                                className='bg-green-900 text-white font-bold'
-                                                onClick={() => {
-                                                    console.log("Selected Route: ", routes[index]);
-                                                    setSelectedRouteIndex(index); // Update selected route index
-                                                }}
-                                            >
-                                            Go
-                                        </button>
+                                                <button
+                                                    className='bg-green-900 text-white font-bold'
+                                                    onClick={() => {
+                                                        console.log("Selected Route: ", routes[index]);
+                                                        setSelectedRouteIndex(index); // Update selected route index
+                                                    }}
+                                                >
+                                                    Go
+                                                </button>
 
                                             </div>
                                         </div>
@@ -408,7 +409,7 @@ const Directions = () => {
                     <div id="map-container"
                         style={{ height: '86vh', width: '100vw' }}
                     >
-                      <MapWrapper source={source} destination={destination} selectedRouteIndex={selectedRouteIndex}  transportationMode={transportationMode}  />
+                        <MapWrapper source={source} destination={destination} selectedRouteIndex={selectedRouteIndex} transportationMode={transportationMode} />
                     </div>
                 </div>
             </div>
@@ -416,11 +417,11 @@ const Directions = () => {
     );
 }
 
-function MapWrapper({ source, destination, selectedRouteIndex, transportationMode }: { source: LocationType | undefined, destination: LocationType | undefined, selectedRouteIndex: number, transportationMode: "driving" | "transit" | "walking" | "bicycling"  }) {
+function MapWrapper({ source, destination, selectedRouteIndex, transportationMode }: { source: LocationType | undefined, destination: LocationType | undefined, selectedRouteIndex: number, transportationMode: "driving" | "transit" | "walking" | "bicycling" }) {
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     const [mapKey, setMapKey] = useState(Date.now());
 
-     useEffect(() => {
+    useEffect(() => {
         setMapKey(Date.now()); // Update the key
     }, [source, destination, selectedRouteIndex, transportationMode]); //include transportationMode
 
@@ -432,78 +433,19 @@ function MapWrapper({ source, destination, selectedRouteIndex, transportationMod
                 defaultCenter={{ lat: 45.4949, lng: -73.5779 }}
                 mapTypeControl={false}
                 fullscreenControl={false}
-             >
-            <RenderRoutes
-                key={`${source?.place_id}-${destination?.place_id}-${selectedRouteIndex}`}
-                source={source}
-                destination={destination}
-                selectedRouteIndex={selectedRouteIndex}
-                transportationMode = {transportationMode}
-            />
+            >
+                <RouteRenderer
+                    key={`${source?.place_id}-${destination?.place_id}-${selectedRouteIndex}`}
+                    source={source}
+                    destination={destination}
+                    selectedRouteIndex={selectedRouteIndex}
+                    transportationMode={transportationMode}
+                />
             </Map>
-         </APIProvider>
+        </APIProvider>
     );
 }
 
-function RenderRoutes({ source, destination, selectedRouteIndex, transportationMode }: {
-    source: LocationType | undefined;
-    destination: LocationType | undefined;
-    selectedRouteIndex: number;
-    transportationMode: "driving" | "transit" | "walking" | "bicycling";
 
-}) {
-    const map = useMap();
-    const routesLibrary = useMapsLibrary('routes');
-    const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService>();
-    const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer>();
-    const [displayedRoute, setDisplayedRoute] = useState<google.maps.DirectionsResult | null>(null);
-
-     useEffect(() => {
-        if (!routesLibrary || !map) return;
-        setDirectionsService(new google.maps.DirectionsService());
-        const renderer = new google.maps.DirectionsRenderer({ map: map });
-        setDirectionsRenderer(renderer);
-        return () => {
-            renderer.setMap(null);
-        };
-    }, [routesLibrary, map]);
-
-    useEffect(() => {
-        if (!directionsService || !directionsRenderer || !source || !destination) {
-
-            if(directionsRenderer) {
-              directionsRenderer.setMap(null);
-            }
-            return;
-        }
-         const travelModeMap = {
-            driving: google.maps.TravelMode.DRIVING,
-            transit: google.maps.TravelMode.TRANSIT,
-            walking: google.maps.TravelMode.WALKING,
-            bicycling: google.maps.TravelMode.BICYCLING,
-        };
-
-        directionsService.route(
-            {
-                origin: { lat: source.lat, lng: source.lng },
-                destination: { lat: destination.lat, lng: destination.lng },
-                travelMode: travelModeMap[transportationMode],
-                provideRouteAlternatives: true,
-            },
-            (response, status) => {
-                if (status === "OK") {
-                    setDisplayedRoute(response);
-                   directionsRenderer.setDirections(response);
-                   directionsRenderer.setRouteIndex(selectedRouteIndex); // Set the selected route
-                } else {
-                    console.error("Directions request failed due to " + status);
-                    setDisplayedRoute(null);
-                }
-            }
-        );
-    }, [directionsService, directionsRenderer, source, destination, selectedRouteIndex, transportationMode]); // Add selectedRouteIndex as a dependency
-
-    return null;
-}
 
 export default Directions;
