@@ -237,6 +237,11 @@ const Directions = () => {
                                 setRoutes([]);
                                 setRoutesAvailable(false);
                                 handleDebouncedSuggestions(e.target.value, "start"); // Call debounced function
+                                // Cancel the reset timeout if the user starts typing
+                                if (resetTimeoutRef.current) {
+                                    clearTimeout(resetTimeoutRef.current);
+                                    resetTimeoutRef.current = null; // Reset the ref
+                                }
                             }}
                             onKeyDown={handleKeyDown}
                         />
