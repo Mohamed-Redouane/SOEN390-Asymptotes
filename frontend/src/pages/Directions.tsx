@@ -496,7 +496,7 @@ function RenderRoutes({ source, destination, selectedRouteIndex, transportationM
     const routesLibrary = useMapsLibrary('routes');
     const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService>();
     const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer>();
-    const [displayedRoute, setDisplayedRoute] = useState<google.maps.DirectionsResult | null>(null);
+    const [/*displayedRoute*/, setDisplayedRoute] = useState<google.maps.DirectionsResult | null>(null);
 
      useEffect(() => {
         if (!routesLibrary || !map) return;

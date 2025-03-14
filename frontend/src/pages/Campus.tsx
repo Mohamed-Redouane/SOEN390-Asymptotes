@@ -33,7 +33,7 @@ function CampusMap() {
     const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
     const [center, setCenter] = useState(CAMPUS_COORDINATES.SGW);
     const [showBuildings, setShowBuildings] = useState(false); // Visibility of building markers
-    const [destination, setDestination] = useState<string>(""); // Store the destination address
+    const [, setDestination] = useState<string>(""); // Store the destination address
     const navigate = useNavigate(); 
 
     useEffect(() => {
