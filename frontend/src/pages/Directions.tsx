@@ -40,7 +40,7 @@ const Directions = () => {
     const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [selectedResultIndex, setSelectedResultIndex] = useState<number>(-1);
     const isProgrammaticChange = useRef(false);
-
+    const [selectedRouteIndex, setSelectedRouteIndex] = useState<number>(-1);
     // Debounce ref
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
     // Get debounce delay from environment variable, default to 300ms
@@ -162,7 +162,6 @@ const Directions = () => {
     };
 
 
-
     const handleTransportKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === "ArrowRight") {
             setTransportationMode((prev) =>
@@ -216,7 +215,7 @@ const Directions = () => {
         };
     }, []);
 
-    const [selectedRouteIndex, setSelectedRouteIndex] = useState<number>(0);
+    
 
 
     return (
@@ -434,6 +433,7 @@ function MapWrapper({ source, destination, selectedRouteIndex, transportationMod
                 mapTypeControl={false}
                 fullscreenControl={false}
             >
+            { selectedRouteIndex !== -1 &&
                 <RouteRenderer
                     key={`${source?.place_id}-${destination?.place_id}-${selectedRouteIndex}`}
                     source={source}
@@ -441,6 +441,7 @@ function MapWrapper({ source, destination, selectedRouteIndex, transportationMod
                     selectedRouteIndex={selectedRouteIndex}
                     transportationMode={transportationMode}
                 />
+            }
             </Map>
         </APIProvider>
     );
