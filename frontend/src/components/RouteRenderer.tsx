@@ -21,9 +21,9 @@ function RouteRenderer({ source, destination, selectedRouteIndex, transportation
     const routesLibrary = useMapsLibrary('routes');
     const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService>();
     const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer>();
-    const [displayedRoute, setDisplayedRoute] = useState<google.maps.DirectionsResult | null>(null);
+    const [/*displayedRoute*/, setDisplayedRoute] = useState<google.maps.DirectionsResult | null>(null);
 
-    useEffect(() => {
+     useEffect(() => {
         if (!routesLibrary || !map) return;
         setDirectionsService(new google.maps.DirectionsService());
         const renderer = new google.maps.DirectionsRenderer({ map: map });
@@ -36,12 +36,12 @@ function RouteRenderer({ source, destination, selectedRouteIndex, transportation
     useEffect(() => {
         if (!directionsService || !directionsRenderer || !source || !destination) {
 
-            if (directionsRenderer) {
-                directionsRenderer.setMap(null);
+            if(directionsRenderer) {
+              directionsRenderer.setMap(null);
             }
             return;
         }
-        const travelModeMap = {
+         const travelModeMap = {
             driving: google.maps.TravelMode.DRIVING,
             transit: google.maps.TravelMode.TRANSIT,
             walking: google.maps.TravelMode.WALKING,
@@ -58,8 +58,8 @@ function RouteRenderer({ source, destination, selectedRouteIndex, transportation
             (response, status) => {
                 if (status === "OK") {
                     setDisplayedRoute(response);
-                    directionsRenderer.setDirections(response);
-                    directionsRenderer.setRouteIndex(selectedRouteIndex); // Set the selected route
+                   directionsRenderer.setDirections(response);
+                   directionsRenderer.setRouteIndex(selectedRouteIndex); // Set the selected route
                 } else {
                     console.error("Directions request failed due to " + status);
                     setDisplayedRoute(null);
@@ -70,5 +70,6 @@ function RouteRenderer({ source, destination, selectedRouteIndex, transportation
 
     return null;
 }
+
 
 export default RouteRenderer;
