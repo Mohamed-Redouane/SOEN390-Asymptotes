@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { useLocation } from 'react-router-dom'; 
+import { useLocation } from 'react-router-dom';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import RoomIcon from '@mui/icons-material/Room';
 import { getSuggestions, getPlaceDetails } from '../services/PlaceServices';
@@ -100,7 +100,7 @@ const Directions = () => {
     useEffect(() => {
         if (destinationFromState) {
             setDestinationQuery(destinationFromState); // Set destination query
-           // handleDebouncedSuggestions(destinationFromState, "end"); // Call debounced function
+            // handleDebouncedSuggestions(destinationFromState, "end"); // Call debounced function
 
             // Automatically selecst the first suggestion
             const selectFirstSuggestion = async () => {
@@ -140,7 +140,7 @@ const Directions = () => {
             setDestination(placeDetails as LocationType);
             setDestinationResults([]);
         }
-        setActive(""); 
+        setActive("");
         setSourceResults([]);
         setDestinationResults([]);
     };
@@ -155,6 +155,7 @@ const Directions = () => {
         } else if (transportationMode === "bicycling") {
             setRoutes(bicyclingRoutes);
         }
+        setSelectedRouteIndex(0); // Select the first route so that its displayed
     }, [transportationMode]);
 
 
@@ -172,11 +173,7 @@ const Directions = () => {
 
         const directionRequest = await fetchDirections(source!, destination!).then((response: any) => {
             console.log("Response from fetchDirections: ", response);
-
-
-
             setRoutes(response.driving);
-
             setDrivingRoutes(response.driving);
             setTransitRoutes(response.transit);
             setWalkingRoutes(response.walking);
@@ -193,13 +190,13 @@ const Directions = () => {
         setActive(""); // Reset active field
     };
 
-        // Ensure suggestions are hidden when the route is displayed
-    /*useEffect(() => {
-        if (routesAvailable) {
-            setSourceResults([]);
-            setDestinationResults([]);
-        }
-    }, [routesAvailable]);*/
+    // Ensure suggestions are hidden when the route is displayed
+    // useEffect(() => {
+    //     if (routesAvailable) {
+    //         setSourceResults([]);
+    //         setDestinationResults([]);
+    //     }
+    // }, [routesAvailable]);
 
 
     const handleTransportKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -222,6 +219,7 @@ const Directions = () => {
         setActive("");
         setSourceResults([]);
         setIsUserTyping(false); // Reset typing state
+        setSelectedRouteIndex(-1); // reset the selected route index so route is not displayed
 
         if (resetTimeoutRef.current) {
             clearTimeout(resetTimeoutRef.current);
@@ -238,10 +236,14 @@ const Directions = () => {
     };
 
     const handleClearDestination = () => {
+
         setDestinationQuery("");
         setDestination(undefined);
         setRoutesAvailable(false);
         setDestinationResults([]);
+        setSelectedRouteIndex(-1);// reset the selected route index so route is not displayed
+        setActive
+            ("");
     }
 
     useEffect(() => {
@@ -255,7 +257,7 @@ const Directions = () => {
         };
     }, []);
 
-    
+
 
 
     return (
@@ -315,7 +317,7 @@ const Directions = () => {
                         }
                     </div>
 
-                   {(active === "start" ? sourceResults : destinationResults)?.length > 0 && (
+                    {(active === "start" ? sourceResults : destinationResults)?.length > 0 && (
                         <div className="flex w-full">
                             <ul className="w-full" id="suggestions-container">
                                 {(active === "start" ? sourceResults : destinationResults)?.map((result, index) => (
@@ -340,7 +342,7 @@ const Directions = () => {
                         </div>
                     )}
 
-                      {(active === "start" ? sourceResults : destinationResults)?.length === 0 && (
+                    {(active === "start" ? sourceResults : destinationResults)?.length === 0 && (
                         <div id='directions-request-container' className="flex flex-col items-center w-full">
                             <button
                                 id="get-directions-button"
@@ -364,9 +366,11 @@ const Directions = () => {
                                     <DirectionsCarIcon
                                         style={{ color: transportationMode === "driving" ? "white" : "gray" }}
                                     />
-                                    <p id='driving-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "driving" ? "white" : "gray" }} >
-                                        {drivingRoutes?.length > 0 ? drivingRoutes[0].legs[0].duration.text : " none "}
-                                    </p>
+                                    {transportationMode === "driving" &&
+                                        <p id='driving-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "driving" ? "white" : "gray" }} >
+                                            {drivingRoutes?.length > 0 ? drivingRoutes[0].legs[0].duration.text : " none "}
+                                        </p>
+                                    }
                                 </button>
 
                                 <button id="transit-option"
@@ -375,9 +379,11 @@ const Directions = () => {
                                     <DirectionsBusIcon
                                         style={{ color: transportationMode === "transit" ? "white" : "gray" }}
                                     />
-                                    <p id='transit-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "transit" ? "white" : "gray" }}>
-                                        {transitRoutes?.length > 0 ? transitRoutes[0].legs[0].duration.text : " none "}
-                                    </p>
+                                    {transportationMode === "transit" &&
+                                        <p id='transit-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "transit" ? "white" : "gray" }}>
+                                            {transitRoutes?.length > 0 ? transitRoutes[0].legs[0].duration.text : " none "}
+                                        </p>
+                                    }
                                 </button>
                                 <button id="walking-option"
                                     onClick={() => setTransportationMode("walking")}
@@ -385,9 +391,11 @@ const Directions = () => {
                                     <DirectionsWalkIcon
                                         style={{ color: transportationMode === "walking" ? "white" : "gray" }}
                                     />
-                                    <p id='walking-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "walking" ? "white" : "gray" }} >
-                                        {walkingRoutes?.length > 0 ? walkingRoutes[0].legs[0].duration.text : " none "}
-                                    </p>
+                                    {transportationMode === "walking" &&
+                                        <p id='walking-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "walking" ? "white" : "gray" }} >
+                                            {walkingRoutes?.length > 0 ? walkingRoutes[0].legs[0].duration.text : " none "}
+                                        </p>
+                                    }
                                 </button>
                                 <button id="bicycling-option"
                                     onClick={() => setTransportationMode("bicycling")}
@@ -396,9 +404,11 @@ const Directions = () => {
                                     <DirectionsBike
                                         style={{ color: transportationMode === "bicycling" ? "white" : "gray" }}
                                     />
-                                    <p id='bicycling-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "bicycling" ? "white" : "gray" }} >
-                                        {bicyclingRoutes?.length > 0 ? bicyclingRoutes[0].legs[0].duration.text : "-"}
-                                    </p>
+                                    {transportationMode === "bicycling" &&
+                                        <p id='bicycling-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "bicycling" ? "white" : "gray" }} >
+                                            {bicyclingRoutes?.length > 0 ? bicyclingRoutes[0].legs[0].duration.text : "-"}
+                                        </p>
+                                    }
                                 </button>
 
 
@@ -408,26 +418,27 @@ const Directions = () => {
                                     route.legs ? (
                                         <div key={index}
                                             tabIndex={0}
-                                            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && console.log("Selected Route: ", routes[index])}
+                                            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && console.log("Selected Route", index, ":",routes[index])}
                                             id="route-item-container"
                                             className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between  align-middle shadow-sm"
 
                                         >
-                                            <div id='route-item-duration-distance' className="flex flex-col items-start align-middle">
+                                            <button id='route-item-duration-distance ' className="flex flex-col items-start align-middle focus:outline-none bg-white w-full"
+                                                onClick={() => {
+                                                    console.log("Selected Route ", index, ":",
+                                                         routes[index]);
+                                                    setSelectedRouteIndex(index); // Update selected route index
+                                                }}>
                                                 <span className="font-bold text-lg">{route.legs[0].duration.text}</span>
                                                 <div className="flex">
                                                     <span className="text-xs">{route.legs[0].distance.text}</span>
                                                     {index === 0 && <span className="text-xs ml-1">— Fastest Route</span>}
                                                     {transportationMode === "transit" && <span className="text-xs ml-1">— {route.legs[0].steps.length} stops</span>}
                                                 </div>
-                                            </div>
-                                            <div className="selecting-route-button">
+                                            </button>
+                                            <div id="selecting-route-button" className='flex flex-col justify-center'>
                                                 <button
-                                                    className='bg-green-900 text-white font-bold'
-                                                    onClick={() => {
-                                                        console.log("Selected Route: ", routes[index]);
-                                                        setSelectedRouteIndex(index); // Update selected route index
-                                                    }}
+                                                    className='bg-green-900 text-white font-bold focus:outline-none'
                                                 >
                                                     Go
                                                 </button>
@@ -473,15 +484,15 @@ function MapWrapper({ source, destination, selectedRouteIndex, transportationMod
                 mapTypeControl={false}
                 fullscreenControl={false}
             >
-            { selectedRouteIndex !== -1 &&
-                <RouteRenderer
-                    key={`${source?.place_id}-${destination?.place_id}-${selectedRouteIndex}`}
-                    source={source}
-                    destination={destination}
-                    selectedRouteIndex={selectedRouteIndex}
-                    transportationMode={transportationMode}
-                />
-            }
+                {selectedRouteIndex !== -1 &&
+                    <RouteRenderer
+                        key={`${source?.place_id}-${destination?.place_id}-${selectedRouteIndex}`}
+                        source={source}
+                        destination={destination}
+                        selectedRouteIndex={selectedRouteIndex}
+                        transportationMode={transportationMode}
+                    />
+                }
             </Map>
         </APIProvider>
     );
