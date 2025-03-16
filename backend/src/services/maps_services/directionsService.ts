@@ -71,9 +71,14 @@ export const fetchDirections = async (source: string, destination: string) => {
             },
         }).then((response) => {
             if (response.data.status !== 'OK'){
-                console.error('Error getting transit directions');
+                console.log('Error getting transit directions');
                 return null;
             }else{
+                console.log("transit: " ,response.data.routes[0].legs[0].steps[1].transit_details);
+                
+                if(response.data.routes.length > 3){ //if there are more than 3 routes, only return the first 3 because the response is too big
+                    response.data.routes = response.data.routes.slice(0,3);
+                }
                 orderRoutes(response); //function to order the routes by duration
                 return response;
             }
@@ -94,7 +99,7 @@ export const fetchDirections = async (source: string, destination: string) => {
             },
         };
 
-        console.log("response from fetchDirections:" ,response.data);
+        // console.log("response from fetchDirections:" ,response.data);
         return response.data;
     } catch (error) {
         console.error('Error getting directions:', error);

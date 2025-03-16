@@ -89,7 +89,6 @@ const Directions = () => {
     };
 
 
-
     useEffect(() => {
         if (userLocation?.address && !sourceQuery && !isResettingStart && !isUserTyping) {
             setSourceQuery(userLocation.address);
@@ -175,6 +174,7 @@ const Directions = () => {
             console.log("Response from fetchDirections: ", response);
             setRoutes(response.driving);
             setDrivingRoutes(response.driving);
+            console.log('transit: ', response.transit[0].legs[0].steps[1].transit_details);
             setTransitRoutes(response.transit);
             setWalkingRoutes(response.walking);
             setBicyclingRoutes(response.bicycling);
@@ -242,8 +242,7 @@ const Directions = () => {
         setRoutesAvailable(false);
         setDestinationResults([]);
         setSelectedRouteIndex(-1);// reset the selected route index so route is not displayed
-        setActive
-            ("");
+        setActive("");
     }
 
     useEffect(() => {
@@ -418,22 +417,46 @@ const Directions = () => {
                                     route.legs ? (
                                         <div key={index}
                                             tabIndex={0}
-                                            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && console.log("Selected Route", index, ":",routes[index])}
+                                            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && console.log("Selected Route", index, ":", routes[index])}
                                             id="route-item-container"
-                                            className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between  align-middle shadow-sm"
-
+                                            className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between focus:outline-none bg-white  align-middle shadow-sm"
                                         >
-                                            <button id='route-item-duration-distance ' className="flex flex-col items-start align-middle focus:outline-none bg-white w-full"
+                                            <button id='route-item-duration-distance '
+                                                className="flex flex-col items-start align-middle  bg-white w-full"
                                                 onClick={() => {
                                                     console.log("Selected Route ", index, ":",
-                                                         routes[index]);
+                                                        routes[index]);
                                                     setSelectedRouteIndex(index); // Update selected route index
-                                                }}>
+                                                }}
+                                            >
                                                 <span className="font-bold text-lg">{route.legs[0].duration.text}</span>
-                                                <div className="flex">
-                                                    <span className="text-xs">{route.legs[0].distance.text}</span>
-                                                    {index === 0 && <span className="text-xs ml-1">— Fastest Route</span>}
-                                                    {transportationMode === "transit" && <span className="text-xs ml-1">— {route.legs[0].steps.length} stops</span>}
+                                                {transportationMode !== "transit" &&
+                                                    <div className="flex">
+                                                        <span className="text-xs">{route.legs[0].distance.text}</span>
+                                                        {index === 0 && <span className="text-xs ml-1">— Fastest Route</span>}
+                                                    </div>
+                                                }
+                                                <div className="flex flex-wrap w-full">
+                                                    {transportationMode === "transit" &&
+                                                        <>
+                                                            {route.legs[0].steps?.map((step: any, index: number) => (
+                                                                // 
+                                                                <React.Fragment key={index}>
+                                                                    {step.travel_mode === "WALKING" && <span className="flex items-center text-xs ml-1">
+                                                                        <DirectionsWalkIcon
+                                                                            style={{ color: "gray", fontSize: "0.8rem" }}
+                                                                        />
+                                                                        {step.duration.text}
+                                                                        </span>}
+                                                                    {step.transit_details && <span className="text-xs ml-1 rounded-lg pl-1 pr-1"
+                                                                        style={{ backgroundColor: step.transit_details.line.color, color: "white" }}>{step.transit_details.line.short_name}</span>}
+                                                                    {index !== route.legs[0].steps.length - 1 && <span className="text-xs ml-1">{'>'}</span>}
+
+                                                                </React.Fragment>
+                                                                // )
+                                                            ))}
+                                                        </>
+                                                    }
                                                 </div>
                                             </button>
                                             <div id="selecting-route-button" className='flex flex-col justify-center'>
