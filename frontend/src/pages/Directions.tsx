@@ -461,7 +461,7 @@ const Directions = () => {
                                                         <>
                                                             {route.legs[0].steps?.map((step: any, index: number) => (
                                                                 // 
-                                                                <React.Fragment key={index}>
+                                                                <React.Fragment key={0}>
                                                                     {step.travel_mode === "WALKING" && <span className="flex items-center text-xs ml-1">
                                                                         <DirectionsWalkIcon
                                                                             style={{ color: "gray", fontSize: "0.8rem" }}
