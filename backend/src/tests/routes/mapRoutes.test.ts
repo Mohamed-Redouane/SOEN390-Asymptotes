@@ -1,4 +1,4 @@
-import express, { query } from 'express';
+import express from 'express';
 import mapRoutes from '../../routes/mapRoutes.js';
 import { describe, test, expect, it, beforeEach } from 'vitest';
 import request from 'supertest';
@@ -31,7 +31,6 @@ describe('GET /maps/addressFromCoordinates', () => {
   });
 
   it('should return formatted_address and place_id', async () => {
-    const latlng = '45.5049,-73.5779';
 
     mock.onGet('https://maps.googleapis.com/maps/api/geocode/json').reply(200, {
       status: 'OK',

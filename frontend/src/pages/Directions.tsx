@@ -174,7 +174,6 @@ const Directions = () => {
             console.log("Response from fetchDirections: ", response);
             setRoutes(response.driving);
             setDrivingRoutes(response.driving);
-            // console.log('transit: ', response.transit[0].legs[0].steps[1].transit_details);
             setTransitRoutes(response.transit);
             setWalkingRoutes(response.walking);
             setBicyclingRoutes(response.bicycling);
