@@ -74,11 +74,11 @@ export const fetchDirections = async (source: string, destination: string) => {
                 console.log('Error getting transit directions');
                 return null;
             }else{
-                console.log("transit: " ,response.data.routes[0].legs[0].steps[1].transit_details);
+                // console.log("transit: " ,response.data.routes[0].legs[0].steps[1].transit_details);
                 
-                if(response.data.routes.length > 3){ //if there are more than 3 routes, only return the first 3 because the response is too big
-                    response.data.routes = response.data.routes.slice(0,3);
-                }
+                // if(response.data.routes.length > 3){ //if there are more than 3 routes, only return the first 3 because the response is too big
+                //     response.data.routes = response.data.routes.slice(0,3);
+                // }
                 orderRoutes(response); //function to order the routes by duration
                 return response;
             }
@@ -88,14 +88,16 @@ export const fetchDirections = async (source: string, destination: string) => {
         if (!responseDriving && !responseWalking && !responseBicycling && !responseTransit) {
             throw new Error('Error getting directions');
         }
+
+
         const response = {
 
             //if the response is null just return an empty array otherwise return the routes
             data: {
                 walking: responseWalking? responseWalking.data.routes : [],
-                driving: responseDriving? responseDriving.data.routes : [],
+                driving: responseDriving? responseDriving.data.routes.slice(0,3) : [],
                 bicycling: responseBicycling ? responseBicycling.data.routes : [],
-                transit: responseTransit ? responseTransit.data.routes : [],
+                transit: responseTransit ? (responseTransit.data.routes.length > 3 ? responseTransit.data.routes.slice(0,3): responseTransit.data.routes) : [],
             },
         };
 

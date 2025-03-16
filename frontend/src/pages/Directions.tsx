@@ -174,7 +174,7 @@ const Directions = () => {
             console.log("Response from fetchDirections: ", response);
             setRoutes(response.driving);
             setDrivingRoutes(response.driving);
-            console.log('transit: ', response.transit[0].legs[0].steps[1].transit_details);
+            // console.log('transit: ', response.transit[0].legs[0].steps[1].transit_details);
             setTransitRoutes(response.transit);
             setWalkingRoutes(response.walking);
             setBicyclingRoutes(response.bicycling);
@@ -496,6 +496,10 @@ const Directions = () => {
                                         </p>
                                     )
                                 ))}
+
+                                {routes?.length === 0 &&
+                                    <p className=" flex items-center justify-center pt-3">No {transportationMode} routes  available</p>
+                                }
 
                             </div>
                         </div>

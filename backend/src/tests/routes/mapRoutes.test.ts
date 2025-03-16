@@ -231,8 +231,8 @@ describe("GET /maps/directions", () => {
   });
 
   it("should return route directions", async () => {
-    const source = "ChIJN1t_tDeuEmsRUsoyG83frY4"; // Example Place ID
-    const destination = "ChIJsXU6z5lZwokRdsjKc_UGGWA"; // Example Place ID
+    const source = "ChIJDbdkHFQayUwR7-8fITgxTmU"; // Example Place ID
+    const destination = "ChIJ-XRliGkbyUwRLtoWc4pDYxw"; // Example Place ID
 
     // Mock the API response
     mock.onGet("https://maps.googleapis.com/maps/api/directions/json").reply(200, {
@@ -261,6 +261,10 @@ describe("GET /maps/directions", () => {
     const response = await request(app)
       .get("/maps/directions")
       .query({ source, destination });
+      if (response.status !== 200) {
+        console.error('Error response:', response.body);
+      }
+  
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
