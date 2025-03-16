@@ -44,6 +44,7 @@ const Directions = () => {
     const [selectedResultIndex, setSelectedResultIndex] = useState<number>(-1);
     const isProgrammaticChange = useRef(false);
     const [selectedRouteIndex, setSelectedRouteIndex] = useState<number>(-1);
+    const [selectedRoute, setSelectedRoute] = useState<any>();
     // Debounce ref
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
     // Get debounce delay from environment variable, default to 300ms
@@ -154,7 +155,6 @@ const Directions = () => {
         } else if (transportationMode === "bicycling") {
             setRoutes(bicyclingRoutes);
         }
-        setSelectedRouteIndex(0); // Select the first route so that its displayed
     }, [transportationMode]);
 
 
@@ -188,6 +188,7 @@ const Directions = () => {
         setSourceResults([]); // Clear the source results
         setDestinationResults([]); // Clear the destination results
         setActive(""); // Reset active field
+        setSelectedRouteIndex(0); // Select the first route so that its displayed
     };
 
     // Ensure suggestions are hidden when the route is displayed
@@ -256,6 +257,24 @@ const Directions = () => {
         };
     }, []);
 
+    const handleSelectedRoute = (index: number) => {
+        //get the active transportation typpe
+        if (transportationMode === "driving") {
+            setSelectedRoute(drivingRoutes[index]);
+        } else if (transportationMode === "transit") {
+            setSelectedRoute(transitRoutes[index]);
+        }
+        else if (transportationMode === "walking") {
+            setSelectedRoute(walkingRoutes[index]);
+        }
+        else if (transportationMode === "bicycling") {
+            setSelectedRoute(bicyclingRoutes[index]);
+        }
+        console.log("Selected Route: ", selectedRoute  , 'from ', transportationMode);
+        setRoutesAvailable(false);
+
+    }
+
 
 
 
@@ -263,7 +282,8 @@ const Directions = () => {
         <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={["places", "geometry"]}>
             <div className="relative flex flex-col flex-shrink-0 w-full" >
                 <div className=" fixed flex flex-col flex-shrink-0 w-full top-55 bg-white z-30">
-                    <div className="flex flex-row items-center pl-2 pr-2">
+                    <div id="input-start-container"
+                        className="flex flex-row items-center pl-2 pr-2">
                         <MyLocationIcon />
                         <input
                             id="start-input"
@@ -289,7 +309,8 @@ const Directions = () => {
                             </button>
                         }
                     </div>
-                    <div className="flex flex-row items-center pl-2 pr-2">
+                    <div id="input-end-container"
+                        className="flex flex-row items-center pl-2 pr-2">
                         <RoomIcon style={{ color: "red" }} />
                         <input
                             id="end-input"
@@ -447,7 +468,7 @@ const Directions = () => {
                                                                             style={{ color: "gray", fontSize: "0.8rem" }}
                                                                         />
                                                                         {step.duration.text}
-                                                                        </span>}
+                                                                    </span>}
                                                                     {step.transit_details && <span className="text-xs ml-1 rounded-lg pl-1 pr-1"
                                                                         style={{ backgroundColor: step.transit_details.line.color, color: "white" }}>{step.transit_details.line.short_name}</span>}
                                                                     {index !== route.legs[0].steps.length - 1 && <span className="text-xs ml-1">{'>'}</span>}
@@ -462,6 +483,7 @@ const Directions = () => {
                                             <div id="selecting-route-button" className='flex flex-col justify-center'>
                                                 <button
                                                     className='bg-green-900 text-white font-bold focus:outline-none'
+                                                    onClick={() => handleSelectedRoute(index)}
                                                 >
                                                     Go
                                                 </button>
