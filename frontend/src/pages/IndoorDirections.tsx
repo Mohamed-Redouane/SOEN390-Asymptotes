@@ -10,26 +10,45 @@ import IndoorPOI from "../components/IndoorDirections/IndoorPOI";
 import SearchNavigation from "../components/IndoorDirections/SearchNavigation";
 
 const BUILDINGS: Record<string, string> = {
-  "Hall Building": "67b0241a845fda000bf299cb",
-  "EV Building": "67b023355b54d7000b151b86",
+  "SWG Campus": "67b0241a845fda000bf299cb",
+  "Loyola Campus": "67b023355b54d7000b151b86",
 };
 
 export default function IndoorDirections() {
   const [accessible, setAccessible] = useState(false);
-  const [selectedBuilding, setSelectedBuilding] = useState<keyof typeof BUILDINGS>("Hall Building");
-  const mapId = BUILDINGS[selectedBuilding]; 
+  const [selectedBuilding, setSelectedBuilding] = useState<keyof typeof BUILDINGS>("SWG Campus");
 
-  const { isLoading, error, mapData } = useMapData({
+  // Fetch map data for both buildings
+  const {
+    isLoading: isLoadingSWG,
+    error: errorSWG,
+    mapData: mapDataSWG,
+  } = useMapData({
     key: import.meta.env.VITE_MAPPEDIN_KEY as string,
     secret: import.meta.env.VITE_MAPPEDIN_SECRET as string,
-    mapId,
+    mapId: BUILDINGS["SWG Campus"],
   });
 
+  const {
+    isLoading: isLoadingLoyola,
+    error: errorLoyola,
+    mapData: mapDataLoyola,
+  } = useMapData({
+    key: import.meta.env.VITE_MAPPEDIN_KEY as string,
+    secret: import.meta.env.VITE_MAPPEDIN_SECRET as string,
+    mapId: BUILDINGS["Loyola Campus"],
+  });
+
+  // Determine which map data to use based on the selected building
+  const currentMapData = selectedBuilding === "SWG Campus" ? mapDataSWG : mapDataLoyola;
+  const isLoading = selectedBuilding === "SWG Campus" ? isLoadingSWG : isLoadingLoyola;
+  const error = selectedBuilding === "SWG Campus" ? errorSWG : errorLoyola;
+
   useEffect(() => {
-    if (mapData) {
-      console.log("New Map Data Loaded:", mapData);
+    if (currentMapData) {
+      console.log("New Map Data Loaded:", currentMapData);
     }
-  }, [mapData]);
+  }, [currentMapData]);
 
   if (isLoading) {
     return <div className="flex-1 flex items-center justify-center">Loading...</div>;
@@ -46,12 +65,13 @@ export default function IndoorDirections() {
         onBuildingSelect={setSelectedBuilding}
       />
 
-      {mapData && (
+      {/* Render the MapView for the selected building */}
+      {currentMapData && (
         <MapView
-          key={mapId} 
-          mapData={mapData}
+          key={selectedBuilding} // Use the building name as the key to force re-render
+          mapData={currentMapData}
           className="flex-1 w-full relative"
-          >
+        >
           <div className="absolute top-4 left-0 right-0 px-4 z-50">
             <SearchNavigation accessible={accessible} />
           </div>

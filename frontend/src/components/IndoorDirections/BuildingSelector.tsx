@@ -2,8 +2,8 @@ import { Building, ChevronDown } from "lucide-react"
 import { useState } from "react"
 
 const BUILDINGS = {
-  "Hall Building": "67b0241a845fda000bf299cb",
-  "EV Building": "67b023355b54d7000b151b86",
+  "SWG Campus": "67b0241a845fda000bf299cb",
+  "Loyola Campus": "67b023355b54d7000b151b86",
 }
 
 const glassStyle = {
@@ -81,6 +81,7 @@ export default function BuildingSelector({ selectedBuilding, onBuildingSelect }:
                 <button
                   key={building}
                   onClick={() => {
+                    console.log("Building Selected:", building)
                     onBuildingSelect(building)
                     setIsOpen(false)
                   }}
