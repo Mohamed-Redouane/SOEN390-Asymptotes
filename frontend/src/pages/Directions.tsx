@@ -11,6 +11,7 @@ import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import { LocationContext } from '../components/LocationContext';
 import { DirectionsBike } from '@mui/icons-material';
 import RouteRenderer from '../components/RouteRenderer';
+import { distanceCalculation } from '../utils/distanceCalculation';
 
 interface LocationType {
     name: string;
@@ -19,6 +20,23 @@ interface LocationType {
     lat: number;
     lng: number;
 }
+
+const CAMPUS_COORDINATES = {
+    LOYOLA: {
+      name: "Loyola Campus",
+      lat: 45.4583,
+      lng: -73.6403,
+      address: "7141 Rue Sherbrooke O, Montréal, QC H4B 1R6, Canada",
+      place_id: "ChIJk5Bx5kkXyUwRHLCpsk_QqeM", // Example placeholder
+    },
+    SGW: {
+      name: "SGW Campus",
+      lat: 45.4949,
+      lng: -73.5779,
+      address: "Sainte-Catherine / Guy, Montréal, QC H3H 2S7, Canada",
+      place_id: "ChIJOx0fzmsayUwR_rq19AxGGm8", // Example placeholder
+    },
+  };
 
 const Directions = () => {
     const location = useLocation(); //useLocation to get the state
@@ -49,6 +67,8 @@ const Directions = () => {
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
     // Get debounce delay from environment variable, default to 300ms
     const DEBOUNCE_DELAY = parseInt(import.meta.env.VITE_DEBOUNCE_DELAY || "300");
+    const [otherCampus, setOtherCampus] = useState<LocationType | null>(null);
+    const [shouldFetchDirections, setShouldFetchDirections] = useState(false);
 
 
     // Debounced suggestion fetching function (KEY CHANGE)
@@ -96,6 +116,43 @@ const Directions = () => {
             setSource(userLocation); // Set the source to userLocation
         }
     }, [userLocation, isResettingStart, isUserTyping]);
+
+    useEffect(() => {
+        // check if user is in any building campus
+        if(userLocation?.address) {
+            // calculate distance between userlocation and loyola campus
+            const isLoyla = distanceCalculation(
+                userLocation.lat,
+                userLocation.lng,
+                CAMPUS_COORDINATES.LOYOLA.lat,
+                CAMPUS_COORDINATES.LOYOLA.lng
+            ) <= 0.5;
+            // if user in loyola set otherCampus to SGW
+            if(isLoyla){
+                setOtherCampus(CAMPUS_COORDINATES.SGW);
+            }
+            else {
+                setOtherCampus(CAMPUS_COORDINATES.LOYOLA);
+            }
+        }
+    }, [userLocation]);
+
+    const handleCampusDirection = () => {
+        if (otherCampus) {
+            // Update states
+            setDestinationQuery(otherCampus.name);
+            setDestination(otherCampus);
+            setRoutesAvailable(false);
+            setShouldFetchDirections(true);
+        };
+    }
+    useEffect(() => {
+        if (shouldFetchDirections && source && destination) {
+            getDirections();
+            setShouldFetchDirections(false); // Reset the flag
+        }
+    }, [source, destination, shouldFetchDirections]);
+    
 
     useEffect(() => {
         if (destinationFromState) {
@@ -376,6 +433,11 @@ const Directions = () => {
                             >
                                 Get Directions
                             </button>
+                            <button
+                            onClick={handleCampusDirection}
+                            className="m-1 border-2 border-gray-200 focus:outline-none rounded-lg w-full bg-blue-600 text-white font-bold">
+                                Get Directions to {otherCampus?.name}
+                                </button>
                         </div>
                     )}
 
