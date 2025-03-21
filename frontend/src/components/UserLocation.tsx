@@ -71,13 +71,6 @@ function UserLocation() {
       
       const isFar = isFarFromCampusBuildings(latitude, longitude);
 
-      if (isFar) {
-        console.warn("User is far from campus buildings.");
-        setShowModal(true);
-        setIsOnCampus(false);
-        return;
-      }
-
       // Check if the user is inside a building
       if (!isFar) {
         console.log("User is inside a building.");
@@ -92,14 +85,14 @@ function UserLocation() {
           setLocation({name: "", lat: latitude, lng: longitude, address: "", place_id: "" });
         }
       } else {
-        console.log("User is not inside a building.");
+        console.log("User is far from campus buildings.");
+        setShowModal(true);
         setIsOnCampus(false);
         setLocation({name: "", lat: latitude, lng: longitude, address: "", place_id: "" });
-
       }
 
       setError(null);
-      setShowModal(false);
+      
     };
 
     const handleError = (err: GeolocationPositionError) => {

@@ -7,7 +7,7 @@ describe('Directions Page', () => {
             body: { user: { id: "test-user", email: "test@example.com" } }, // Fake authenticated user
         }).as("getCurrentUser");
 
-        cy.visit("http://localhost:5173/directions", { timeout: 20000 });
+        cy.visit("http://localhost:5173/directions", { timeout: 5000 }); //set to 5000 due to rebounce
         
     
         cy.intercept("GET", "api/maps/placesPredictions*", {
