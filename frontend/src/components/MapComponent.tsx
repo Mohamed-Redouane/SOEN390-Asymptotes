@@ -12,19 +12,16 @@ function MapComponent({ geoJsonData, setIsUserInsideBuilding }: MapComponentProp
   const { location: userLocation } = useContext(LocationContext);
 
   useEffect(() => {
-    if (!map || !geoJsonData || !userLocation) return;
+     if (!map || !geoJsonData) return;
 
     map.data.forEach((feature) => map.data.remove(feature));
 
     // Load GeoJSON
     map.data.addGeoJson(geoJsonData);
-
-    const userLatLng = new google.maps.LatLng(userLocation.lat, userLocation.lng);
-    let userInsideBuilding = false;
+    
 
     map.data.forEach((feature) => {
       const geometry = feature.getGeometry();
-
       if (geometry?.getType() === "Polygon") {
         const polygonPaths = (geometry as google.maps.Data.Polygon).getArray().map((path) =>
           (path as google.maps.Data.LinearRing).getArray().map((coord) => ({
@@ -32,20 +29,22 @@ function MapComponent({ geoJsonData, setIsUserInsideBuilding }: MapComponentProp
             lng: (coord as google.maps.LatLng).lng(),
           }))
         );
+        map.data.overrideStyle(feature, { fillColor: "blue", fillOpacity: 0.5 });
 
         const polygon = new google.maps.Polygon({
           paths: polygonPaths,
         });
-
-        if (google.maps.geometry.poly.containsLocation(userLatLng, polygon)) {
-          userInsideBuilding = true;
-          map.data.overrideStyle(feature, { fillColor: "red", fillOpacity: 0.8 });
-        } else {
-          map.data.overrideStyle(feature, { fillColor: "blue", fillOpacity: 0.5 });
+        if(userLocation){
+          const userLatLng = new google.maps.LatLng(userLocation.lat, userLocation.lng);
+          let userInsideBuilding = false;
+          if (google.maps.geometry.poly.containsLocation(userLatLng, polygon)) {
+            userInsideBuilding = true;
+            setIsUserInsideBuilding(userInsideBuilding);
+            map.data.overrideStyle(feature, { fillColor: "red", fillOpacity: 0.8 });
+          }
         }
       }
     });
-    setIsUserInsideBuilding(userInsideBuilding);
     const infoWindow = new google.maps.InfoWindow();
     const listener = map.data.addListener("click", (event: google.maps.Data.MouseEvent) => {
       const name = event.feature.getProperty("name");
