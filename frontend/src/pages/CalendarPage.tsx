@@ -5,6 +5,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import EventDetailsModal from '../components/EventDetailsModal';
 import CalendarSelector from '../components/CalendarSelector';
 import WeekView from '../components/WeekView';
+import SmartPlanner from '../components/SmartPlanner';
 
 const CalendarPage: React.FC = () => {
   const [calendars, setCalendars] = useState<any[]>([]);
@@ -16,7 +17,28 @@ const CalendarPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [isSmartPlannerOpen, setIsSmartPlannerOpen] = useState(false);
+  const [currentPosition, setCurrentPosition] = useState<{ lat: number; lng: number } | null>(null);
 
+
+  // Get user's current position on component mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCurrentPosition({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          // Handle error silently - current position will remain null
+        }
+      );
+    }
+  }, []);
 
   const handleCalendarsLoaded = (loadedCalendars: any[]) => {
     setCalendars(loadedCalendars);
@@ -33,6 +55,11 @@ const CalendarPage: React.FC = () => {
     setSelectedEvent(event);
     setIsOpen(true);
   };
+  
+  const handleSmartPlannerClick = () => {
+    setIsSmartPlannerOpen(true);
+  };
+
   //refactored to use chain expression for better readability.
   const handleGetEvents = async (calendarId: string) => {
     if (!gapi.client?.calendar) {
@@ -124,13 +151,25 @@ const CalendarPage: React.FC = () => {
           message={errorMessage || "An unknown error occurred."}
           show={showError}
         />
-
         {isAuthenticated && calendars.length > 0 && (
-          <CalendarSelector
-            calendars={calendars}
-            selectedCalendarId={selectedCalendarId}
-            onSelectCalendar={(calendarId) => setSelectedCalendarId(calendarId)}
-          />
+          <div>
+            <CalendarSelector
+              calendars={calendars}
+              selectedCalendarId={selectedCalendarId}
+              onSelectCalendar={(calendarId) => setSelectedCalendarId(calendarId)}
+            />
+            
+            {/* Smart Planner Button */}
+            <div className="mb-6 text-center">
+              <button
+                onClick={handleSmartPlannerClick}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 shadow-md"
+                disabled={events.length === 0}
+              >
+                🧠 Smart Planner
+              </button>
+            </div>
+          </div>
         )}
         
         {loading && (
@@ -155,6 +194,12 @@ const CalendarPage: React.FC = () => {
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           selectedEvent={selectedEvent}
+        />
+        <SmartPlanner
+          isOpen={isSmartPlannerOpen}
+          onClose={() => setIsSmartPlannerOpen(false)}
+          events={events}
+          currentPosition={currentPosition}
         />
       </div>
     </div>
