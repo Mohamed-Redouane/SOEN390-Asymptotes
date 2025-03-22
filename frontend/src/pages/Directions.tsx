@@ -352,7 +352,7 @@ const Directions = () => {
                                             handleSelect(index);
                                             console.log("Selected: ", result);
                                         }}
-                                        className="flex flex-row items-center m-2 border-2 border-gray-200 rounded-lg w-full pr-4">
+                                        className="flex flex-row items-center m-2 border-2 border-gray-200 rounded-lg w-full pr-4 text-black bg-white">
                                         <div className="flex flex-col items-center">
                                             <RoomIcon style={{ color: "gray" }} />
                                         </div>
@@ -444,7 +444,7 @@ const Directions = () => {
                                             tabIndex={0}
                                             onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && console.log("Selected Route", index, ":", routes[index])}
                                             id="route-item-container"
-                                            className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between focus:outline-none bg-white  align-middle shadow-sm"
+                                            className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between focus:outline-none bg-white  text-black align-middle shadow-sm"
                                         >
                                             <button id='route-item-duration-distance '
                                                 className="flex flex-col items-start align-middle  bg-white w-full"
