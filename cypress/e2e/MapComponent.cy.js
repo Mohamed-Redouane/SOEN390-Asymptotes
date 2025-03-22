@@ -5,7 +5,7 @@ describe("MapComponent", () => {
             body: { user: { id: "test-user", email: "test@example.com" } }, // Fake authenticated user
         }).as("getCurrentUser");
 
-        cy.visit("http://localhost:5173/");
+        cy.visit("http://localhost:5173/map");
     });
 
     it("The Google Maps API is loaded", () => {

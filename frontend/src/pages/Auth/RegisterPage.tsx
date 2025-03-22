@@ -16,7 +16,6 @@ export function RegisterPage() {
     setError('');
     setSuccessMsg('');
     setLoading(true);
-
     try {
       const data = await handleRegister(username, email, password);
       setSuccessMsg(data.message || 'Registration successful!');
@@ -35,8 +34,10 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center">
-      <RegisterForm onSubmit={onSubmit} error={error} isLoading={loading} />
-    </div>
+    <RegisterForm
+      onSubmit={onSubmit}
+      error={error}
+      isLoading={loading}
+    />
   );
 }

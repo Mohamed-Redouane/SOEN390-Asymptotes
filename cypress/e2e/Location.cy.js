@@ -6,7 +6,7 @@ describe("Location Tracking", () => {
       body: { user: { id: "test-user", email: "test@example.com" } }, 
     }).as("getCurrentUser");
 
-    cy.visit("/"); 
+    cy.visit("/map"); 
     cy.wait("@getCurrentUser");
   });
 

@@ -5,7 +5,7 @@ describe("Bottom Navigation Bar", () => {
             body: { user: { id: "test-user", email: "test@example.com" } }, // Fake authenticated user
         }).as("getCurrentUser");
 
-        cy.visit("http://localhost:5173/");
+        cy.visit("http://localhost:5173/map");
         cy.wait("@getCurrentUser", { timeout: 10000 }).then((interception) => {
             console.log("Intercepted request:", interception);
         });
@@ -23,7 +23,7 @@ describe("Bottom Navigation Bar", () => {
     it("Each navigation button should navigate correctly", () => {
         const navItems = [
             { label: "Shuttle", path: "/shuttle" },
-            { label: "Map", path: "/" },
+            { label: "Map", path: "/map" },
             { label: "Directions", path: "/indoordirections" },
             { label: "Schedule", path: "/schedule" },
         ];

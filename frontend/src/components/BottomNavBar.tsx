@@ -37,7 +37,7 @@ const BottomNavBar = () => {
   const isDirectionsActive = (location.pathname === '/directions' || location.pathname === '/indoordirections');
 
   const handleNavigation = (value: string) => {
-    if (value === '/') {
+    if (value === '/map') {
       navigate(value);
     } else if (value === '/directions' || value === '/indoordirections') {
 
@@ -138,7 +138,7 @@ const BottomNavBar = () => {
 
       <nav className="flex h-16 bg-white shadow-lg backdrop-blur-md">
         <NavButton icon={Bus} label="Shuttle" value="/shuttle" isActive={location.pathname === '/shuttle'} />
-        <NavButton icon={Map} label="Map" value="/" isActive={location.pathname === '/' || location.pathname === '/LOYcampus'} />
+        <NavButton icon={Map} label="Map" value="/map" isActive={location.pathname === '/map' || location.pathname === '/LOYcampus'} />
         {/* Need to disable the button if we are on /indoordirections or in /directions */}
 
         <NavButton
