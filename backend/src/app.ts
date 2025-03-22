@@ -18,7 +18,7 @@ const app: Application = express();
 app.disable('x-powered-by');
 
 app.use(cors({
-  origin: ["https://soen390-asymptotes-production.up.railway.app", "http://localhost:5173"],
+  origin: ["https://soen390-asymptotes-production.up.railway.app", "http://localhost:5173", "https://www.cu-oncampus.ca","https://cu-oncampus.ca" ],
   credentials: true,
 }));
 
