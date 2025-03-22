@@ -121,7 +121,6 @@ const Directions = () => {
         }, DEBOUNCE_DELAY); // Use the environment variable here
     };
 
-
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "ArrowDown") {
             setSelectedResultIndex((prev) => Math.min(prev + 1, (active === "start" ? sourceResults : destinationResults).length - 1));
@@ -131,20 +130,18 @@ const Directions = () => {
             handleSelect(selectedResultIndex);
         }
     };
-
-
     useEffect(() => {
         if (userLocation?.address && !sourceQuery && !isResettingStart && !isUserTyping) {
             setSourceQuery(userLocation.address);
             setSource(userLocation); // Set the source to userLocation
         }
     }, [userLocation, isResettingStart, isUserTyping]);
-
+    
     useEffect(() => {
         if (destinationFromState) {
             setDestinationQuery(destinationFromState); // Set destination query
             // handleDebouncedSuggestions(destinationFromState, "end"); // Call debounced function
-
+            
             // Automatically selecst the first suggestion
             const selectFirstSuggestion = async () => {
                 const predictions = await getSuggestions(destinationFromState, 45.5049, -73.5779);
@@ -166,7 +163,6 @@ const Directions = () => {
     }, [destinationFromState]);
 
     // No longer need the useEffect for fetching suggestions.  It's handled by handleDebouncedSuggestions
-
 
     const handleSelect = async (index: number) => {
         const place = (active === "start" ? sourceResults : destinationResults)[index];
