@@ -19,7 +19,7 @@ const CAMPUS_COORDINATES: { [key in CampusType]: { lat: number, lng: number } } 
 function CampusMap() {
     const [geoJsonData, setGeoJsonData] = useState<any>(null);
     const { location: userLocation } = useContext(LocationContext);
-    //const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW);   //TEST LOCATION
+    //const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.LOYOLA);   //TEST LOCATION
     const [isUserInsideBuilding, setIsUserInsideBuilding] = useState(false);
     const [campus, setCampus] = useState<CampusType>("SGW");
     const [pointsOfInterest, setPointsOfInterest] = useState<any[]>([]);
@@ -148,9 +148,9 @@ function CampusMap() {
         <div>
             {loading && <div>Loading...</div>}
 
-            <ModalPOI isOpen={isModalOpen} onClose={toggleModal}>
-                <div>
-                    <label htmlFor="radius">Select Radius: </label>
+            <ModalPOI isOpen={isModalOpen} onClose={toggleModal} >
+                <div className="bg-white ">
+                    <label className="text-black" htmlFor="radius">Select Radius: </label>
                     <select id="radius" value={radius} onChange={handleRadiusChange}>
                         <option value={100}>100 meters</option>
                         <option value={200}>200 meters</option>
@@ -163,8 +163,8 @@ function CampusMap() {
                         onBlur={(e) => setRadius(Number(e.target.value))}
                     />
                 </div>
-                <div>
-                    <label htmlFor="poiType">Select POI Type: </label>
+                <div className="bg-white ">
+                    <label htmlFor="poiType" className="text-black">Select POI Type: </label>
                     <select id="poiType" value={poiType} onChange={handlePoiTypeChange}>
                         <option value="restaurant">Restaurant</option>
                         <option value="cafe">Cafe</option>
