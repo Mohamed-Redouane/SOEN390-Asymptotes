@@ -1,5 +1,3 @@
-"use client"
-
 import { MapPin } from "lucide-react"
 import { useMemo } from "react"
 
@@ -10,8 +8,8 @@ interface LogoProps {
 }
 
 export default function Logo({ size = "medium", showTagline = true, animated = true }: LogoProps) {
-  // Size mappings
-  const sizeMap = {
+
+    const sizeMap = {
     small: {
       container: "flex items-center space-x-2",
       icon: "w-5 h-5",
@@ -92,8 +90,8 @@ export default function Logo({ size = "medium", showTagline = true, animated = t
         )}
       </div>
 
-      {/* Inline keyframes for custom animations */}
-      <style jsx global>{`
+
+      <style>{`
         @import url('https://api.fontshare.com/v2/css?f[]=clash-display@200,400,700,500,600,300&display=swap');
         
         @keyframes bounce {
