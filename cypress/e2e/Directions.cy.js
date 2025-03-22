@@ -304,4 +304,52 @@ describe('Directions Page', () => {
         cy.get('#bicycling-option').click();
         
     });
+
+    it('should display the button to get directions to a LOYOLA when user is at SGW', () =>{
+        cy.wait("@getCurrentUser"); // Wait for mock authentication request
+
+        const mockUserLocation = {
+            name: "Current Location",
+            address: "1234 Current St, Montreal, QC",
+            place_id: "current_location_id",
+            lat: 45.4949,
+            lng: -73.5779,
+        };
+        cy.intercept("GET", "/api/maps/addressFromCoordinates*", {
+            statusCode: 200,
+            body: {
+                formatted_address: mockUserLocation.address,
+                place_id: mockUserLocation.place_id,
+            },
+        }).as("getAddressFromCoords");
+
+        cy.wait("@getAddressFromCoords");
+
+        cy.get('#get-directions-to-campus-button').should('exist');
+    })
+
+    it("should input the destination address of LOYOLA when user is at SGW and clicks on the appropriate button", () => {
+        cy.wait("@getCurrentUser"); // Wait for mock authentication request
+
+        const mockUserLocation = {
+            name: "Current Location",
+            address: "1234 Current St, Montreal, QC",
+            place_id: "current_location_id",
+            lat: 45.4949,
+            lng: -73.5779,
+        };
+        cy.intercept("GET", "/api/maps/addressFromCoordinates*", {
+            statusCode: 200,
+            body: {
+                formatted_address: mockUserLocation.address,
+                place_id: mockUserLocation.place_id,
+            },
+        }).as("getAddressFromCoords");
+
+        cy.wait("@getAddressFromCoords");
+
+        cy.get('#get-directions-to-campus-button').click();
+
+        cy.get('#end-input').should('have.value', 'Loyola Campus');
+    });
 });
