@@ -14,8 +14,6 @@ function UserLocation() {
   const [showOnCampusMessage, setShowOnCampusMessage] = useState<boolean>(false);
   const [showOffCampusMessage, setShowOffCampusMessage] = useState<boolean>(false);
 
-
-  
   useEffect(() => {
     fetch("/Building.geojson")
       .then((response) => response.json())
