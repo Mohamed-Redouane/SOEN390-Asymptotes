@@ -187,6 +187,7 @@ const Directions = () => {
             setDestination(otherCampus);
             setRoutesAvailable(false);
             setShouldFetchDirections(true);
+            setOtherCampus(null); // Remove the button after fetching directions
         };
     }
 
@@ -345,7 +346,21 @@ const Directions = () => {
         setDestinationResults([]);
         setSelectedRouteIndex(-1);// reset the selected route index so route is not displayed
         setActive("");
-    }
+        // Check if user is still on one of the campuses
+        if (userLocation?.address) {
+            const isLoyla = distanceCalculation(
+                userLocation.lat,
+                userLocation.lng,
+                CAMPUS_COORDINATES.LOYOLA.lat,
+                CAMPUS_COORDINATES.LOYOLA.lng
+                ) <= 0.5;
+                if (isLoyla) {
+                    setOtherCampus(CAMPUS_COORDINATES.SGW);
+                } else {
+                    setOtherCampus(CAMPUS_COORDINATES.LOYOLA);
+                }
+            }
+        }
 
     useEffect(() => {
         return () => {
