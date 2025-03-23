@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './LoginForm.css';
-import videoSrc from "../../assets/concordiaa.mp4";
+import './LoginForm.css'; 
+import videoSrc from '../../assets/concordiaa.mp4';
+import { motion } from 'framer-motion';
+import { AlertCircle, Eye, EyeOff, Loader } from 'lucide-react';
 
 interface RegisterFormProps {
   onSubmit: (username: string, email: string, password: string) => Promise<void>;
@@ -13,6 +15,7 @@ export function RegisterForm({ onSubmit, error, isLoading }: RegisterFormProps) 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
   const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -21,26 +24,38 @@ export function RegisterForm({ onSubmit, error, isLoading }: RegisterFormProps) 
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center w-full px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 relative">
+      {/* Background Video */}
       <video autoPlay muted loop className="background-video">
         <source src={videoSrc} type="video/mp4" />
-        Not supported
+        Your browser does not support the video tag.
       </video>
-      <div className="background-overlay"></div>
-      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6 animate-fade-in relative z-10">
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
+
+      {/* Glass Card */}
+      <div className="purple-glass-card w-full max-w-md p-8 animate-fade-in relative z-10">
+        <h2 className="text-2xl font-bold text-center mb-6 text-white">
           Create an account
         </h2>
 
+        {/* Animated Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded mb-4 animate-shake">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="flex items-center bg-red-500/20 border border-red-500/30 
+                       text-red-100 px-4 py-3 rounded mb-4 animate-shake"
+          >
+            <AlertCircle className="mr-2" />
             {error}
-          </div>
+          </motion.div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Form Fields */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Username */}
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-200 mb-1">
               Username
             </label>
             <input
@@ -51,14 +66,16 @@ export function RegisterForm({ onSubmit, error, isLoading }: RegisterFormProps) 
               onChange={(e) => setUsername(e.target.value)}
               disabled={isLoading}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 bg-white text-black"
+              className="w-full px-4 py-3 border border-purple-300/30 rounded-lg 
+                         focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400
+                         disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 
+                         bg-purple-400/20 text-white placeholder:text-purple-200/70"
             />
           </div>
 
-          <div className="mb-4">
-            <label htmlFor="user-email" className="text-gray-800 text-sm font-semibold">
+          {/* Email */}
+          <div>
+            <label htmlFor="user-email" className="block text-sm font-medium text-gray-200 mb-1">
               Email Address
             </label>
             <input
@@ -69,51 +86,73 @@ export function RegisterForm({ onSubmit, error, isLoading }: RegisterFormProps) 
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
               required
-              className="block w-full px-4 py-2 border border-gray-400 rounded-lg shadow-sm 
-                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-                disabled:opacity-60 disabled:cursor-not-allowed transition-all bg-gray-50 text-gray-900"
+              className="w-full px-4 py-3 border border-purple-300/30 rounded-lg
+                         focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400
+                         disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300
+                         bg-purple-400/20 text-white placeholder:text-purple-200/70"
             />
           </div>
 
-          <div className="mb-4">
-            <label htmlFor="user-password" className="text-gray-800 text-sm font-semibold">
+          {/* Password */}
+          <div>
+            <label htmlFor="user-password" className="block text-sm font-medium text-gray-200 mb-1">
               Secure Password
             </label>
-            <div className="flex items-center border border-gray-400 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-indigo-500">
+            <div className="relative">
               <input
                 id="user-password"
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 placeholder="********"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
                 required
-                className="flex-grow px-4 py-2 focus:outline-none bg-gray-50 text-gray-900"
+                className="w-full px-4 py-3 border border-purple-300/30 rounded-lg
+                           focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400
+                           disabled:opacity-50 disabled:cursor-not-allowed pr-12 transition-all duration-300
+                           bg-purple-400/20 text-white placeholder:text-purple-200/70"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="p-2 text-indigo-600 hover:text-indigo-800 transition-all duration-300 bg-transparent"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 
+                           text-purple-200 hover:text-white transition-all duration-300 
+                           bg-transparent p-1 rounded"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? "🙈" : "👁️"}
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
           </div>
 
-
-          <div className="text-sm text-blue-600 text-center">
-            Already have an account? <Link to="/login" className="hover:underline transition-all duration-300">Log in</Link>
+          {/* Already have an account? */}
+          <div className="text-sm text-center text-blue-100">
+            Already have an account?{' '}
+            <Link to="/login" className="underline hover:text-white transition-all duration-300">
+              Log in
+            </Link>
           </div>
 
-          <button
+          {/* Register Button with Spinner */}
+          <motion.button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-              disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                       disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300
+                       text-lg font-semibold"
           >
-            {isLoading ? "Registering..." : "Register"}
-          </button>
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <Loader className="animate-spin mr-2" size={20} />
+                Registering...
+              </span>
+            ) : (
+              'Register'
+            )}
+          </motion.button>
         </form>
       </div>
     </div>
