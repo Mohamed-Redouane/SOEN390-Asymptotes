@@ -233,8 +233,8 @@ function ScheduleItem({
           </span>
           <span className="text-xs text-muted-foreground">SGW</span>
           {isUpcoming && sgwMinutesUntil > 0 && (
-            <span className={cn("text-xs font-medium mt-1", sgwMinutesUntil <= 5 ? "text-red-600" : "text-red-600")}>
-              {formatMinutes(sgwMinutesUntil)}
+            <span className="text-xs font-medium mt-1 text-red-600">
+            {formatMinutes(sgwMinutesUntil)}
             </span>
           )}
         </div>
