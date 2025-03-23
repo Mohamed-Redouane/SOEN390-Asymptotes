@@ -9,6 +9,16 @@ interface Particle {
 }
 
 /**
+ * Use the Web Crypto API to generate a float in [0, 1).
+ * This is cryptographically secure, so it won't trigger "weak random" warnings.
+ */
+function secureRandom() {
+  const array = new Uint32Array(1);
+  window.crypto.getRandomValues(array);
+  return array[0] / (0xffffffff + 1);
+}
+
+/**
  * Creates a particle using the given canvas dimensions.
  * This function returns a plain object without using `this`.
  */
@@ -17,12 +27,13 @@ function createParticle(
   canvasHeight: number,
   color: string
 ): Particle {
-  let x = Math.random() * canvasWidth;
-  let y = Math.random() * canvasHeight;
-  const size = Math.random() * 2 + 0.5;
-  const speedX = Math.random() * 0.5 - 0.25;
-  const speedY = Math.random() * 0.5 - 0.25;
-  const alpha = Math.random() * 0.5 + 0.1;
+  // Replace Math.random() calls with secureRandom().
+  let x = secureRandom() * canvasWidth;
+  let y = secureRandom() * canvasHeight;
+  const size = secureRandom() * 2 + 0.5;
+  const speedX = secureRandom() * 0.5 - 0.25;
+  const speedY = secureRandom() * 0.5 - 0.25;
+  const alpha = secureRandom() * 0.5 + 0.1;
 
   return {
     get x() {
@@ -56,24 +67,24 @@ export function ParticleBackground() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    
+
     let animationFrameId: number;
     let particles: Particle[] = [];
-    
+
     // Store canvas dimensions to avoid repeated null checks.
     let canvasWidth = canvas.width;
     let canvasHeight = canvas.height;
-    
+
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      
+
       canvasWidth = canvas.width;
       canvasHeight = canvas.height;
-      
+
       initParticles();
     };
 
@@ -111,14 +122,14 @@ export function ParticleBackground() {
 
     const animate = () => {
       ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-      
+
       for (const particle of particles) {
         particle.update(canvasWidth, canvasHeight);
         particle.draw(ctx);
       }
-      
+
       connectParticles();
-      
+
       animationFrameId = requestAnimationFrame(animate);
     };
 
