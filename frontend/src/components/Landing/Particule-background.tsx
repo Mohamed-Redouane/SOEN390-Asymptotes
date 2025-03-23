@@ -1,93 +1,100 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
+interface Particle {
+  x: number;
+  y: number;
+  update: (canvasWidth: number, canvasHeight: number) => void;
+  draw: (ctx: CanvasRenderingContext2D) => void;
+}
+
+/**
+ * Creates a particle using the given canvas dimensions.
+ * This function returns a plain object without using `this`.
+ */
+function createParticle(
+  canvasWidth: number,
+  canvasHeight: number,
+  color: string
+): Particle {
+  let x = Math.random() * canvasWidth;
+  let y = Math.random() * canvasHeight;
+  const size = Math.random() * 2 + 0.5;
+  const speedX = Math.random() * 0.5 - 0.25;
+  const speedY = Math.random() * 0.5 - 0.25;
+  const alpha = Math.random() * 0.5 + 0.1;
+
+  return {
+    get x() {
+      return x;
+    },
+    get y() {
+      return y;
+    },
+    update: (width: number, height: number) => {
+      x += speedX;
+      y += speedY;
+      if (x > width) x = 0;
+      else if (x < 0) x = width;
+      if (y > height) y = 0;
+      else if (y < 0) y = height;
+    },
+    draw: (ctx: CanvasRenderingContext2D) => {
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.globalAlpha = alpha;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    },
+  };
+}
+
 export function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
+    
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
+    
     let animationFrameId: number;
     let particles: Particle[] = [];
     
-    // Store canvas dimensions at the module level to avoid null checks
+    // Store canvas dimensions to avoid repeated null checks.
     let canvasWidth = canvas.width;
     let canvasHeight = canvas.height;
-
+    
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       
-      // Update the module level variables
       canvasWidth = canvas.width;
       canvasHeight = canvas.height;
       
       initParticles();
     };
 
-    class Particle {
-      x: number;
-      y: number;
-      size: number;
-      speedX: number;
-      speedY: number;
-      color: string;
-      alpha: number;
-
-      constructor() {
-        this.x = Math.random() * canvasWidth;
-        this.y = Math.random() * canvasHeight;
-        this.size = Math.random() * 2 + 0.5;
-        this.speedX = Math.random() * 0.5 - 0.25;
-        this.speedY = Math.random() * 0.5 - 0.25;
-        this.color = "#60A5FA";
-        this.alpha = Math.random() * 0.5 + 0.1;
-      }
-
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        if (this.x > canvasWidth) this.x = 0;
-        else if (this.x < 0) this.x = canvasWidth;
-
-        if (this.y > canvasHeight) this.y = 0;
-        else if (this.y < 0) this.y = canvasHeight;
-      }
-
-      draw() {
-        if (!ctx) return;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.globalAlpha = this.alpha;
-        ctx.fill();
-      }
-    }
-
-    function initParticles() {
+    const initParticles = () => {
       particles = [];
-      const particleCount = Math.min(Math.floor((window.innerWidth * window.innerHeight) / 10000), 100);
-
+      const particleCount = Math.min(
+        Math.floor((window.innerWidth * window.innerHeight) / 10000),
+        100
+      );
       for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
+        particles.push(createParticle(canvasWidth, canvasHeight, "#60A5FA"));
       }
-    }
+    };
 
-    function connectParticles() {
-      if (!ctx) return;
+    const connectParticles = () => {
       const maxDistance = 150;
-
       for (let i = 0; i < particles.length; i++) {
-        for (let j = i; j < particles.length; j++) {
+        for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const distance = Math.sqrt(dx * dx + dy * dy);
-
           if (distance < maxDistance) {
             ctx.beginPath();
             ctx.strokeStyle = "#60A5FA";
@@ -96,23 +103,24 @@ export function ParticleBackground() {
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.stroke();
+            ctx.globalAlpha = 1;
           }
         }
       }
-    }
+    };
 
-    function animate() {
-      if (!ctx) return;
+    const animate = () => {
       ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-
+      
       for (const particle of particles) {
-        particle.update();
-        particle.draw();
+        particle.update(canvasWidth, canvasHeight);
+        particle.draw(ctx);
       }
-
+      
       connectParticles();
+      
       animationFrameId = requestAnimationFrame(animate);
-    }
+    };
 
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
