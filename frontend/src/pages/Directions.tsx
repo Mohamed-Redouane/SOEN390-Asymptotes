@@ -12,6 +12,8 @@ import { LocationContext } from '../components/LocationContext';
 import { DirectionsBike } from '@mui/icons-material';
 import RouteRenderer from '../components/RouteRenderer';
 import { distanceCalculation } from '../utils/distanceCalculation';
+import ShareLocationIcon from '@mui/icons-material/ShareLocation';
+import LocationCityIcon from '@mui/icons-material/LocationCity';
 
 interface LocationType {
     name: string;
@@ -88,6 +90,7 @@ const Directions = () => {
     const location = useLocation(); //useLocation to get the state
     // const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW); // to be used to simulate being on campus
     const destinationFromState = location.state?.destination || ""; // Get destination from state
+    const isFromSchedule = location.state?.isFromSchedule || false; // Check if direction is from schedule
     const [active, setActive] = useState<string>("");
     const [sourceQuery, setSourceQuery] = useState<string>("");
     const [destinationQuery, setDestinationQuery] = useState<string>(destinationFromState);
@@ -116,6 +119,52 @@ const Directions = () => {
     const DEBOUNCE_DELAY = parseInt(import.meta.env.VITE_DEBOUNCE_DELAY || "300");
     const [otherCampus, setOtherCampus] = useState<LocationType | null>(null);
     const [shouldFetchDirections, setShouldFetchDirections] = useState(false);
+    
+    const [hasArrived, setHasArrived] = useState<boolean>(false);
+
+
+    const JumpingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
+        return (
+            <div
+                onClick={onClick}
+                className="fixed bottom-20 right-10 cursor-pointer animate-bounce"
+                style={{ zIndex: 1000 }}
+            >
+                <ShareLocationIcon style={{ fontSize: 50, color: "red" }} />
+            </div>
+        );
+    };
+
+
+    const BuildingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
+        return (
+            <div
+                onClick={onClick}
+                className="fixed bottom-32 right-10 cursor-pointer animate-bounce"
+                style={{ zIndex: 1000 }}
+            >
+                <LocationCityIcon style={{ fontSize: 50, color: "red" }} />
+            </div>
+        );
+    };
+
+    const handleClearRouteAndPrompts = () => {
+        setRoutes([]);
+        setRoutesAvailable(false);
+        setSourceQuery("");
+        setDestinationQuery("");
+        setSource(undefined);
+        setDestination(undefined);
+        setSelectedRouteIndex(-1);
+        setHasArrived(false);
+    };
+
+
+    const handleSwitchToIndoorDirections = () => {
+        // Logic to switch to indoor directions view
+        console.log("Switching to indoor directions view");
+    };
+
 
 
     // Debounced suggestion fetching function (KEY CHANGE)
@@ -291,6 +340,7 @@ const Directions = () => {
         setDestinationResults([]); // Clear the destination results
         setActive(""); // Reset active field
         setSelectedRouteIndex(0); // Select the first route so that its displayed
+        setHasArrived(true);
     };
 
     // Ensure suggestions are hidden when the route is displayed
@@ -641,7 +691,10 @@ const Directions = () => {
                             setActive("end");
                         }}
                       />
+                    
                     </div>
+                    {hasArrived && <JumpingIcon onClick={handleClearRouteAndPrompts} />}
+                    {hasArrived && isFromSchedule && <BuildingIcon onClick={handleSwitchToIndoorDirections} />}
                 </div>
             </div>
         </APIProvider>

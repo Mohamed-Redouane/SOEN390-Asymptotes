@@ -48,8 +48,8 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ isOpen, onClose, 
             </div>
             <button
               className="mt-6 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
-              onClick={() => navigate('/directions', 
-                { state: { destination: locationName } })}
+              onClick={() => navigate('/directions',
+                { state: { destination: locationName, isFromSchedule: true } })}
             >
               Get Directions
             </button>
