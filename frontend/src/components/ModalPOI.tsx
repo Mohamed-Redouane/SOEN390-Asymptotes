@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import './ModalPOI.css';
 
 interface ModalProps {
     isOpen: boolean;

@@ -109,7 +109,7 @@ const BottomNavBar = () => {
       {/* Direction Type Toggle */}
       {isDirectionsActive && (
         <div className={`absolute bottom-16 left-0 right-0 flex justify-center transition-all duration-300 transform ${showDirectionOptions ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
-          <div className="directiosn-options bg-white rounded-lg shadow-lg overflow-hidden flex w-11/12 max-w-md border border-[#4c3ee2]/20">
+          <div className="widget rounded-lg shadow-lg overflow-hidden flex w-11/12 max-w-md border border-[#4c3ee2]/20">
             <button
               onClick={() => handleDirectionTypeChange('indoor')}
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 transition-all duration-200
@@ -136,7 +136,7 @@ const BottomNavBar = () => {
       )}
 
 
-      <nav className="flex h-16 bg-white shadow-lg backdrop-blur-md">
+      <nav className="widget flex h-16 shadow-lg backdrop-blur-md">
         <NavButton icon={Bus} label="Shuttle" value="/shuttle" isActive={location.pathname === '/shuttle'} />
         <NavButton icon={Map} label="Map" value="/map" isActive={location.pathname === '/map' || location.pathname === '/LOYcampus'} />
         {/* Need to disable the button if we are on /indoordirections or in /directions */}

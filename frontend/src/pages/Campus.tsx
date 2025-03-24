@@ -165,8 +165,7 @@ function CampusMap() {
                         />
                     </div>
                 </div>
-                <div className="bg-white ">
-                    <label htmlFor="poiType" className="text-black">Select POI Type: </label>
+                    <label htmlFor="poiType">Select POI Type: </label>
                     <select id="poiType" value={poiType} onChange={handlePoiTypeChange}>
                         <option value="restaurant">Restaurant</option>
                         <option value="cafe">Cafe</option>
@@ -178,7 +177,6 @@ function CampusMap() {
                         <option value="hospital">Hospital</option>
                         <option value="school">School</option>
                     </select>
-                </div>
                 <button onClick={togglePOIs} className='' className='bg-[#4c3ee2] text-white'>
                     {showPOIs ? "Hide POIs" : "Show POIs"}
                 </button>
