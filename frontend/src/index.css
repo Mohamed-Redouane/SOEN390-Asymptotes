@@ -118,4 +118,8 @@ button:focus-visible {
   .widget, body {
     @apply bg-background text-foreground;
   }
+  select, input {
+    @apply bg-secondary text-foreground;
+    border-radius: 8px;
+  }
 }

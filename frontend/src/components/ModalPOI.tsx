@@ -28,13 +28,13 @@ const ModalPOI: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
 
     return (
-        <>
-            <div className="widget z-50 fixed left-0 mt-8 p-4 space-y-4 rounded-lg">
+        <div data-testid='poimodal-content'>
+            <div className="widget z-50 fixed left-0 mt-8 p-5 max-w-30 gap-4 rounded-lg flex flex-col items-center justify-center shadow-lg [&_label]:font-bold">
                     {children}
             </div>
-            <button className="fixed top-0 left-0 z-40 opacity-50 w-full h-full bg-black" onClick={onClose} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onClose()}>
+            <button className="fixed top-0 left-0 z-40 opacity-50 w-full h-full bg-black border-0" onClick={onClose} data-testid='poimodal-overlay' tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onClose()}>
             </button>
-        </>
+        </div>
     );
 };
 

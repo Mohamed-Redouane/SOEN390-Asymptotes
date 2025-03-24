@@ -146,27 +146,32 @@ function CampusMap() {
 
     return (
         <div>
-            {loading && <div>Loading...</div>}
+            {loading && <div className='fixed w-full'>Loading...</div>}
 
             <ModalPOI isOpen={isModalOpen} onClose={toggleModal}>
                 <div>
                     <label htmlFor="radius">Select Radius: </label>
-                    <div className='space-x-8'>
-                        <select id="radius" value={radius} onChange={handleRadiusChange}>
+                    <div>
+                        <select id="radius" className='w-full' value={radius} onChange={handleRadiusChange}>
                             <option value={100}>100 meters</option>
                             <option value={200}>200 meters</option>
                             <option value={500}>500 meters</option>
                             <option value={1000}>1000 meters</option>
                         </select>
                         <input
+                            className='w-full'
                             type="number"
+                            min='1'
                             placeholder="Enter custom radius"
-                            onBlur={(e) => setRadius(Number(e.target.value))}
+                            onBlur={(e) => {
+                                setRadius(e.target.value > 0 ? Number(e.target.value) : 1)
+                            }}
                         />
                     </div>
                 </div>
+                <div>
                     <label htmlFor="poiType">Select POI Type: </label>
-                    <select id="poiType" value={poiType} onChange={handlePoiTypeChange}>
+                    <select id="poiType" className='w-full' value={poiType} onChange={handlePoiTypeChange}>
                         <option value="restaurant">Restaurant</option>
                         <option value="cafe">Cafe</option>
                         <option value="library">Library</option>
@@ -177,7 +182,8 @@ function CampusMap() {
                         <option value="hospital">Hospital</option>
                         <option value="school">School</option>
                     </select>
-                <button onClick={togglePOIs} className='' className='bg-[#4c3ee2] text-white'>
+                </div>
+                <button onClick={togglePOIs} className='bg-[#007bff] text-white transition duration-300 hover:bg-[#0056b3] w-full'>
                     {showPOIs ? "Hide POIs" : "Show POIs"}
                 </button>
             </ModalPOI>
