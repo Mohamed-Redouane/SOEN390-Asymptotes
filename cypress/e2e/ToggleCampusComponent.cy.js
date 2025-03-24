@@ -5,7 +5,7 @@ describe("Toggle Button Component ", () => {
             body: { user: { id: "test-user", email: "test@example.com" } }, // Fake authenticated user
         }).as("getCurrentUser");
 
-        cy.visit("http://localhost:5173/");
+        cy.visit("http://localhost:5173/map");
 
         // Stub the geolocation API to return a location on sgw campus so the modal can dissapear
         cy.window().then((win) => {

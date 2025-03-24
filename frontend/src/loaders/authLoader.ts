@@ -1,15 +1,15 @@
+// src/loaders/authLoader.js
 import { redirect } from "react-router-dom";
 import { getCurrentUser } from "../api/authApi";
 import { isAxiosError, ErrorResponse } from "../utils/axiosUtils"; 
 
 export async function requireAuthLoader() {
   try {
-    const data: { user?: unknown } = await getCurrentUser();
+    const data = await getCurrentUser();
 
     if (data.user) {
       return data.user;
     }
-
 
     if (window.location.pathname !== "/login") {
       return redirect("/login");
@@ -28,5 +28,23 @@ export async function requireAuthLoader() {
     }
   }
 
-  return null; 
+  return null;
+}
+
+export async function requireNotAuthLoader() {
+  try {
+    const data = await getCurrentUser();
+
+    // If the user is authenticated, redirect them to the map page
+    if (data.user) {
+      return redirect("/map");
+    }
+  } catch (error: unknown) {
+    // If an error occurs, it may indicate the user is not authenticated,
+    // so we simply allow the welcome page to render.
+    console.error("User not authenticated or an error occurred:", error);
+  }
+
+  // Allow the welcome page to render if no authenticated user is found.
+  return null;
 }

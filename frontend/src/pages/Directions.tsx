@@ -11,6 +11,7 @@ import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import { LocationContext } from '../components/LocationContext';
 import { DirectionsBike } from '@mui/icons-material';
 import RouteRenderer from '../components/RouteRenderer';
+import { distanceCalculation } from '../utils/distanceCalculation';
 
 interface LocationType {
     name: string;
@@ -20,6 +21,22 @@ interface LocationType {
     lng: number;
 }
 
+const CAMPUS_COORDINATES = {
+    LOYOLA: {
+        name: "Loyola Campus",
+        lat: 45.4583,
+        lng: -73.6403,
+        address: "7141 Rue Sherbrooke O, Montréal, QC H4B 1R6, Canada",
+        place_id: "ChIJk5Bx5kkXyUwRHLCpsk_QqeM", // Example placeholder
+    },
+    SGW: {
+        name: "SGW Campus",
+        lat: 45.4949,
+        lng: -73.5779,
+        address: "Sainte-Catherine / Guy, Montréal, QC H3H 2S7, Canada",
+        place_id: "ChIJOx0fzmsayUwR_rq19AxGGm8", // Example placeholder
+    },
+};
 interface MapclickListenerProps {
     onMapClick: (destination: LocationType) => void;
 }
@@ -65,6 +82,7 @@ const MapClickListener: React.FC<MapclickListenerProps> = ({ onMapClick }) => {
 
 const Directions = () => {
     const location = useLocation(); //useLocation to get the state
+    // const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW); // to be used to simulate being on campus
     const destinationFromState = location.state?.destination || ""; // Get destination from state
     const [active, setActive] = useState<string>("");
     const [sourceQuery, setSourceQuery] = useState<string>("");
@@ -92,6 +110,8 @@ const Directions = () => {
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
     // Get debounce delay from environment variable, default to 300ms
     const DEBOUNCE_DELAY = parseInt(import.meta.env.VITE_DEBOUNCE_DELAY || "300");
+    const [otherCampus, setOtherCampus] = useState<LocationType | null>(null);
+    const [shouldFetchDirections, setShouldFetchDirections] = useState(false);
 
 
     // Debounced suggestion fetching function (KEY CHANGE)
@@ -137,6 +157,46 @@ const Directions = () => {
         }
     }, [userLocation, isResettingStart, isUserTyping]);
     
+    useEffect(() => {
+        // check if user is in any building campus
+        if (userLocation?.address) {
+            // calculate distance between userlocation and loyola campus
+            const isLoyla = distanceCalculation(
+                userLocation.lat,
+                userLocation.lng,
+                CAMPUS_COORDINATES.LOYOLA.lat,
+                CAMPUS_COORDINATES.LOYOLA.lng
+            ) <= 0.5;
+            // if user in loyola set otherCampus to SGW
+            if (isLoyla) {
+                setOtherCampus(CAMPUS_COORDINATES.SGW);
+            }
+            else {
+                setOtherCampus(CAMPUS_COORDINATES.LOYOLA);
+            }
+        }
+    }, [userLocation]);
+
+    const handleCampusDirection = () => {
+        if (otherCampus) {
+            // Update states
+            setDestinationQuery(otherCampus.name);
+            setDestination(otherCampus);
+            setRoutesAvailable(false);
+            setShouldFetchDirections(true);
+            setOtherCampus(null); // Remove the button after fetching directions
+        };
+    }
+
+
+    useEffect(() => {
+        if (shouldFetchDirections && source && destination) {
+            getDirections();
+            setShouldFetchDirections(false); // Reset the flag
+        }
+    }, [source, destination, shouldFetchDirections]);
+
+
     useEffect(() => {
         if (destinationFromState) {
             setDestinationQuery(destinationFromState); // Set destination query
@@ -282,7 +342,21 @@ const Directions = () => {
         setDestinationResults([]);
         setSelectedRouteIndex(-1);// reset the selected route index so route is not displayed
         setActive("");
-    }
+        // Check if user is still on one of the campuses
+        if (userLocation?.address) {
+            const isLoyla = distanceCalculation(
+                userLocation.lat,
+                userLocation.lng,
+                CAMPUS_COORDINATES.LOYOLA.lat,
+                CAMPUS_COORDINATES.LOYOLA.lng
+                ) <= 0.5;
+                if (isLoyla) {
+                    setOtherCampus(CAMPUS_COORDINATES.SGW);
+                } else {
+                    setOtherCampus(CAMPUS_COORDINATES.LOYOLA);
+                }
+            }
+        }
 
     useEffect(() => {
         return () => {
@@ -308,12 +382,10 @@ const Directions = () => {
         else if (transportationMode === "bicycling") {
             setSelectedRoute(bicyclingRoutes[index]);
         }
-        console.log("Selected Route: ", selectedRoute  , 'from ', transportationMode);
+        console.log("Selected Route: ", selectedRoute, 'from ', transportationMode);
         setRoutesAvailable(false);
 
     }
-
-
 
 
     return (
@@ -391,7 +463,7 @@ const Directions = () => {
                                             handleSelect(index);
                                             console.log("Selected: ", result);
                                         }}
-                                        className="flex flex-row items-center m-2 border-2 border-gray-200 rounded-lg w-full pr-4">
+                                        className="flex flex-row items-center m-2 border-2 border-gray-200 rounded-lg w-full pr-4 text-black bg-white">
                                         <div className="flex flex-col items-center">
                                             <RoomIcon style={{ color: "gray" }} />
                                         </div>
@@ -415,6 +487,13 @@ const Directions = () => {
                             >
                                 Get Directions
                             </button>
+                            {otherCampus != null && <button
+                                id="get-directions-to-campus-button"
+                                onClick={handleCampusDirection}
+                                className="m-1 border-2 border-gray-200 focus:outline-none rounded-lg w-full bg-blue-600 text-white font-bold">
+                                Get Directions to {otherCampus?.name}
+                            </button>
+                            }
                         </div>
                     )}
 
@@ -483,7 +562,7 @@ const Directions = () => {
                                             tabIndex={0}
                                             onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && console.log("Selected Route", index, ":", routes[index])}
                                             id="route-item-container"
-                                            className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between focus:outline-none bg-white  align-middle shadow-sm"
+                                            className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between focus:outline-none bg-white  text-black align-middle shadow-sm"
                                         >
                                             <button id='route-item-duration-distance '
                                                 className="flex flex-col items-start align-middle  bg-white w-full"

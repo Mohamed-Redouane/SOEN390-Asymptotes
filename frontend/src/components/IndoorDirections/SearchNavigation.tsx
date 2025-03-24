@@ -260,7 +260,12 @@ const floors = [...new Set(directions.path.map((p: any) => p.floor.name))] as st
       setSuggestions([])
       setActiveInput(null)
     } catch (error: any) {
-      setError(error.message || "Failed to generate directions")
+
+      // Manually checking here if the common error is due to the map data not being available
+      if (!error.message.includes("undefined")) {
+        setError(error.message || "Failed to generate directions")
+      } 
+
     } finally {
       setIsLoading(false)
     }
@@ -493,12 +498,14 @@ const floors = [...new Set(directions.path.map((p: any) => p.floor.name))] as st
                   </motion.div>
                 )}
 
-                {/* Error Message (Will show only if there is an error) */}
-                  {error && (
+                  {/* Error Message (Will show only if there is an error) */}
+                    {error && (
                     <div className="text-red-500 text-sm mt-2">
                       {error}
                     </div>
                   )}
+                
+                
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-2">
                   <button

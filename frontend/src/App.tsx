@@ -18,6 +18,7 @@ function App() {
     "/forgot-password",
     "/reset-password",
     "/verify-email",
+    "/"
   ];
   const isAuthRoute = hideNavbarPaths.includes(location.pathname);
 

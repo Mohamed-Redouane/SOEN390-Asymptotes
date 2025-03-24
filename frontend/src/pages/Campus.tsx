@@ -19,7 +19,7 @@ const CAMPUS_COORDINATES: { [key in CampusType]: { lat: number, lng: number } } 
 function CampusMap() {
     const [geoJsonData, setGeoJsonData] = useState<any>(null);
     const { location: userLocation } = useContext(LocationContext);
-    //const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW);   //TEST LOCATION
+    //const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.LOYOLA);   //TEST LOCATION
     const [isUserInsideBuilding, setIsUserInsideBuilding] = useState(false);
     const [campus, setCampus] = useState<CampusType>("SGW");
     const [pointsOfInterest, setPointsOfInterest] = useState<any[]>([]);
@@ -165,8 +165,8 @@ function CampusMap() {
                         />
                     </div>
                 </div>
-                <div>
-                    <label htmlFor="poiType">Select POI Type: </label>
+                <div className="bg-white ">
+                    <label htmlFor="poiType" className="text-black">Select POI Type: </label>
                     <select id="poiType" value={poiType} onChange={handlePoiTypeChange}>
                         <option value="restaurant">Restaurant</option>
                         <option value="cafe">Cafe</option>
