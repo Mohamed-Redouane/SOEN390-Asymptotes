@@ -29,11 +29,13 @@ const ModalPOI: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="modal-overlay" onClick={onClose} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onClose()}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && e.stopPropagation()}>
-                {children}
+        <>
+            <div className="widget z-50 fixed left-0 mt-8 p-4 space-y-4 rounded-lg">
+                    {children}
             </div>
-        </div>
+            <button className="fixed top-0 left-0 z-40 opacity-50 w-full h-full bg-black" onClick={onClose} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onClose()}>
+            </button>
+        </>
     );
 };
 

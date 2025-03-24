@@ -39,7 +39,7 @@ h1 {
   line-height: 1.1;
 }
 
-button {
+.widget, button {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
@@ -66,7 +66,7 @@ button:focus-visible {
   a:hover {
     color: #747bff;
   }
-  button {
+  .widget, button {
     background-color: #f9f9f9;
   }
 }

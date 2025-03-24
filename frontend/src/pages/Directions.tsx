@@ -24,10 +24,6 @@ interface MapclickListenerProps {
     onMapClick: (destination: LocationType) => void;
 }
 
-interface DirectionsToNextClass {
-    locationName: string;
-}
-
 const MapClickListener: React.FC<MapclickListenerProps> = ({ onMapClick }) => {
     const map = useMap();
   useEffect(() => {

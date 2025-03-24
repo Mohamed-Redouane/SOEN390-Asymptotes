@@ -151,17 +151,19 @@ function CampusMap() {
             <ModalPOI isOpen={isModalOpen} onClose={toggleModal}>
                 <div>
                     <label htmlFor="radius">Select Radius: </label>
-                    <select id="radius" value={radius} onChange={handleRadiusChange}>
-                        <option value={100}>100 meters</option>
-                        <option value={200}>200 meters</option>
-                        <option value={500}>500 meters</option>
-                        <option value={1000}>1000 meters</option>
-                    </select>
-                    <input
-                        type="number"
-                        placeholder="Enter custom radius"
-                        onBlur={(e) => setRadius(Number(e.target.value))}
-                    />
+                    <div className='space-x-8'>
+                        <select id="radius" value={radius} onChange={handleRadiusChange}>
+                            <option value={100}>100 meters</option>
+                            <option value={200}>200 meters</option>
+                            <option value={500}>500 meters</option>
+                            <option value={1000}>1000 meters</option>
+                        </select>
+                        <input
+                            type="number"
+                            placeholder="Enter custom radius"
+                            onBlur={(e) => setRadius(Number(e.target.value))}
+                        />
+                    </div>
                 </div>
                 <div>
                     <label htmlFor="poiType">Select POI Type: </label>
@@ -177,7 +179,7 @@ function CampusMap() {
                         <option value="school">School</option>
                     </select>
                 </div>
-                <button onClick={togglePOIs} >
+                <button onClick={togglePOIs} className='' className='bg-[#4c3ee2] text-white'>
                     {showPOIs ? "Hide POIs" : "Show POIs"}
                 </button>
             </ModalPOI>
