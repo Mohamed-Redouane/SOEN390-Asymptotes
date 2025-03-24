@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import RoomIcon from '@mui/icons-material/Room';
 import { getSuggestions, getPlaceDetails } from '../services/PlaceServices';
@@ -160,7 +160,15 @@ const Directions = () => {
     };
 
 
+    const navigate = useNavigate();
+    
     const handleSwitchToIndoorDirections = () => {
+        navigate('/indoordirections'), {
+            state: { 
+                destination: destinationQuery,
+                isFromSchedule: isFromSchedule
+            }
+        }
         // Logic to switch to indoor directions view
         console.log("Switching to indoor directions view");
     };
