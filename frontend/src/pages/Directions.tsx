@@ -47,6 +47,7 @@ interface DirectionsToNextClass {
     locationName: string;
 }
 
+
 const MapClickListener: React.FC<MapclickListenerProps> = ({ onMapClick }) => {
     const map = useMap();
   useEffect(() => {
@@ -89,6 +90,7 @@ const MapClickListener: React.FC<MapclickListenerProps> = ({ onMapClick }) => {
 const Directions = () => {
     const location = useLocation(); //useLocation to get the state
     // const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW); // to be used to simulate being on campus
+    const eventNameQuery = location.state?.eventName || ""; // Get event name from state
     const destinationFromState = location.state?.destination || ""; // Get destination from state
     const isFromSchedule = location.state?.isFromSchedule || false; // Check if direction is from schedule
     const [active, setActive] = useState<string>("");
@@ -163,14 +165,13 @@ const Directions = () => {
     const navigate = useNavigate();
     
     const handleSwitchToIndoorDirections = () => {
-        navigate('/indoordirections'), {
-            state: { 
-                destination: destinationQuery,
-                isFromSchedule: isFromSchedule
-            }
-        }
+        navigate(`/indoordirections?dest=${encodeURIComponent(eventNameQuery)}`);
         // Logic to switch to indoor directions view
-        console.log("Switching to indoor directions view");
+        console.log("Switching to indoor directions view", (eventNameQuery),destinationQuery , isFromSchedule);
+
+        // Create a context to store the event name and destination
+        // Use the context to display the event name and destination in the indoor directions view
+        
     };
 
 

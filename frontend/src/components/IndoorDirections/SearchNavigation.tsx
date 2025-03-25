@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useMap } from "@mappedin/react-sdk"
 import { Search, Navigation2, Loader2, X, CornerDownLeft, History, ChevronDown } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useLocation } from 'react-router-dom';
 
 interface Location {
   name: string
@@ -32,6 +33,15 @@ interface SearchNavigationProps {
 const RECENT_SEARCHES_KEY = "recentSearches"
 const MAX_RECENT_SEARCHES = 5
 
+// TODO: Maybe move this to a utility file, so we add unit tests for it
+// This function will take the event name and return just the room number
+// Example: "SOEN 343 - WW [C080]" will return "C080"
+const getRoomNumber = (eventName: string) => {
+    const roomNumber = eventName.match(/\[(.*?)\]/);
+    return roomNumber ? roomNumber[1] : "";
+}
+
+
 export default function SearchNavigation({ accessible = false }: SearchNavigationProps) {
   const { mapView, mapData } = useMap()
   const [startPoint, setStartPoint] = useState("")
@@ -55,6 +65,35 @@ export default function SearchNavigation({ accessible = false }: SearchNavigatio
       setRecentSearches(JSON.parse(saved))
     }
   }, [])
+
+  // Get destination from URL
+  const { search } = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(search);
+    const destinationName = params.get('dest');
+    console.log("Destination from URL:", destinationName);
+    // Set endpoint to destination from URL
+    if (destinationName) {
+      const localDest = getRoomNumber(destinationName)
+      setEndPoint(localDest)
+      // Also set the start point depending on the page (if it includes H at the beginning, set it to Hall)
+      // If it starts with J, set it to JMSB
+      // If it starts with L, set to Loyola
+      if (localDest.startsWith("H")) {
+        setStartPoint("Entrance Hall")
+      } else if (localDest.startsWith("J")) {
+        setStartPoint("Entrance JMSB")
+      }
+      // TODO: Check this after since we will have to change to loyola map if this is the case
+      else if (localDest.startsWith("L")) {
+        setStartPoint("170")
+      }
+  
+    }
+
+   
+
+  }, [search]); // Only runs when search changes
 
   // Save recent searches
   const saveRecentSearch = (start: string, end: string) => {
@@ -307,6 +346,7 @@ const floors = [...new Set(directions.path.map((p: any) => p.floor.name))] as st
     }
   }
 
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (!containerRef.current?.contains(e.target as Node)) {
@@ -388,7 +428,7 @@ const floors = [...new Set(directions.path.map((p: any) => p.floor.name))] as st
                         aria-label="Destination"
                         role="combobox"
                         aria-expanded={activeInput === "end" && suggestions.length > 0}
-                      />
+                      /> 
                       {endPoint && (
                         <button
                           onClick={() => clearInput(false)}

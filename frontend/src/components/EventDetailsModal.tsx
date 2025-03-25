@@ -20,7 +20,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ isOpen, onClose, 
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="max-w-md w-full bg-white rounded-xl shadow-xl p-6">
             <Dialog.Title className="text-2xl font-bold text-gray-900">
-              {selectedEvent?.summary}
+              {selectedEvent?.summary} 
             </Dialog.Title>
             <div className="mt-4 space-y-3 text-gray-700">
               <div className="flex items-center">
@@ -49,7 +49,7 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ isOpen, onClose, 
             <button
               className="mt-6 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
               onClick={() => navigate('/directions',
-                { state: { destination: locationName, isFromSchedule: true } })}
+                { state: {eventName: selectedEvent?.summary , destination: locationName, isFromSchedule: true } })}
             >
               Get Directions
             </button>
