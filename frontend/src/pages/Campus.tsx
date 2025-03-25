@@ -164,7 +164,7 @@ function CampusMap() {
                             min='1'
                             placeholder="Enter custom radius"
                             onBlur={(e) => {
-                                setRadius(e.target.value > 0 ? Number(e.target.value) : 1)
+                                setRadius((+e.target.value) > 0 ? Number(e.target.value) : 1)
                             }}
                         />
                     </div>
