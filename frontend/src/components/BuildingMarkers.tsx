@@ -16,8 +16,8 @@ const BuildingMarkers: React.FC<GeoJsonBuildingMarkersProps> = ({ geoJsonData })
   // For each feature, compute a marker position using the centroid of the polygon's first ring.
   const markers = geoJsonData.features.map((feature: any, index: number) => {
     if (feature.geometry.type === "Polygon") {
-      // GeoJSON coordinates are in [lng, lat] order.
-      const coordinates = feature.geometry.coordinates[0]; // First ring
+      
+      const coordinates = feature.geometry.coordinates[0]; 
       if (!coordinates || coordinates.length === 0) return null;
       // Convert coordinates to {lat, lng} objects.
       const points = coordinates.map((coord: [number, number]) => ({
@@ -42,7 +42,7 @@ const BuildingMarkers: React.FC<GeoJsonBuildingMarkersProps> = ({ geoJsonData })
             const houseNumber = feature.properties["addr:housenumber"] || "";
             const street = feature.properties["addr:street"] || "";
             const city = feature.properties["addr:city"] || "";
-            //const fullAddress = `${houseNumber} ${street}, ${city}`.trim();
+            
             const address = feature.properties.address || `${houseNumber} ${street}, ${city}`.trim();;
             const content = `
               <div style="max-width:250px; background:#fff; border-radius:8px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,0.3); color:#333; font-family: 'Roboto', sans-serif;">
@@ -56,7 +56,7 @@ const BuildingMarkers: React.FC<GeoJsonBuildingMarkersProps> = ({ geoJsonData })
             });
             infoWindow.open(map);
             setActiveInfoWindow(infoWindow);
-            // Optionally close after a delay:
+            
             setTimeout(() => {
               infoWindow.close();
               setActiveInfoWindow(null);
