@@ -8,6 +8,7 @@ import { APIProvider, Map, useMap } from '@vis.gl/react-google-maps';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
+import AirportShuttleIcon from '@mui/icons-material/AirportShuttle';
 import { LocationContext } from '../components/LocationContext';
 import { DirectionsBike } from '@mui/icons-material';
 import RouteRenderer from '../components/RouteRenderer';
@@ -93,7 +94,7 @@ const Directions = () => {
     const [destinationQuery, setDestinationQuery] = useState<string>(destinationFromState);
     const [sourceResults, setSourceResults] = useState<LocationType[]>([]);
     const [destinationResults, setDestinationResults] = useState<LocationType[]>([]);
-    const [transportationMode, setTransportationMode] = useState<"driving" | "transit" | "walking" | "bicycling">("driving");
+    const [transportationMode, setTransportationMode] = useState<"driving" | "transit" | "walking" | "bicycling" | "shuttle">("driving");
     const [source, setSource] = useState<LocationType>();
     const [destination, setDestination] = useState<LocationType>();
     const [routesAvailable, setRoutesAvailable] = useState<boolean>(false);
@@ -102,6 +103,7 @@ const Directions = () => {
     const [transitRoutes, setTransitRoutes] = useState<any>();
     const [walkingRoutes, setWalkingRoutes] = useState<any>();
     const [bicyclingRoutes, setBicyclingRoutes] = useState<any>();
+    const [shuttleRoutes, setShuttleRoutes] = useState<any[]>([]);
     const { location: userLocation } = useContext(LocationContext);
     const [isResettingStart, setIsResettingStart] = useState(false);
     const [isUserTyping, setIsUserTyping] = useState(false); // Keep track of typing
@@ -257,8 +259,10 @@ const Directions = () => {
             setRoutes(walkingRoutes);
         } else if (transportationMode === "bicycling") {
             setRoutes(bicyclingRoutes);
+        } else if (transportationMode === "shuttle") {
+            setRoutes(shuttleRoutes);
         }
-    }, [transportationMode]);
+    }, [transportationMode, drivingRoutes, transitRoutes, walkingRoutes, bicyclingRoutes, shuttleRoutes]);
 
 
     const getDirections = async () => {
@@ -280,6 +284,7 @@ const Directions = () => {
             setTransitRoutes(response.transit);
             setWalkingRoutes(response.walking);
             setBicyclingRoutes(response.bicycling);
+            setShuttleRoutes(response.shuttle || []);
             return response;
         }
         ).catch((error) => {
@@ -305,11 +310,17 @@ const Directions = () => {
     const handleTransportKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === "ArrowRight") {
             setTransportationMode((prev) =>
-                prev === "driving" ? "transit" : prev === "transit" ? "walking" : "driving"
+                prev === "driving" ? "transit" : 
+                prev === "transit" ? "walking" : 
+                prev === "walking" ? "bicycling" : 
+                prev === "bicycling" ? "shuttle" : "driving"
             );
         } else if (event.key === "ArrowLeft") {
             setTransportationMode((prev) =>
-                prev === "walking" ? "transit" : prev === "transit" ? "driving" : "walking"
+                prev === "shuttle" ? "bicycling" :
+                prev === "bicycling" ? "walking" : 
+                prev === "walking" ? "transit" : 
+                prev === "transit" ? "driving" : "shuttle"
             );
         }
     };
@@ -385,6 +396,9 @@ const Directions = () => {
         }
         else if (transportationMode === "bicycling") {
             setSelectedRoute(bicyclingRoutes[index]);
+        }
+        else if (transportationMode === "shuttle") {
+            setSelectedRoute(shuttleRoutes[index]);
         }
         console.log("Selected Route: ", selectedRoute, 'from ', transportationMode);
         setRoutesAvailable(false);
@@ -531,6 +545,7 @@ const Directions = () => {
                                         </p>
                                     }
                                 </button>
+                                
                                 <button id="walking-option"
                                     onClick={() => setTransportationMode("walking")}
                                     className={`flex flex-row  bg-white items-center justify-center focus:outline-none p-2 m-2 truncate rounded-full ${transportationMode === "walking" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}>
@@ -543,6 +558,7 @@ const Directions = () => {
                                         </p>
                                     }
                                 </button>
+                                
                                 <button id="bicycling-option"
                                     onClick={() => setTransportationMode("bicycling")}
                                     className={`flex flex-row items-center justify-center focus:outline-none  bg-white  p-2 m-2 truncate rounded-full ${transportationMode === "bicycling" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}
@@ -557,7 +573,19 @@ const Directions = () => {
                                     }
                                 </button>
 
-
+                                <button id="shuttle-option"
+                                    onClick={() => setTransportationMode("shuttle")}
+                                    className={`flex flex-row items-center justify-center focus:outline-none  bg-white  p-2 m-2 truncate rounded-full ${transportationMode === "shuttle" ? "flex-[2] sm:flex-1 bg-blue-500" : "flex-1"}`}
+                                >
+                                    <AirportShuttleIcon
+                                        style={{ color: transportationMode === "shuttle" ? "white" : "gray" }}
+                                    />
+                                    {transportationMode === "shuttle" &&
+                                        <p id='shuttle-duration' className={`overflow-hidden text-ellipsis ml-1`} style={{ color: transportationMode === "shuttle" ? "white" : "gray" }} >
+                                            {shuttleRoutes?.length > 0 ? (shuttleRoutes[0].duration?.text || shuttleRoutes[0].legs[0].duration.text) : "-"}
+                                        </p>
+                                    }
+                                </button>
                             </div>
                             <div id='routes-display' className='flex flex-col border-t-2 mb-3 over'>
                                 {routes?.map((route: any, index: number) => (
@@ -601,6 +629,30 @@ const Directions = () => {
 
                                                                 </React.Fragment>
                                                                 // )
+                                                            ))}
+                                                        </>
+                                                    }
+                                                    {transportationMode === "shuttle" &&
+                                                        <>
+                                                            {route.legs[0].steps?.map((step: any, index: number) => (
+                                                                <React.Fragment key={index}>
+                                                                    {step.travel_mode === "WALKING" && 
+                                                                        <span className="flex items-center text-xs ml-1">
+                                                                            <DirectionsWalkIcon style={{ color: "gray", fontSize: "0.8rem" }} />
+                                                                            {step.duration.text}
+                                                                        </span>
+                                                                    }
+                                                                    {step.travel_mode === "TRANSIT" && 
+                                                                        <>
+                                                                            <span className="text-xs ml-1 rounded-lg pl-1 pr-1"
+                                                                                style={{ backgroundColor: "#6A0DAD", color: "white" }}>
+                                                                                SHUTTLE
+                                                                            </span>
+                                                                            <span className="text-xs ml-1">{step.duration.text}</span>
+                                                                        </>
+                                                                    }
+                                                                    {index !== route.legs[0].steps.length - 1 && <span className="text-xs ml-1">{'>'}</span>}
+                                                                </React.Fragment>
                                                             ))}
                                                         </>
                                                     }
@@ -652,7 +704,7 @@ interface MapWrapperProps {
     source: LocationType | undefined;
     destination: LocationType | undefined;
     selectedRouteIndex: number;
-    transportationMode: "driving" | "transit" | "walking" | "bicycling";
+    transportationMode: "driving" | "transit" | "walking" | "bicycling" | "shuttle";
     onMapClick: (destination: LocationType) => void;
 }
 
