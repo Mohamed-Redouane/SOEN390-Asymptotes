@@ -45,10 +45,11 @@ const BuildingMarkers: React.FC<GeoJsonBuildingMarkersProps> = ({ geoJsonData })
             //const fullAddress = `${houseNumber} ${street}, ${city}`.trim();
             const address = feature.properties.address || `${houseNumber} ${street}, ${city}`.trim();;
             const content = `
-              <div style="max-width:250px; background:#fff; border-radius:8px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,0.3); color:#333; font-family: 'Roboto', sans-serif;">
-                <h3 style="margin:0 0 5px 0; color:#5A2DA2;">${feature.properties.name || "Building"}</h3>
-                <p style="margin:0;">${address}</p>
-                <button id="get-directions-building-button" class="mt-2 border-2 border-gray-200 focus:outline-none rounded-lg bg-blue-600 text-white font-bold px-3 py-2 cursor-pointer">
+              <div class="max-w-[250px] bg-white rounded-lg p-3 shadow-md text-gray-800 font-sans" >
+                <h3 class="text-xl font-bold text-[#5A2DA2] mb-2">${feature.properties.name || "Building"}</h3>
+                <p class="m-0">${address}</p>
+                <button id="get-directions-building-button"
+                  class="mt-3 rounded-lg bg-[#5A2DA2] text-white font-bold px-4 py-2 cursor-pointer hover:bg-[#4b29f1]">
                   Get Directions
                 </button>
               </div>
