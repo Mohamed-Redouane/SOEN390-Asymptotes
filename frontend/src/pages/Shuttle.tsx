@@ -122,7 +122,7 @@ const ConcordiaShuttle = () => {
           Live Map
         </CardTitle>
         <div className="flex items-center gap-2">
-          {['Loyola', 'SGW', 'Shuttles'].map((location, index) => (
+          {['Loyola', 'SGW', 'Shuttles'].map((location,_) => (
             <Badge 
               key={location} 
               variant="outline" 
