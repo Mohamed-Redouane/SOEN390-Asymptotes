@@ -9,12 +9,12 @@ interface CalendarSelectorProps {
 const CalendarSelector: React.FC<CalendarSelectorProps> = ({ calendars, selectedCalendarId, onSelectCalendar }) => {
   return (
     <div className="mb-6 text-center">
-      <label htmlFor="calendar-select" className="block text-lg font-semibold text-gray-700 mb-2">
+      <label htmlFor="calendar-select" className="block text-lg font-semibold mb-2">
         Select a Calendar:
       </label>
       <select
         id="calendar-select"
-        className="px-4 py-2 border rounded-lg bg-white shadow-sm text-gray-900"
+        className="px-4 py-2 border rounded-lg shadow-sm"
         value={selectedCalendarId || ''}
         onChange={(e) => onSelectCalendar(e.target.value)}
       >
