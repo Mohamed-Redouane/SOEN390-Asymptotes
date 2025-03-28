@@ -169,6 +169,7 @@ const Directions = () => {
         // Logic to switch to indoor directions view
         console.log("Switching to indoor directions view", (eventNameQuery),destinationQuery , isFromSchedule);
 
+        
         // Create a context to store the event name and destination
         // Use the context to display the event name and destination in the indoor directions view
         

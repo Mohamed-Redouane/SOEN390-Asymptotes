@@ -18,8 +18,8 @@ const CAMPUS_COORDINATES: { [key in CampusType]: { lat: number, lng: number } } 
 
 function CampusMap() {
     const [geoJsonData, setGeoJsonData] = useState<any>(null);
-    //const { location: userLocation } = useContext(LocationContext);
-    const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW);   //TEST LOCATION
+    const { location: userLocation } = useContext(LocationContext);
+    //const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW);   //TEST LOCATION
     const [isUserInsideBuilding, setIsUserInsideBuilding] = useState(false);
     const [campus, setCampus] = useState<CampusType>("SGW");
     const [pointsOfInterest, setPointsOfInterest] = useState<any[]>([]);

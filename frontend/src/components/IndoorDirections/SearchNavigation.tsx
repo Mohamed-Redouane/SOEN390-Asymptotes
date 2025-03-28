@@ -46,6 +46,7 @@ export default function SearchNavigation({ accessible = false }: SearchNavigatio
   const { mapView, mapData } = useMap()
   const [startPoint, setStartPoint] = useState("")
   const [endPoint, setEndPoint] = useState("")
+  const [shouldAutoNavigate, setShouldAutoNavigate] = useState(false);
   const [suggestions, setSuggestions] = useState<Location[]>([])
   const [isStart, setIsStart] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
@@ -88,12 +89,22 @@ export default function SearchNavigation({ accessible = false }: SearchNavigatio
       else if (localDest.startsWith("L")) {
         setStartPoint("170")
       }
+
+      setShouldAutoNavigate(true);
   
     }
 
    
 
   }, [search]); // Only runs when search changes
+
+  // Automatically trigger navigation when startPoint and endPoint are set
+  useEffect(() => {
+    if (shouldAutoNavigate && startPoint && endPoint) {
+      handleNavigation();
+      setShouldAutoNavigate(false); // Reset the flag to prevent repeated navigation
+    }
+  }, [shouldAutoNavigate, startPoint, endPoint]);
 
   // Save recent searches
   const saveRecentSearch = (start: string, end: string) => {
