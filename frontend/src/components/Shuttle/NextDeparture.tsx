@@ -111,7 +111,7 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
               ? "bg-gray-100 text-orange-500"
               : isSoon
                 ? "bg-gray-100 text-teal-500"
-                : "bg-gray-100 text-teal-500",
+                : "bg-gray-100 text-teal-500"
           )}
         />
 
@@ -133,4 +133,3 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
     </Card>
   )
 }
-

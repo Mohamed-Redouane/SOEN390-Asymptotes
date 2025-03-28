@@ -62,9 +62,7 @@ export const ScheduleItem = ({ loy, sgw, isUpcoming, isNext, currentMinutes }: S
             className={cn(
               "font-medium",
               isUpcoming && sgwMinutesUntil > 0
-                ? sgwMinutesUntil <= 5
-                  ? "text-orange-600"
-                  : "text-orange-600"
+                ? "text-orange-600"  // Simplified
                 : "text-gray-500",
             )}
           >
@@ -74,7 +72,7 @@ export const ScheduleItem = ({ loy, sgw, isUpcoming, isNext, currentMinutes }: S
           <span className="text-xs text-gray-500">SGW</span>
           {isUpcoming && sgwMinutesUntil > 0 && (
             <span
-              className={cn("text-xs font-medium mt-1", sgwMinutesUntil <= 5 ? "text-orange-600" : "text-orange-600")}
+              className={cn("text-xs font-medium mt-1", "text-orange-600")}  // Removed redundant conditional
             >
               {formatMinutes(sgwMinutesUntil)}
             </span>
@@ -92,4 +90,3 @@ export const ScheduleItem = ({ loy, sgw, isUpcoming, isNext, currentMinutes }: S
     </div>
   )
 }
-

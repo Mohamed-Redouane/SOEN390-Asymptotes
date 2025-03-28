@@ -10,8 +10,7 @@ import { Separator } from "../components/ui/separator"
 import { ScrollArea } from "../components/ui/scroll-area"
 import { AlertCircle, Calendar, Clock, MapPin, RefreshCw } from "lucide-react"
 import { initializeLeaflet } from "../utils/leaflet-utils"
-import { formatTime } from "../utils/time-utils"
-import { timeToMinutes } from "../utils/time-utils"
+import { formatTime, timeToMinutes } from "../utils/time-utils"
 import { MapComponent } from "../components/Shuttle/MapComponent"
 import { ScheduleItem } from "../components/Shuttle/ScheduleItem"
 import { NextDeparture } from "../components/Shuttle/NextDeparture"
@@ -114,10 +113,127 @@ const ConcordiaShuttle = () => {
     setRouteDialogOpen(true)
   }
 
+  // Reusable Map Card Component
+  const renderMapCard = (isDesktop: boolean) => (
+    <Card className={`${isDesktop ? 'lg:col-span-2' : ''} overflow-hidden bg-white border border-gray-200`}>
+      <CardHeader className="pb-2 flex flex-row items-center justify-between">
+        <CardTitle className="flex items-center gap-2 text-gray-800">
+          <MapPin className="h-5 w-5 text-teal-600" />
+          Live Map
+        </CardTitle>
+        <div className="flex items-center gap-2">
+          {['Loyola', 'SGW', 'Shuttles'].map((location, index) => (
+            <Badge 
+              key={location} 
+              variant="outline" 
+              className={`bg-white ${
+                location === 'Loyola' ? 'text-teal-700 hover:bg-teal-50 border-teal-200' :
+                location === 'SGW' ? 'text-orange-700 hover:bg-orange-50 border-orange-200' :
+                'text-green-700 hover:bg-green-50 border-green-200'
+              }`}
+            >
+              <div className={`w-2 h-2 rounded-full ${
+                location === 'Loyola' ? 'bg-teal-500' :
+                location === 'SGW' ? 'bg-orange-500' :
+                'bg-green-500'
+              } mr-1 animate-pulse`}></div>
+              {location}
+            </Badge>
+          ))}
+        </div>
+      </CardHeader>
+      <CardContent className="p-0">
+        {error ? (
+          <div className={`flex flex-col items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'} bg-gray-50`}>
+            <AlertCircle className="h-10 w-10 text-orange-500 mb-2" />
+            <p className="text-gray-700 font-medium">{error}</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleFetchShuttleData}
+              className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+            >
+              Try Again
+            </Button>
+          </div>
+        ) : loading && busLocations.length === 0 ? (
+          <div className={`flex items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'} bg-gray-50`}>
+            <div className="flex flex-col items-center">
+              <RefreshCw className="h-10 w-10 animate-spin mb-2 text-teal-500" />
+              <p className="text-gray-600">Loading shuttle locations...</p>
+            </div>
+          </div>
+        ) : busLocations.length === 0 ? (
+          <div className={`flex flex-col items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'} bg-gray-50`}>
+            <p className="text-gray-600">No shuttle data available</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleFetchShuttleData}
+              className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+            >
+              Refresh
+            </Button>
+          </div>
+        ) : (
+          <MapComponent
+            busLocations={shuttleBuses}
+            campusPoints={campusPoints}
+            onCenterMap={(_) => {
+              centerMapRef.current = (loc) => {
+                if (loc) {
+                  centerMap(loc)
+                }
+              }
+            }}
+          />
+        )}
+      </CardContent>
+    </Card>
+  )
+
+  // Reusable Schedule Table
+  const renderScheduleTable = (scheduleData: any[]) => (
+    <>
+      <div className="flex justify-between mb-2 px-3 text-sm font-medium">
+        <div className="flex items-center gap-1">
+          <div className="h-3 w-3 rounded-full bg-[#26a69a]" />
+          <span className="text-gray-700">Loyola</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="h-3 w-3 rounded-full bg-[#fb8c00]" />
+          <span className="text-gray-700">Sir George Williams</span>
+        </div>
+      </div>
+      <Separator className="mb-2 bg-gray-200" />
+      <ScrollArea className="h-[300px] pr-4">
+        <div className="space-y-2">
+          {scheduleData.map((item, index) => {
+            const loyMinutes = timeToMinutes(item.loy)
+            const sgwMinutes = timeToMinutes(item.sgw)
+            const isUpcoming = loyMinutes >= currentMinutes || sgwMinutes >= currentMinutes
+            const isNext = index === nextDepartureIndex
+            return (
+              <ScheduleItem
+                key={index}
+                loy={item.loy}
+                sgw={item.sgw}
+                isUpcoming={isUpcoming}
+                isNext={isNext}
+                currentMinutes={currentMinutes}
+              />
+            )
+          })}
+        </div>
+      </ScrollArea>
+    </>
+  )
+
   return (
     <div className="min-h-screen bg-white text-gray-800">
       <div className="container mx-auto py-4 px-4 max-w-6xl mb-20 pt-16">
         <div className="flex flex-col gap-6">
+          {/* Header Section (Shared between mobile and desktop) */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-gray-800">Concordia Shuttle Service</h1>
@@ -164,7 +280,7 @@ const ConcordiaShuttle = () => {
             </Card>
           )}
 
-          {/* Mobile view with improved spacing and fixed bottom padding */}
+          {/* Mobile Layout */}
           <div className="md:hidden mb-24">
             <Tabs defaultValue="map" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-4 sticky top-0 z-10 bg-white border-b border-gray-200">
@@ -187,81 +303,7 @@ const ConcordiaShuttle = () => {
               </TabsList>
 
               <TabsContent value="map" className="mt-0">
-                {/* Map Card (Mobile) */}
-                <Card className="overflow-hidden bg-white border border-gray-200">
-                  <CardHeader className="pb-2 flex flex-row items-center justify-between">
-                    <CardTitle className="flex items-center gap-2 text-gray-800">
-                      <MapPin className="h-5 w-5 text-teal-600" />
-                      Live Map
-                    </CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="bg-white text-teal-700 hover:bg-teal-50 border-teal-200">
-                        <div className="w-2 h-2 rounded-full bg-teal-500 mr-1 animate-pulse"></div>
-                        Loyola
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className="bg-white text-orange-700 hover:bg-orange-50 border-orange-200"
-                      >
-                        <div className="w-2 h-2 rounded-full bg-orange-500 mr-1 animate-pulse"></div>
-                        SGW
-                      </Badge>
-                      <Badge variant="outline" className="bg-white text-green-700 hover:bg-green-50 border-green-200">
-                        <div className="w-2 h-2 rounded-full bg-green-500 mr-1 animate-pulse"></div>
-                        Shuttles
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    {error ? (
-                      <div className="flex flex-col items-center justify-center h-[400px] bg-gray-50">
-                        <AlertCircle className="h-10 w-10 text-orange-500 mb-2" />
-                        <p className="text-gray-700 font-medium">{error}</p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleFetchShuttleData}
-                          className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
-                        >
-                          Try Again
-                        </Button>
-                      </div>
-                    ) : loading && busLocations.length === 0 ? (
-                      <div className="flex items-center justify-center h-[400px] bg-gray-50">
-                        <div className="flex flex-col items-center">
-                          <RefreshCw className="h-10 w-10 animate-spin mb-2 text-teal-500" />
-                          <p className="text-gray-600">Loading shuttle locations...</p>
-                        </div>
-                      </div>
-                    ) : busLocations.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center h-[400px] bg-gray-50">
-                        <p className="text-gray-600">No shuttle data available</p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleFetchShuttleData}
-                          className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
-                        >
-                          Refresh
-                        </Button>
-                      </div>
-                    ) : (
-                      <MapComponent
-                        busLocations={shuttleBuses}
-                        campusPoints={campusPoints}
-                        onCenterMap={(_) => {
-                          centerMapRef.current = (loc) => {
-                            if (loc) {
-                              centerMap(loc)
-                            }
-                          }
-                        }}
-                      />
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Next Departure (Mobile) */}
+                {renderMapCard(false)}
                 {!noServiceToday && (
                   <div className="mt-4">
                     <NextDeparture
@@ -274,7 +316,6 @@ const ConcordiaShuttle = () => {
               </TabsContent>
 
               <TabsContent value="schedule" className="mt-0">
-                {/* Schedule Card (Mobile) */}
                 <Card className="bg-white border border-gray-200">
                   <CardHeader className="pb-2">
                     <CardTitle className="flex items-center gap-2 text-gray-800">
@@ -303,71 +344,11 @@ const ConcordiaShuttle = () => {
                       </TabsList>
 
                       <TabsContent value="mon-thu" className="mt-0">
-                        <div className="flex justify-between mb-2 px-3 text-sm font-medium">
-                          <div className="flex items-center gap-1">
-                            <div className="h-3 w-3 rounded-full bg-[#26a69a]" />
-                            <span className="text-gray-700">Loyola</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="h-3 w-3 rounded-full bg-[#fb8c00]" />
-                            <span className="text-gray-700">Sir George Williams</span>
-                          </div>
-                        </div>
-                        <Separator className="mb-2 bg-gray-200" />
-                        <ScrollArea className="h-[300px] pr-4">
-                          <div className="space-y-2">
-                            {scheduleMonThu.map((item, index) => {
-                              const loyMinutes = timeToMinutes(item.loy)
-                              const sgwMinutes = timeToMinutes(item.sgw)
-                              const isUpcoming = loyMinutes >= currentMinutes || sgwMinutes >= currentMinutes
-                              const isNext = index === nextDepartureIndex
-                              return (
-                                <ScheduleItem
-                                  key={index}
-                                  loy={item.loy}
-                                  sgw={item.sgw}
-                                  isUpcoming={isUpcoming}
-                                  isNext={isNext}
-                                  currentMinutes={currentMinutes}
-                                />
-                              )
-                            })}
-                          </div>
-                        </ScrollArea>
+                        {renderScheduleTable(scheduleMonThu)}
                       </TabsContent>
 
                       <TabsContent value="fri" className="mt-0">
-                        <div className="flex justify-between mb-2 px-3 text-sm font-medium">
-                          <div className="flex items-center gap-1">
-                            <div className="h-3 w-3 rounded-full bg-[#26a69a]" />
-                            <span className="text-gray-700">Loyola</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="h-3 w-3 rounded-full bg-[#fb8c00]" />
-                            <span className="text-gray-700">Sir George Williams</span>
-                          </div>
-                        </div>
-                        <Separator className="mb-2 bg-gray-200" />
-                        <ScrollArea className="h-[300px] pr-4">
-                          <div className="space-y-2">
-                            {scheduleFri.map((item, index) => {
-                              const loyMinutes = timeToMinutes(item.loy)
-                              const sgwMinutes = timeToMinutes(item.sgw)
-                              const isUpcoming = loyMinutes >= currentMinutes || sgwMinutes >= currentMinutes
-                              const isNext = index === nextDepartureIndex
-                              return (
-                                <ScheduleItem
-                                  key={index}
-                                  loy={item.loy}
-                                  sgw={item.sgw}
-                                  isUpcoming={isUpcoming}
-                                  isNext={isNext}
-                                  currentMinutes={currentMinutes}
-                                />
-                              )
-                            })}
-                          </div>
-                        </ScrollArea>
+                        {renderScheduleTable(scheduleFri)}
                       </TabsContent>
                     </Tabs>
 
@@ -383,80 +364,9 @@ const ConcordiaShuttle = () => {
 
           {/* Desktop Layout */}
           <div className="hidden md:grid md:grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Map Card */}
-            <Card className="lg:col-span-2 overflow-hidden bg-white border border-gray-200">
-              <CardHeader className="pb-2 flex flex-row items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-gray-800">
-                  <MapPin className="h-5 w-5 text-teal-600" />
-                  Live Map
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="bg-white text-teal-700 hover:bg-teal-50 border-teal-200">
-                    <div className="w-2 h-2 rounded-full bg-teal-500 mr-1 animate-pulse"></div>
-                    Loyola
-                  </Badge>
-                  <Badge variant="outline" className="bg-white text-orange-700 hover:bg-orange-50 border-orange-200">
-                    <div className="w-2 h-2 rounded-full bg-orange-500 mr-1 animate-pulse"></div>
-                    SGW
-                  </Badge>
-                  <Badge variant="outline" className="bg-white text-green-700 hover:bg-green-50 border-green-200">
-                    <div className="w-2 h-2 rounded-full bg-green-500 mr-1 animate-pulse"></div>
-                    Shuttles
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                {error ? (
-                  <div className="flex flex-col items-center justify-center h-[500px] bg-gray-50">
-                    <AlertCircle className="h-10 w-10 text-orange-500 mb-2" />
-                    <p className="text-gray-700 font-medium">{error}</p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleFetchShuttleData}
-                      className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
-                    >
-                      Try Again
-                    </Button>
-                  </div>
-                ) : loading && busLocations.length === 0 ? (
-                  <div className="flex items-center justify-center h-[500px] bg-gray-50">
-                    <div className="flex flex-col items-center">
-                      <RefreshCw className="h-10 w-10 animate-spin mb-2 text-teal-500" />
-                      <p className="text-gray-600">Loading shuttle locations...</p>
-                    </div>
-                  </div>
-                ) : busLocations.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-[500px] bg-gray-50">
-                    <p className="text-gray-600">No shuttle data available</p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleFetchShuttleData}
-                      className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
-                    >
-                      Refresh
-                    </Button>
-                  </div>
-                ) : (
-                  <MapComponent
-                    busLocations={shuttleBuses}
-                    campusPoints={campusPoints}
-                    onCenterMap={(_) => {
-                      centerMapRef.current = (loc) => {
-                        if (loc) {
-                          centerMap(loc)
-                        }
-                      }
-                    }}
-                  />
-                )}
-              </CardContent>
-            </Card>
+            {renderMapCard(true)}
 
-            {/* Schedule and Next Departure Cards */}
             <div className="space-y-6">
-              {/* Next Departure (Desktop) */}
               {!noServiceToday && (
                 <NextDeparture
                   schedule={activeSchedule}
@@ -465,7 +375,6 @@ const ConcordiaShuttle = () => {
                 />
               )}
 
-              {/* Schedule Card (Desktop) */}
               <Card className="bg-white border border-gray-200">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-gray-800">
@@ -494,71 +403,11 @@ const ConcordiaShuttle = () => {
                     </TabsList>
 
                     <TabsContent value="mon-thu" className="mt-0">
-                      <div className="flex justify-between mb-2 px-3 text-sm font-medium">
-                        <div className="flex items-center gap-1">
-                          <div className="h-3 w-3 rounded-full bg-[#26a69a]" />
-                          <span className="text-gray-700">Loyola</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="h-3 w-3 rounded-full bg-[#fb8c00]" />
-                          <span className="text-gray-700">Sir George Williams</span>
-                        </div>
-                      </div>
-                      <Separator className="mb-2 bg-gray-200" />
-                      <ScrollArea className="h-[300px] pr-4">
-                        <div className="space-y-2">
-                          {scheduleMonThu.map((item, index) => {
-                            const loyMinutes = timeToMinutes(item.loy)
-                            const sgwMinutes = timeToMinutes(item.sgw)
-                            const isUpcoming = loyMinutes >= currentMinutes || sgwMinutes >= currentMinutes
-                            const isNext = index === nextDepartureIndex
-                            return (
-                              <ScheduleItem
-                                key={index}
-                                loy={item.loy}
-                                sgw={item.sgw}
-                                isUpcoming={isUpcoming}
-                                isNext={isNext}
-                                currentMinutes={currentMinutes}
-                              />
-                            )
-                          })}
-                        </div>
-                      </ScrollArea>
+                      {renderScheduleTable(scheduleMonThu)}
                     </TabsContent>
 
                     <TabsContent value="fri" className="mt-0">
-                      <div className="flex justify-between mb-2 px-3 text-sm font-medium">
-                        <div className="flex items-center gap-1">
-                          <div className="h-3 w-3 rounded-full bg-[#26a69a]" />
-                          <span className="text-gray-700">Loyola</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="h-3 w-3 rounded-full bg-[#fb8c00]" />
-                          <span className="text-gray-700">Sir George Williams</span>
-                        </div>
-                      </div>
-                      <Separator className="mb-2 bg-gray-200" />
-                      <ScrollArea className="h-[300px] pr-4">
-                        <div className="space-y-2">
-                          {scheduleFri.map((item, index) => {
-                            const loyMinutes = timeToMinutes(item.loy)
-                            const sgwMinutes = timeToMinutes(item.sgw)
-                            const isUpcoming = loyMinutes >= currentMinutes || sgwMinutes >= currentMinutes
-                            const isNext = index === nextDepartureIndex
-                            return (
-                              <ScheduleItem
-                                key={index}
-                                loy={item.loy}
-                                sgw={item.sgw}
-                                isUpcoming={isUpcoming}
-                                isNext={isNext}
-                                currentMinutes={currentMinutes}
-                              />
-                            )
-                          })}
-                        </div>
-                      </ScrollArea>
+                      {renderScheduleTable(scheduleFri)}
                     </TabsContent>
                   </Tabs>
 
@@ -580,4 +429,3 @@ const ConcordiaShuttle = () => {
 }
 
 export default ConcordiaShuttle
-
