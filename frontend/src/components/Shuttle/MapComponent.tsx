@@ -54,52 +54,52 @@ export const MapComponent = ({ busLocations, campusPoints, onCenterMap }: MapCom
       }
 
       // Attempt to get current position with detailed error handling
-      navigator.geolocation.getCurrentPosition(
-        // Success callback
-        (position) => {
-          const userLocation: [number, number] = [
-            position.coords.latitude, 
-            position.coords.longitude
-          ]
-          setMapCenter(userLocation)
-          setMapZoom(15)
-        },
-        (error) => {
-          let errorMessage = 'Unknown error';
-          switch(error.code) {
-            case error.PERMISSION_DENIED:
-              errorMessage = 'Location permission was denied. Please check your browser settings.';
-              console.error('Geolocation error: User denied location access');
-              break;
-            case error.POSITION_UNAVAILABLE:
-              errorMessage = 'Location information is unavailable.';
-              console.error('Geolocation error: Location information unavailable');
-              break;
-            case error.TIMEOUT:
-              errorMessage = 'Location request timed out.';
-              console.error('Geolocation error: Request timed out');
-              break;
-            default:
-              console.error('Unexpected geolocation error', error);
-          }
+    //   navigator.geolocation.getCurrentPosition(
+    //     // Success callback
+    //     (position) => {
+    //       const userLocation: [number, number] = [
+    //         position.coords.latitude, 
+    //         position.coords.longitude
+    //       ]
+    //       setMapCenter(userLocation)
+    //       setMapZoom(15)
+    //     },
+    //     (error) => {
+    //       let errorMessage = 'Unknown error';
+    //       switch(error.code) {
+    //         case error.PERMISSION_DENIED:
+    //           errorMessage = 'Location permission was denied. Please check your browser settings.';
+    //           console.error('Geolocation error: User denied location access');
+    //           break;
+    //         case error.POSITION_UNAVAILABLE:
+    //           errorMessage = 'Location information is unavailable.';
+    //           console.error('Geolocation error: Location information unavailable');
+    //           break;
+    //         case error.TIMEOUT:
+    //           errorMessage = 'Location request timed out.';
+    //           console.error('Geolocation error: Request timed out');
+    //           break;
+    //         default:
+    //           console.error('Unexpected geolocation error', error);
+    //       }
 
-          console.warn('Geolocation Debug Info:', {
-            userAgent: navigator.userAgent,
-            locationServicesEnabled: 'geolocation' in navigator,
-            secureContext: window.isSecureContext,
-            origin: window.location.origin
-          });
+    //       console.warn('Geolocation Debug Info:', {
+    //         userAgent: navigator.userAgent,
+    //         locationServicesEnabled: 'geolocation' in navigator,
+    //         secureContext: window.isSecureContext,
+    //         origin: window.location.origin
+    //       });
 
-          alert(errorMessage);
-        },
-        {
-          enableHighAccuracy: true,  
-          timeout: 10000,            
-          maximumAge: 0              
-        }
-      );
+    //       alert(errorMessage);
+    //     },
+    //     {
+    //       enableHighAccuracy: true,  
+    //       timeout: 10000,            
+    //       maximumAge: 0              
+    //     }
+    //   );
 
-      return true;
+    //   return true;
     }
 
     checkGeolocationPermission();

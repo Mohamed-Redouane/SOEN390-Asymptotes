@@ -107,11 +107,7 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
           value={progressValue}
           className={cn(
             "h-2",
-            isUrgent
-              ? "bg-gray-100 text-orange-500"
-              : isSoon
-                ? "bg-gray-100 text-teal-500"
-                : "bg-gray-100 text-teal-500"
+            isUrgent ? "bg-gray-100 text-orange-500" : "bg-gray-100 text-teal-500"
           )}
         />
 
