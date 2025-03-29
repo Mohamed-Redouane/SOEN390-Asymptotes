@@ -77,7 +77,8 @@ export class AuthController {
     try {
       const { email } = req.body;
       if (!email) {
-        return void res.status(400).json({ error: "Email is required." });
+        res.status(400).json({ error: "Email is required." });
+        return;
       }
       await container.authService.requestPasswordReset(email);
       res.status(200).json({ message: "Reset requested. Check logs/email for code." });
@@ -92,7 +93,8 @@ export class AuthController {
     try {
       const { code, newPassword } = req.body;
       if (!code || !newPassword) {
-        return void res.status(400).json({ error: "code and newPassword are required." });
+        res.status(400).json({ error: "code and newPassword are required." });
+        return;
       }
       await container.authService.resetPassword(code, newPassword);
       res.status(200).json({ message: "Password reset successful." });
@@ -105,7 +107,8 @@ export class AuthController {
     try {
       const { userId } = req.body;
       if (!userId) {
-        return void res.status(400).json({ error: "userId is required." });
+        res.status(400).json({ error: "userId is required." });
+        return;
       }
       await container.authService.resendVerification(userId);
       res.status(200).json({ message: "New verification code sent. Check console or email." });

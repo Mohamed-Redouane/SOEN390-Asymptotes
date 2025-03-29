@@ -19,7 +19,7 @@ function generateRandomOTP(): string {
 
 
 export class EmailVerificationService {
-  constructor(private pool: Pool) {}
+  constructor(private readonly pool: Pool) {}
 
 
 

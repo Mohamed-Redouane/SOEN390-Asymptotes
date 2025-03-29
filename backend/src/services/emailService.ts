@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import { getVerificationEmailHtml, getPasswordResetEmailHtml } from "./emailTemplate.js";
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendVerificationEmail(email: string, code: string, username: string) {
   const htmlContent = getVerificationEmailHtml(code, username);

@@ -1,5 +1,5 @@
 export function orderRoutes(routesObject: any): any{
-    if (!routesObject || !routesObject.data || !routesObject.data.routes){
+    if (!routesObject?.data?.routes){
        throw new Error('Invalid routes object, cannot order the routes');
     }
     //given the routes from the google maps api, sort them by duration

@@ -11,7 +11,7 @@ export interface PasswordResetSession {
 }
 
 export class PasswordResetRepository {
-  constructor(private pool: Pool) {}
+  constructor(private readonly pool: Pool) {}
 
   
   public async createRequest(data: Omit<PasswordResetSession, "id" | "emailVerified"> & { emailVerified?: number }): Promise<void> {

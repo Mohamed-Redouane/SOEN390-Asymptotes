@@ -19,10 +19,10 @@ export interface UserResponse {
 
 export class AuthService {
   constructor(
-    private userRepo: UserRepository,
-    private sessionRepo: SessionRepository,
-    private verificationRepo: EmailVerificationRepository,
-    private passwordResetRepo: PasswordResetRepository
+    private readonly userRepo: UserRepository,
+    private readonly sessionRepo: SessionRepository,
+    private readonly verificationRepo: EmailVerificationRepository,
+    private readonly passwordResetRepo: PasswordResetRepository
 
   ) {}
 

@@ -10,7 +10,7 @@ export interface EmailVerificationRequest {
 }
 
 export class EmailVerificationRepository {
-  constructor(private pool: Pool) {}
+  constructor(private readonly pool: Pool) {}
 
 
   public async createRequest(data: Omit<EmailVerificationRequest, "id"> & { id?: string }): Promise<void> {
