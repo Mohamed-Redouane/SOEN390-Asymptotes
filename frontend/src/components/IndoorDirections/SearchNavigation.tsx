@@ -87,7 +87,10 @@ export default function SearchNavigation({ accessible = false }: SearchNavigatio
       }
       // TODO: Check this after since we will have to change to loyola map if this is the case
       else if (localDest.startsWith("L")) {
-        setStartPoint("170")
+        setStartPoint("L170")
+      }
+      else if (localDest.startsWith("VE")) {
+        setStartPoint("VE1")
       }
 
       setShouldAutoNavigate(true);
