@@ -129,23 +129,24 @@ const Directions = () => {
         return (
             <div
                 onClick={onClick}
-                className="fixed bottom-20 right-10 cursor-pointer animate-bounce"
+                className="fixed bottom-20 right-8 cursor-pointer flex items-center justify-center bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-700 transition-all"
                 style={{ zIndex: 1000 }}
             >
-                <ShareLocationIcon style={{ fontSize: 50, color: "red" }} />
+                <span className="mr-2 font-bold">Clear All</span>
+                <MyLocationIcon style={{ fontSize: 20 }} />
             </div>
         );
     };
-
-
+    
     const BuildingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
         return (
             <div
                 onClick={onClick}
-                className="fixed bottom-32 right-10 cursor-pointer animate-bounce"
+                className="fixed bottom-32 right-5 cursor-pointer flex items-center justify-center bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-all animate-bounce"
                 style={{ zIndex: 1000 }}
             >
-                <LocationCityIcon style={{ fontSize: 50, color: "red" }} />
+                <span className="mr-2 font-bold">Indoor View</span>
+                <LocationCityIcon style={{ fontSize: 20 }} />
             </div>
         );
     };
