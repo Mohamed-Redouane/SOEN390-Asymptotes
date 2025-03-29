@@ -104,9 +104,9 @@ const CalendarPage: React.FC = () => {
   const today = new Date().toLocaleDateString('en-CA'); 
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-      <div className="max-w-6xl mx-auto text-gray-900">
-        <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-10">
+    <div className="min-h-screen from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-10">
           📅 Course Schedule
         </h1>
 
