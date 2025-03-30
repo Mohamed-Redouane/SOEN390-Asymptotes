@@ -134,9 +134,15 @@ export default function FloorSelector() {
             style={glassStyle}
           >
             {floors.map((floor) => (
-              <div
+              <button
                 key={floor.id}
                 onClick={() => handleFloorChange(floor.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleFloorChange(floor.id);
+                    e.preventDefault();
+                  }
+                }}
                 className={`
                   w-full p-1.5 text-left transition-all duration-200
                   flex items-center justify-between gap-1 cursor-pointer
@@ -144,11 +150,10 @@ export default function FloorSelector() {
                 `}
                 role="option"
                 aria-selected={floor.id === currentFloor}
-                tabIndex={0}
               >
                 <span className="text-xs truncate">{floor.name}</span>
                 {floor.id === currentFloor && <div className="h-1.5 w-1.5 rounded-full bg-[#6C5CE7] shrink-0" />}
-              </div>
+              </button>
             ))}
           </div>
         )}
