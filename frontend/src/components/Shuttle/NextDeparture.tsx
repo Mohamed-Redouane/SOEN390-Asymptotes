@@ -79,13 +79,25 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
 
   // use helper function for the status
   const {isUrgent, isSoon} = getDepartureStatus(nextDepartureMinutes)
+
+  const getBorderColor = (isUrgent: boolean, isSoon: boolean) => {
+    if (isUrgent) return "border-orange-200"
+    if(isSoon) return "border-teal-200"
+    return "border-gray-200";
+  }
+
+  const getStatusMessage = (isUrgent: boolean, isSoon: boolean): string => {
+    if (isUrgent) return "Hurry! Departing soon";
+    if (isSoon) return "Departing soon";
+    return "";
+  };
   
 
   return (
     <Card
       className={cn(
         "border transition-all duration-300 bg-white",
-        isUrgent ? "border-orange-200" : isSoon ? "border-teal-200" : "border-gray-200",
+        getBorderColor(isUrgent, isSoon)
       )}
     >
       <CardHeader className="pb-2">
@@ -129,7 +141,7 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
 
         <div className="mt-3 flex justify-between items-center">
           <span className="text-xs text-gray-500">
-            {isUrgent ? "Hurry! Departing soon" : isSoon ? "Departing soon" : ""}
+            {getStatusMessage(isUrgent, isSoon)}
           </span>
           <Button
             variant="outline"
