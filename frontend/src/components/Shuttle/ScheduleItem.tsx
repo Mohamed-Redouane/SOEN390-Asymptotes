@@ -11,12 +11,10 @@ const BaseScheduleItem = ({
   isUrgent = false,
   locationName,
 }: {
-  location: string;
   time: string;
   minutesUntil: number;
   isUpcoming: boolean;
   isUrgent?: boolean;
-  isNext?: boolean;
   locationName: string;
 }) => {
   return (
@@ -84,23 +82,19 @@ export const ScheduleItem = ({ loy, sgw, isUpcoming, isNext, currentMinutes }: S
       )}
     >
       <BaseScheduleItem
-        location="Loyola"
         time={loy}
         minutesUntil={loyMinutesUntil}
         isUpcoming={isUpcoming}
         isUrgent={loyMinutesUntil > 0 && loyMinutesUntil <= 5}
-        isNext={isNext}
         locationName="Loyola"
       />
 
       <div className="flex items-center gap-3 w-1/2 justify-end">
         <BaseScheduleItem
-          location="SGW"
           time={sgw}
           minutesUntil={sgwMinutesUntil}
           isUpcoming={isUpcoming}
           isUrgent={sgwMinutesUntil > 0 && sgwMinutesUntil <= 5}
-          isNext={isNext}
           locationName="SGW"
         />
       </div>
