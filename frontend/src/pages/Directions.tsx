@@ -12,7 +12,6 @@ import { LocationContext } from '../components/LocationContext';
 import { DirectionsBike } from '@mui/icons-material';
 import RouteRenderer from '../components/RouteRenderer';
 import { distanceCalculation } from '../utils/distanceCalculation';
-import ShareLocationIcon from '@mui/icons-material/ShareLocation';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 
 interface LocationType {
