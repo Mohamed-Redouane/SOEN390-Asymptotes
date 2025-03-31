@@ -125,7 +125,7 @@ const Directions = () => {
     const JumpingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
         return (
             <div
-                onClick={onClick}
+                onClick={onClick} onKeyDown={(e) => e.key === "Enter" && onClick}
                 className="fixed bottom-20 right-8 cursor-pointer flex items-center justify-center bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-700 transition-all"
                 style={{ zIndex: 1000 }}
             >
@@ -138,7 +138,7 @@ const Directions = () => {
     const BuildingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
         return (
             <div
-                onClick={onClick}
+                onClick={onClick} onKeyDown={(e) => e.key === "Enter" && onClick}
                 className="fixed bottom-32 right-5 cursor-pointer flex items-center justify-center bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-all animate-bounce"
                 style={{ zIndex: 1000 }}
             >
