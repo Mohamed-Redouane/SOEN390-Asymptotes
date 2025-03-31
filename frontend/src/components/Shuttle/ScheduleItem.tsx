@@ -17,16 +17,41 @@ const BaseScheduleItem = ({
   isUrgent?: boolean;
   locationName: string;
 }) => {
+
+  const getColor = (isUpcoming: boolean, minutesUntil: number, isUrgent: boolean) => {
+    if(isUpcoming && minutesUntil> 0) {
+      if(isUrgent) {
+        return "bg-orange-500 text-white";
+      }
+      else {
+        return "bg-teal-500 text-white"
+      }
+    }
+    else {
+      return "bg-gray-200 text-gray-500"
+    }
+  }
+
+  const getTextColor = (isUpcoming: boolean, minutesUntil: number, isUrgent: boolean) => {
+    if(isUpcoming && minutesUntil > 0) {
+      if(isUrgent) {
+        return "text-orange-600"; 
+      }
+      else {
+        return "text-teal-600"; 
+      }
+    }
+    else {
+      return "text-gray-500"; 
+    }
+  }
+
   return (
     <div className="flex items-center gap-3 w-1/2">
       <div
         className={cn(
           "flex flex-col items-center justify-center rounded-full w-8 h-8",
-          isUpcoming && minutesUntil > 0
-            ? isUrgent
-              ? "bg-orange-500 text-white"
-              : "bg-teal-500 text-white"
-            : "bg-gray-200 text-gray-500"
+          getColor(isUpcoming, minutesUntil, isUrgent)
         )}
       >
         <MapPin className="h-4 w-4" />
@@ -35,11 +60,7 @@ const BaseScheduleItem = ({
         <span
           className={cn(
             "font-medium",
-            isUpcoming && minutesUntil > 0
-              ? isUrgent
-                ? "text-orange-600"
-                : "text-teal-600"
-              : "text-gray-500"
+            getTextColor(isUpcoming,minutesUntil,isUrgent)
           )}
         >
           {time}
@@ -68,17 +89,18 @@ export const ScheduleItem = ({ loy, sgw, isUpcoming, isNext, currentMinutes }: S
 
   const isUrgent = (loyMinutesUntil > 0 && loyMinutesUntil <= 5) || (sgwMinutesUntil > 0 && sgwMinutesUntil <= 5);
 
+  const getContainerStyle = (isNext: boolean,isUrgent: boolean,isUpcoming: boolean) => {
+    if (isNext) return "bg-white border border-teal-200"
+    if (isUrgent) return "bg-white border border-orange-200"
+    if (isUpcoming) return "bg-white hover:bg-gray-50"
+    return "hover:bg-gray-50"
+  }
+
   return (
     <div
       className={cn(
         "flex justify-between py-3 px-4 rounded-md transition-all",
-        isNext
-          ? "bg-white border border-teal-200"
-          : isUrgent
-          ? "bg-white border border-orange-200"
-          : isUpcoming
-          ? "bg-white hover:bg-gray-50"
-          : "hover:bg-gray-50"
+        getContainerStyle(isNext, isUrgent, isUpcoming)
       )}
     >
       <BaseScheduleItem
