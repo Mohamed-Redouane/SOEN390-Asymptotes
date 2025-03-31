@@ -9,7 +9,7 @@ export interface User {
 }
 
 export class UserRepository {
-  constructor(private pool: Pool) {}
+  constructor(private readonly pool: Pool) {}
 
   public async createUser(dto: RegisterDTO, passwordHash: string): Promise<User> {
     const query = `

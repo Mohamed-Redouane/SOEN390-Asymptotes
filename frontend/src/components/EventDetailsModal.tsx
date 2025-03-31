@@ -18,11 +18,12 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ isOpen, onClose, 
       <Dialog as="div" className="relative z-10" onClose={onClose}>
         <div className="fixed inset-0 bg-black bg-opacity-30" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="max-w-md w-full bg-white rounded-xl shadow-xl p-6">
-            <Dialog.Title className="text-2xl font-bold text-gray-900">
-              {selectedEvent?.summary} 
+          <Dialog.Panel className="widget max-w-md w-full rounded-xl shadow-xl p-6">
+            <Dialog.Title className="text-2xl font-bold">
+              {selectedEvent?.summary}
+
             </Dialog.Title>
-            <div className="mt-4 space-y-3 text-gray-700">
+            <div className="mt-4 space-y-3">
               <div className="flex items-center">
                 <FaClock className="mr-2" />
                 <span>

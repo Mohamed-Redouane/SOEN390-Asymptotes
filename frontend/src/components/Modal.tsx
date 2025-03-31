@@ -9,7 +9,7 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ message, onConfirm, onCancel }) => {
   return (
     <div data-testid="modal" className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
+      <div className="widget p-6 rounded-lg shadow-lg w-80 text-center">
         <p className="text-lg font-semibold">{message}</p>
         <div className="mt-4 flex justify-center gap-4">
           <button
