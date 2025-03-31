@@ -115,10 +115,10 @@ const ConcordiaShuttle = () => {
 
   // Reusable Map Card Component
   const renderMapCard = (isDesktop: boolean) => (
-    <Card className={`${isDesktop ? 'lg:col-span-2' : ''} overflow-hidden bg-white border border-gray-200`}>
+    <Card className={`${isDesktop ? 'lg:col-span-2' : ''} overflow-hidden border border-gray-200`}>
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="flex items-center gap-2 text-gray-800">
-          <MapPin className="h-5 w-5 text-teal-600" />
+        <CardTitle className="flex items-center gap-2">
+          <MapPin className="h-5 w-5" />
           Live Map
         </CardTitle>
         <div className="flex items-center gap-2">
@@ -126,10 +126,10 @@ const ConcordiaShuttle = () => {
             <Badge 
               key={location} 
               variant="outline" 
-              className={`bg-white ${
-                location === 'Loyola' ? 'text-teal-700 hover:bg-teal-50 border-teal-200' :
-                location === 'SGW' ? 'text-orange-700 hover:bg-orange-50 border-orange-200' :
-                'text-green-700 hover:bg-green-50 border-green-200'
+              className={`${
+                location === 'Loyola' ? 'text-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900 border-teal-200' :
+                location === 'SGW' ? 'text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900 border-orange-200' :
+                'text-green-600 hover:bg-green-50 dark:hover:bg-green-900 border-green-200'
               }`}
             >
               <div className={`w-2 h-2 rounded-full ${
@@ -146,12 +146,12 @@ const ConcordiaShuttle = () => {
         {error ? (
           <div className={`flex flex-col items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'} bg-gray-50`}>
             <AlertCircle className="h-10 w-10 text-orange-500 mb-2" />
-            <p className="text-gray-700 font-medium">{error}</p>
+            <p className="font-medium">{error}</p>
             <Button
               variant="outline"
               size="sm"
               onClick={handleFetchShuttleData}
-              className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+              className="mt-4 border-gray-200 hover:bg-gray-50"
             >
               Try Again
             </Button>
@@ -159,18 +159,18 @@ const ConcordiaShuttle = () => {
         ) : loading && busLocations.length === 0 ? (
           <div className={`flex items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'} bg-gray-50`}>
             <div className="flex flex-col items-center">
-              <RefreshCw className="h-10 w-10 animate-spin mb-2 text-teal-500" />
-              <p className="text-gray-600">Loading shuttle locations...</p>
+              <RefreshCw className="h-10 w-10 animate-spin mb-2" />
+              <p>Loading shuttle locations...</p>
             </div>
           </div>
         ) : busLocations.length === 0 ? (
           <div className={`flex flex-col items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'} bg-gray-50`}>
-            <p className="text-gray-600">No shuttle data available</p>
+            <p>No shuttle data available</p>
             <Button
               variant="outline"
               size="sm"
               onClick={handleFetchShuttleData}
-              className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+              className="mt-4 border-gray-200 hover:bg-gray-50"
             >
               Refresh
             </Button>
@@ -198,11 +198,11 @@ const ConcordiaShuttle = () => {
       <div className="flex justify-between mb-2 px-3 text-sm font-medium">
         <div className="flex items-center gap-1">
           <div className="h-3 w-3 rounded-full bg-[#26a69a]" />
-          <span className="text-gray-700">Loyola</span>
+          <span>Loyola</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="h-3 w-3 rounded-full bg-[#fb8c00]" />
-          <span className="text-gray-700">Sir George Williams</span>
+          <span>Sir George Williams</span>
         </div>
       </div>
       <Separator className="mb-2 bg-gray-200" />
@@ -230,16 +230,16 @@ const ConcordiaShuttle = () => {
   )
 
   return (
-    <div className="min-h-screen bg-white text-gray-800">
+    <div className="min-h-screen">
       <div className="container mx-auto py-4 px-4 max-w-6xl mb-20 pt-16">
         <div className="flex flex-col gap-6">
           {/* Header Section (Shared between mobile and desktop) */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-gray-800">Concordia Shuttle Service</h1>
+              <h1 className="text-2xl font-bold tracking-tight">Concordia Shuttle Service</h1>
               <div className="flex items-center justify-between">
-                <p className="text-gray-500 mt-1">Real-time tracking and schedule information</p>
-                <div className="flex items-center gap-1 text-xs text-gray-500 ml-2">
+                <p className="mt-1">Real-time tracking and schedule information</p>
+                <div className="flex items-center gap-1 text-xs ml-2">
                   <Calendar className="h-3 w-3" />
                   <span>
                     {new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
@@ -254,24 +254,24 @@ const ConcordiaShuttle = () => {
                 size="sm"
                 onClick={handleFetchShuttleData}
                 disabled={loading}
-                className="flex items-center gap-2 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                className="flex items-center gap-2 border-gray-200 hover:bg-gray-50"
               >
                 <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                 Refresh
               </Button>
-              {lastUpdated && <span className="text-xs text-gray-500">Updated: {formatTime(lastUpdated)}</span>}
+              {lastUpdated && <span className="text-xs">Updated: {formatTime(lastUpdated)}</span>}
             </div>
           </div>
 
           {/* Service Alert for Weekends */}
           {noServiceToday && (
-            <Card className="bg-white border border-orange-200">
+            <Card className="border border-orange-200">
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
                   <AlertCircle className="h-5 w-5 mt-0.5 text-orange-500" />
                   <div>
-                    <h3 className="font-medium text-gray-800">No Service Today</h3>
-                    <p className="text-sm mt-1 text-gray-600">
+                    <h3 className="font-medium">No Service Today</h3>
+                    <p className="text-sm mt-1">
                       The shuttle service doesn't operate on weekends. Regular service will resume on Monday.
                     </p>
                   </div>
@@ -283,7 +283,7 @@ const ConcordiaShuttle = () => {
           {/* Mobile Layout */}
           <div className="md:hidden mb-24">
             <Tabs defaultValue="map" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-4 sticky top-0 z-10 bg-white border-b border-gray-200">
+              <TabsList className="grid w-full grid-cols-2 mb-4 sticky top-0 z-10 border-b border-gray-200">
                 <TabsTrigger
                   value="map"
                   onClick={() => setActiveTab("map")}
@@ -316,13 +316,13 @@ const ConcordiaShuttle = () => {
               </TabsContent>
 
               <TabsContent value="schedule" className="mt-0">
-                <Card className="bg-white border border-gray-200">
+                <Card className="border border-gray-200">
                   <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-2 text-gray-800">
+                    <CardTitle className="flex items-center gap-2">
                       <Clock className="h-5 w-5 text-teal-600" />
                       Full Schedule
                     </CardTitle>
-                    <CardDescription className="text-gray-500">Mon–Thu and Friday departure times</CardDescription>
+                    <CardDescription>Mon–Thu and Friday departure times</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Tabs value={selectedDay} className="w-full">
@@ -375,13 +375,13 @@ const ConcordiaShuttle = () => {
                 />
               )}
 
-              <Card className="bg-white border border-gray-200">
+              <Card className="border border-gray-200">
                 <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-gray-800">
-                    <Clock className="h-5 w-5 text-teal-600" />
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
                     Full Schedule
                   </CardTitle>
-                  <CardDescription className="text-gray-500">Mon–Thu and Friday departure times</CardDescription>
+                  <CardDescription>Mon–Thu and Friday departure times</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Tabs value={selectedDay} className="w-full">
@@ -389,14 +389,14 @@ const ConcordiaShuttle = () => {
                       <TabsTrigger
                         value="mon-thu"
                         onClick={() => setSelectedDay("mon-thu")}
-                        className="flex items-center gap-1 data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700"
+                        className="flex items-center gap-1 data-[state=active]:bg-teal-50"
                       >
                         Mon–Thu
                       </TabsTrigger>
                       <TabsTrigger
                         value="fri"
                         onClick={() => setSelectedDay("fri")}
-                        className="flex items-center gap-1 data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700"
+                        className="flex items-center gap-1 data-[state=active]:bg-teal-50"
                       >
                         Friday
                       </TabsTrigger>
@@ -411,7 +411,7 @@ const ConcordiaShuttle = () => {
                     </TabsContent>
                   </Tabs>
 
-                  <div className="mt-4 text-xs text-gray-500">
+                  <div className="mt-4 text-xs">
                     <p>* Last departure of the day</p>
                     <p>Highlighted times indicate upcoming departures</p>
                   </div>

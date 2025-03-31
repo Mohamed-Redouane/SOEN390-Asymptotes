@@ -28,7 +28,7 @@ const BaseScheduleItem = ({
             ? isUrgent
               ? "bg-orange-500 text-white"
               : "bg-teal-500 text-white"
-            : "bg-gray-200 text-gray-500"
+            : "bg-gray-200 dark:bg-gray-800"
         )}
       >
         <MapPin className="h-4 w-4" />
@@ -41,18 +41,18 @@ const BaseScheduleItem = ({
               ? isUrgent
                 ? "text-orange-600"
                 : "text-teal-600"
-              : "text-gray-500"
+              : "text-gray-500 dark:text-gray-200"
           )}
         >
           {time}
-          {time.includes("*") && <span className="text-xs ml-1 align-top">*</span>}
+          {time.includes("*")}
         </span>
-        <span className="text-xs text-gray-500">{locationName}</span>
+        <span className="text-xs">{locationName}</span>
         {isUpcoming && minutesUntil > 0 && (
           <span
             className={cn(
               "text-xs font-medium mt-1",
-              isUrgent ? "text-orange-600" : "text-teal-600"
+              isUrgent ? "text-orange-500" : "text-teal-500"
             )}
           >
             {formatMinutes(minutesUntil)}
@@ -75,12 +75,10 @@ export const ScheduleItem = ({ loy, sgw, isUpcoming, isNext, currentMinutes }: S
       className={cn(
         "flex justify-between py-3 px-4 rounded-md transition-all",
         isNext
-          ? "bg-white border border-teal-200"
+          ? "border border-teal-200"
           : isUrgent
-          ? "bg-white border border-orange-200"
-          : isUpcoming
-          ? "bg-white hover:bg-gray-50"
-          : "hover:bg-gray-50"
+          ? "border border-orange-200"
+          : "hover:bg-gray-50 dark:hover:bg-gray-900"
       )}
     >
       <BaseScheduleItem

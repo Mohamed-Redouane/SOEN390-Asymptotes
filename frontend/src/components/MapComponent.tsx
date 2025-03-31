@@ -7,44 +7,49 @@ interface MapComponentProps {
   setIsUserInsideBuilding: (inside: boolean) => void;
 }
 
+// Assume that the GeoJSON is loaded in the map.
+function initMapGeometry(map, userLocation) {
+  map.data.forEach((feature) => {
+    const geometry = feature.getGeometry();
+    if (geometry?.getType() === "Polygon") {
+      const polygonPaths = (geometry as google.maps.Data.Polygon).getArray().map((path) =>
+        (path as google.maps.Data.LinearRing).getArray().map((coord) => ({
+          lat: (coord as google.maps.LatLng).lat(),
+          lng: (coord as google.maps.LatLng).lng(),
+        }))
+      );
+      map.data.overrideStyle(feature, { fillColor: "blue", fillOpacity: 0.5 });
+
+      const polygon = new google.maps.Polygon({
+        paths: polygonPaths,
+      });
+      if(userLocation){
+        const userLatLng = new google.maps.LatLng(userLocation.lat, userLocation.lng);
+        let userInsideBuilding = false;
+        if (google.maps.geometry.poly.containsLocation(userLatLng, polygon)) {
+          userInsideBuilding = true;
+          setIsUserInsideBuilding(userInsideBuilding);
+          map.data.overrideStyle(feature, { fillColor: "red", fillOpacity: 0.8 });
+        }
+      }
+    }
+  });
+  return;
+}
+
 function MapComponent({ geoJsonData, setIsUserInsideBuilding }: MapComponentProps) {
   const map = useMap();
   const { location: userLocation } = useContext(LocationContext);
 
   useEffect(() => {
-     if (!map || !geoJsonData) return;
+    if (!map || !geoJsonData) return;
 
     map.data.forEach((feature) => map.data.remove(feature));
-
+    
     // Load GeoJSON
     map.data.addGeoJson(geoJsonData);
+    initMapGeometry(map, userLocation);
     
-
-    map.data.forEach((feature) => {
-      const geometry = feature.getGeometry();
-      if (geometry?.getType() === "Polygon") {
-        const polygonPaths = (geometry as google.maps.Data.Polygon).getArray().map((path) =>
-          (path as google.maps.Data.LinearRing).getArray().map((coord) => ({
-            lat: (coord as google.maps.LatLng).lat(),
-            lng: (coord as google.maps.LatLng).lng(),
-          }))
-        );
-        map.data.overrideStyle(feature, { fillColor: "blue", fillOpacity: 0.5 });
-
-        const polygon = new google.maps.Polygon({
-          paths: polygonPaths,
-        });
-        if(userLocation){
-          const userLatLng = new google.maps.LatLng(userLocation.lat, userLocation.lng);
-          let userInsideBuilding = false;
-          if (google.maps.geometry.poly.containsLocation(userLatLng, polygon)) {
-            userInsideBuilding = true;
-            setIsUserInsideBuilding(userInsideBuilding);
-            map.data.overrideStyle(feature, { fillColor: "red", fillOpacity: 0.8 });
-          }
-        }
-      }
-    });
     const infoWindow = new google.maps.InfoWindow();
     const listener = map.data.addListener("click", (event: google.maps.Data.MouseEvent) => {
       const name = event.feature.getProperty("name");
@@ -80,7 +85,7 @@ function MapComponent({ geoJsonData, setIsUserInsideBuilding }: MapComponentProp
       };
     }, [map, geoJsonData, userLocation, setIsUserInsideBuilding]);
 
-  return null;
+  return;
 }
 
 export default MapComponent;

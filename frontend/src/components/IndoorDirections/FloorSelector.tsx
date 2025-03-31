@@ -44,7 +44,7 @@ export default function FloorSelector() {
   const handleFloorChange = async (floorId: string) => {
     try {
       setIsChanging(true)
-      await mapView?.setFloor(floorId)
+      mapView?.setFloor(floorId)
       setCurrentFloor(floorId)
       setIsOpen(false)
     } catch (error) {

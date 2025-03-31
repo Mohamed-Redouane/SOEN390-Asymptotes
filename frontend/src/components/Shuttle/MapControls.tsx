@@ -14,7 +14,7 @@ import type { MapControlsProps } from "../types"
 export const MapControls = ({ onZoomIn, onZoomOut, onMyLocation, onMapTypeChange }: MapControlsProps) => {
   return (
     <div className="absolute top-3 right-3 flex flex-col gap-2 z-[1000]">
-      <div className="bg-white/95 backdrop-blur-sm p-1.5 rounded-lg shadow-md border border-gray-200 flex flex-col gap-1.5">
+      <div className="backdrop-blur-sm p-1.5 rounded-lg shadow-md border border-gray-200 flex flex-col gap-1.5">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
