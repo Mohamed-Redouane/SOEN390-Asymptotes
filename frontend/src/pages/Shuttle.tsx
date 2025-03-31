@@ -18,7 +18,6 @@ import { RouteDialog } from "../components/Shuttle/RouteDialog"
 import { scheduleMonThu, scheduleFri } from "../components/schedule-data"
 import { fetchShuttleData } from "../services/shuttle-service"
 import type { BusLocation, DayType, TabType } from "../components/types"
-import { MotionValue } from "framer-motion"
 
 //error state component
 const MapErrorState = ({ isDesktop, error, onRetry}: {isDesktop: boolean; error: string; onRetry: () => void;}) => (
