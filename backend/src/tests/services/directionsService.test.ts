@@ -90,9 +90,9 @@ describe('fetchDirections function in directionsService,js', () => {
         mock.onGet('https://maps.googleapis.com/maps/api/directions/json').reply(200, mockBicyclingResponse);
         mock.onGet('https://maps.googleapis.com/maps/api/directions/json').reply(200, mockTransitResponse);
 
-        const respone = await fetchDirections(source, destination);
+        const response = await fetchDirections(source, destination);
         expect(mock.history.get.length).toBe(4); // One for each mode
-        expect(respone).toEqual({
+        expect(response).toEqual({
           bicycling: [
             {
               legs: [

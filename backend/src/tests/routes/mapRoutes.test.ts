@@ -51,13 +51,10 @@ describe('GET /maps/addressFromCoordinates', () => {
 
     const response = await request(app).get('/maps/addressFromCoordinates').query({ lat: '45.5049', lng: '-73.5779' });
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(
-      
-        {
-          formatted_address: "123 Main St, Montreal, QC, Canada",
-          place_id: 'ChIJ1234567890',
-        }
-  );
+    expect(response.body).toEqual({
+      formatted_address: '123 Main St, Montreal, QC, Canada',
+      place_id: 'ChIJ1234567890',
+    });
   })
 
   it('should return 400 is lat or lng are missing', async () => {
