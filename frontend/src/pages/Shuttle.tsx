@@ -18,6 +18,7 @@ import { RouteDialog } from "../components/Shuttle/RouteDialog"
 import { scheduleMonThu, scheduleFri } from "../components/schedule-data"
 import { fetchShuttleData } from "../services/shuttle-service"
 import type { BusLocation, DayType, TabType } from "../components/types"
+import { MotionValue } from "framer-motion"
 
 //error state component
 const MapErrorState = ({ isDesktop, error, onRetry}: {isDesktop: boolean; error: string; onRetry: () => void;}) => (
@@ -69,7 +70,7 @@ const ConcordiaShuttle = () => {
   const [hasMounted, setHasMounted] = useState(false)
   const [currentMinutes, setCurrentMinutes] = useState<number>(0)
   const [currentDay, setCurrentDay] = useState<number>(0)
-  const setActiveTab = useState<TabType>("map")[1]
+  const [activeTab, setActiveTab] = useState<TabType>("map")
   const [routeDialogOpen, setRouteDialogOpen] = useState(false)
   const centerMapRef = useRef<(location: { lat: number; lng: number }) => void>(() => {})
 
@@ -324,19 +325,17 @@ const ConcordiaShuttle = () => {
 
           {/* Mobile Layout */}
           <div className="md:hidden mb-24">
-            <Tabs defaultValue="map" className="w-full">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabType)} className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-4 sticky top-0 z-10 bg-white border-b border-gray-200">
                 <TabsTrigger
-                  value="map"
-                  onClick={() => setActiveTab("map")}
+                  value= "map"
                   className="flex items-center gap-1 data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700"
                 >
                   <MapPin className="h-4 w-4" />
                   Live Map
                 </TabsTrigger>
                 <TabsTrigger
-                  value="schedule"
-                  onClick={() => setActiveTab("schedule")}
+                  value= "schedule"
                   className="flex items-center gap-1 data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700"
                 >
                   <Clock className="h-4 w-4" />
