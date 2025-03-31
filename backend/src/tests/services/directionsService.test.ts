@@ -92,7 +92,49 @@ describe('fetchDirections function in directionsService,js', () => {
 
         const respone = await fetchDirections(source, destination);
         expect(mock.history.get.length).toBe(4); // One for each mode
-        expect(respone).toEqual(mockResponse.routes);
+        expect(respone).toEqual({
+          bicycling: [
+            {
+              legs: [
+                {
+                  distance: { value: 500 },
+                  duration: { value: 400 },
+                },
+              ],
+            },
+          ],
+          driving: [
+            {
+              legs: [
+                {
+                  distance: { value: 500 },
+                  duration: { value: 400 },
+                },
+              ],
+            },
+          ],
+          shuttle: [],
+          transit: [
+            {
+              legs: [
+                {
+                  distance: { value: 500 },
+                  duration: { value: 400 },
+                },
+              ],
+            },
+          ],
+          walking: [
+            {
+              legs: [
+                {
+                  distance: { value: 500 },
+                  duration: { value: 400 },
+                },
+              ],
+            },
+          ],
+        });
 
     });
 
@@ -201,8 +243,40 @@ describe('fetchDirections function in directionsService,js', () => {
 
         const response = await fetchDirections(source, destination);
         expect(mock.history.get.length).toBe(4); // One for each mode
-        expect(response).toEqual(mockResponse.routes);
-        console.log("response in directions test", response.bicycling);
+        expect(response).toEqual({
+          bicycling: [],
+          driving: [
+            {
+              legs: [
+                {
+                  distance: { value: 500 },
+                  duration: { value: 2039 },
+                },
+              ],
+            },
+          ],
+          shuttle: [],
+          transit: [
+            {
+              legs: [
+                {
+                  distance: { value: 500 },
+                  duration: { value: 400 },
+                },
+              ],
+            },
+          ],
+          walking: [
+            {
+              legs: [
+                {
+                  distance: { value: 511 },
+                  duration: { value: 20 },
+                },
+              ],
+            },
+          ],
+        });
     });
 
     it('should throw an error when the directions API fails', async () => {

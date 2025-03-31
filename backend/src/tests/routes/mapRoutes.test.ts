@@ -272,16 +272,16 @@ describe("GET /maps/directions", () => {
           {
             "legs": [
               {
-               "distance": {
-              "text": "5 km",
-              "value": 5000,
-            },
-            "duration": {
-              "text": "10 mins",
-              "value": 600,
-            },
-            "end_address": "End Location",
-            "start_address": "Start Location",
+                "distance": {
+                  "text": "5 km",
+                  "value": 5000,
+                },
+                "duration": {
+                  "text": "10 mins",
+                  "value": 600,
+                },
+                "end_address": "End Location",
+                "start_address": "Start Location",
               },
             ],
             "summary": "Main Street",
@@ -306,6 +306,7 @@ describe("GET /maps/directions", () => {
             "summary": "Main Street",
           },
         ],
+        "shuttle": [],
         "transit": [
           {
             "legs": [
