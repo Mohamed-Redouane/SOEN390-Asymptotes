@@ -28,7 +28,7 @@ const ConcordiaShuttle = () => {
   const [hasMounted, setHasMounted] = useState(false)
   const [currentMinutes, setCurrentMinutes] = useState<number>(0)
   const [currentDay, setCurrentDay] = useState<number>(0)
-  const [, setActiveTab] = useState<TabType>("map")
+  const setActiveTab = useState<TabType>("map")[1]
   const [routeDialogOpen, setRouteDialogOpen] = useState(false)
   const centerMapRef = useRef<(location: { lat: number; lng: number }) => void>(() => {})
 
