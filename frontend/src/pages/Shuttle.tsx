@@ -183,23 +183,41 @@ const ConcordiaShuttle = () => {
 
   // refactored Reusable Map Card Component
   const renderMapCard = (isDesktop: boolean) => {
-    const renderMapContent = () => {
+    const getMapContent = () => {
       if (error) {
-        return <MapErrorState isDesktop={isDesktop} error={error} onRetry={handleFetchShuttleData} />;
+        return <MapErrorState 
+          isDesktop={isDesktop} 
+          error={error} 
+          onRetry={handleFetchShuttleData} 
+        />
       }
+      
       if (loading && busLocations.length === 0) {
-        return <MapLoadingState isDesktop={isDesktop} />;
+        return <MapLoadingState isDesktop={isDesktop} />
       }
+      
       if (busLocations.length === 0) {
-        return <MapEmptyState isDesktop={isDesktop} onRefresh={handleFetchShuttleData} />;
+        return <MapEmptyState 
+          isDesktop={isDesktop} 
+          onRefresh={handleFetchShuttleData} 
+        />
       }
+  
+      const handleCenterMap = (loc: { lat: number; lng: number }) => {
+        if (loc) {
+          centerMap(loc);
+        }
+      }
+  
+      const setupCenterMapRef = () => {
+        centerMapRef.current = handleCenterMap;
+      }
+  
       return (
         <MapComponent
           busLocations={shuttleBuses}
           campusPoints={campusPoints}
-          onCenterMap={() => {
-            centerMapRef.current = (loc) => loc && centerMap(loc);
-          }}
+          onCenterMap={setupCenterMapRef}
         />
       )
     }
@@ -229,7 +247,7 @@ const ConcordiaShuttle = () => {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {renderMapContent()}
+          {getMapContent()}
         </CardContent>
       </Card>
     )
