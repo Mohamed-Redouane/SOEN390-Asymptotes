@@ -330,14 +330,14 @@ const ConcordiaShuttle = () => {
                         <TabsTrigger
                           value="mon-thu"
                           onClick={() => setSelectedDay("mon-thu")}
-                          className="flex items-center gap-1 data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700"
+                          className="flex items-center gap-1 data-[state=active]:text-teal-700"
                         >
                           Mon–Thu
                         </TabsTrigger>
                         <TabsTrigger
                           value="fri"
                           onClick={() => setSelectedDay("fri")}
-                          className="flex items-center gap-1 data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700"
+                          className="flex items-center gap-1 data-[state=active]:text-teal-700"
                         >
                           Friday
                         </TabsTrigger>
@@ -385,18 +385,18 @@ const ConcordiaShuttle = () => {
                 </CardHeader>
                 <CardContent>
                   <Tabs value={selectedDay} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 mb-4 bg-gray-50">
+                    <TabsList className="grid w-full grid-cols-2 mb-4">
                       <TabsTrigger
                         value="mon-thu"
                         onClick={() => setSelectedDay("mon-thu")}
-                        className="flex items-center gap-1 data-[state=active]:bg-teal-50"
+                        className="flex items-center gap-1 data-[state=active]:bg-teal-50 data-[state=active]:dark:bg-teal-900"
                       >
                         Mon–Thu
                       </TabsTrigger>
                       <TabsTrigger
                         value="fri"
                         onClick={() => setSelectedDay("fri")}
-                        className="flex items-center gap-1 data-[state=active]:bg-teal-50"
+                        className="flex items-center gap-1 data-[state=active]:bg-teal-50 data-[state=active]:dark:bg-teal-900"
                       >
                         Friday
                       </TabsTrigger>

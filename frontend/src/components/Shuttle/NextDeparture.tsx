@@ -42,7 +42,7 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
 
   const isLoyolaNext = minutesUntilLoy > 0 && (minutesUntilSgw <= 0 || minutesUntilLoy < minutesUntilSgw)
   const prevDeparture = nextDepartureIndex-1 >= 0 ? 
-    schedule[nextDepartureIndex-1] : schedule[schedule.length-1]; // previous day
+    schedule[nextDepartureIndex-1] : {sgw: "00:00", loy: "00:00"} // midnight
   const nextDepartureContext = isLoyolaNext ? {
     minutes: minutesUntilLoy,
     campus: "Loyola Campus",
@@ -56,7 +56,6 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
   }
   const progressValue = 100*((nextDepartureContext.duration
     - nextDepartureContext.minutes) / nextDepartureContext.duration);
-  console.log(progressValue);
   
   const isUrgent = nextDepartureContext.minutes <= 5
   const isSoon = nextDepartureContext.minutes <= 15 && !isUrgent
