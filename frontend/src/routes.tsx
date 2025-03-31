@@ -13,6 +13,7 @@ import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage';
 import { VerifyEmailPage } from './pages/Auth/VerifyEmailPage';
 import IndoorDirections from './pages/IndoorDirections';
 import Directions from './pages/Directions';
+import ConcordiaSchedule from './pages/Shuttle';
 
 export const router = createBrowserRouter([
   {
@@ -32,7 +33,7 @@ export const router = createBrowserRouter([
         loader: requireAuthLoader,
         element: (
           <div style={{ height: '86vh', width: '100vw' }}>
-            404 Not Found
+            <ConcordiaSchedule/>
           </div>
         ),
       },

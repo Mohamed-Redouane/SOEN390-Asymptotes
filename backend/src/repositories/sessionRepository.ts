@@ -8,7 +8,7 @@ export interface SessionEntity {
 }
 
 export class SessionRepository {
-  constructor(private pool: Pool) {}
+  constructor(private readonly pool: Pool) {}
 
  
   public async createSession(session: SessionEntity): Promise<void> {

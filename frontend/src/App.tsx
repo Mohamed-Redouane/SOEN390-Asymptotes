@@ -11,6 +11,13 @@ function App() {
   const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const darkModeEnabled = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (darkModeEnabled) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+
   // List of routes where NavBar/BottomNavBar should be hidden
   const hideNavbarPaths = [
     "/login",

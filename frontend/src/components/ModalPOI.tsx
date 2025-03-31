@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import './ModalPOI.css';
 
 interface ModalProps {
     isOpen: boolean;
@@ -29,10 +28,12 @@ const ModalPOI: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="modal-overlay" onClick={onClose} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onClose()}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && e.stopPropagation()}>
-                {children}
+        <div id='poimodal-content'>
+            <div className="widget z-50 fixed left-0 mt-8 p-5 w-60 gap-4 rounded-lg flex flex-col items-center justify-center shadow-lg [&_label]:font-bold [&_input]:mt-1 [&_input]:p-2 [&_select]:p-2">
+                    {children}
             </div>
+            <button className="fixed top-0 left-0 z-40 opacity-50 w-full h-full bg-black border-0" onClick={onClose} id='poimodal-overlay' tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && onClose()}>
+            </button>
         </div>
     );
 };
