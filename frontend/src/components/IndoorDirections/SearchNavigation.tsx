@@ -37,8 +37,9 @@ const MAX_RECENT_SEARCHES = 5
 // This function will take the event name and return just the room number
 // Example: "SOEN 343 - WW [C080]" will return "C080"
 const getRoomNumber = (eventName: string) => {
-    const roomNumber = eventName.match(/\[(.*?)\]/);
-    return roomNumber ? roomNumber[1] : "";
+  const roomNumberMatch = typeof eventName === 'string' ? eventName.match(/\[([^\]]+)\]/) : null;
+  const roomNumber = roomNumberMatch ? roomNumberMatch[1] : eventName;
+  return roomNumber;
 }
 
 
