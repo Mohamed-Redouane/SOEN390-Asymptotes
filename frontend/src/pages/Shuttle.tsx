@@ -154,6 +154,31 @@ const ConcordiaShuttle = () => {
     setRouteDialogOpen(true)
   }
 
+  const mapBadgesStyle = (location: string) => {
+    if(location === 'Loyola') {
+      return 'text-teal-700 hover:bg-teal-50 border-teal-200'
+    }
+    else if(location === 'SGW') {
+      return 'text-orange-700 hover:bg-orange-50 border-orange-200'
+    }
+    else {
+      return 'text-green-700 hover:bg-green-50 border-green-200'
+    }
+  }
+
+  const onMapLocationsStyle = (location: string) => {
+    if(location === 'Loyola') {
+      return 'bg-teal-500'
+    }
+    else if(location === 'SGW') {
+      return 'bg-orange-500'
+    }
+    else {
+      return 'bg-green-500'
+    }
+
+  }
+
 
   // refactored Reusable Map Card Component
   const renderMapCard = (isDesktop: boolean) => {
@@ -191,15 +216,11 @@ const ConcordiaShuttle = () => {
                 key={location} 
                 variant="outline" 
                 className={`bg-white ${
-                  location === 'Loyola' ? 'text-teal-700 hover:bg-teal-50 border-teal-200' :
-                  location === 'SGW' ? 'text-orange-700 hover:bg-orange-50 border-orange-200' :
-                  'text-green-700 hover:bg-green-50 border-green-200'
+                  mapBadgesStyle(location)
                 }`}
               >
                 <div className={`w-2 h-2 rounded-full ${
-                  location === 'Loyola' ? 'bg-teal-500' :
-                  location === 'SGW' ? 'bg-orange-500' :
-                  'bg-green-500'
+                  onMapLocationsStyle(location)
                 } mr-1 animate-pulse`}></div>
                 {location}
               </Badge>
