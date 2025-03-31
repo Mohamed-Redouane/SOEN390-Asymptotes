@@ -257,7 +257,7 @@ const ConcordiaShuttle = () => {
             const isNext = index === nextDepartureIndex
             return (
               <ScheduleItem
-                key={index}
+                key={`${item.loy}-${item.sgw}`} // Stable key from time values
                 loy={item.loy}
                 sgw={item.sgw}
                 isUpcoming={isUpcoming}
