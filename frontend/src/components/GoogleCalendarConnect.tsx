@@ -88,11 +88,15 @@ const GoogleCalendarConnect: React.FC<GoogleCalendarConnectProps> = ({
     if (isLoading) {
       return <CircularProgress />;
     } else if (isSignedIn) {
-      return <Button variant="contained" color="primary" onClick={handleSignOut}>Sign Out</Button>;
+      return (<>
+      <Button variant="contained" color="primary" onClick={handleSignOut}>Sign Out</Button>
+      </>)
+
     } else {
       return <Button variant="contained" color="primary" onClick={handleSignIn}>Sign In with Google</Button>;
     }
   };
+
 
   return (
     <div>

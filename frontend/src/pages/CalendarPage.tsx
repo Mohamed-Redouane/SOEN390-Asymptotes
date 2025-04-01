@@ -5,6 +5,8 @@ import ErrorMessage from '../components/ErrorMessage';
 import EventDetailsModal from '../components/EventDetailsModal';
 import CalendarSelector from '../components/CalendarSelector';
 import WeekView from '../components/WeekView';
+import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
 
 const CalendarPage: React.FC = () => {
   const [calendars, setCalendars] = useState<any[]>([]);
@@ -17,6 +19,48 @@ const CalendarPage: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
+  const navigate = useNavigate();
+  const handleNavigateToDirections = () => {
+    const nextClass = handleGoToNextClass();
+    
+    if (nextClass) {
+      navigate('/directions', {
+        state: {
+          eventName: nextClass.summary,
+          destination: nextClass.location,
+          isFromSchedule: true
+        }
+      });
+    }
+  };
+
+  const handleGoToNextClass = () => {
+    // In here we check all the events for today, and based on the current time we find the next class.
+    const currentDate = new Date();
+    // Use 2025-03-25 at 9:00 AM as a test case.
+    // const currentDate = new Date("2025-03-26T09:00:00Z"); // Test case
+
+    // First we filter only the next upcoming event
+    const upcomingClasses = events.filter(event => {
+      const startTime = new Date(event.start.dateTime || event.start.date);
+      return (
+        startTime > currentDate &&
+        event.location &&
+        startTime.getDate() === currentDate.getDate() &&
+        startTime.getMonth() === currentDate.getMonth() &&
+        startTime.getFullYear() === currentDate.getFullYear()
+      );
+    });
+
+    const nextClass = upcomingClasses[0]; // Get the first upcoming class
+    if (!nextClass) {
+      alert("No upcoming classes found for today.");
+      return;
+    }
+    // Now just 
+    console.log("Current Time:", nextClass.summary);
+    return nextClass;
+  }
 
   const handleCalendarsLoaded = (loadedCalendars: any[]) => {
     setCalendars(loadedCalendars);
@@ -104,11 +148,12 @@ const CalendarPage: React.FC = () => {
   const today = new Date().toLocaleDateString('en-CA'); 
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-      <div className="max-w-6xl mx-auto text-gray-900">
-        <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-10">
+    <div className="min-h-screen from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-10">
           📅 Course Schedule
         </h1>
+
 
         <GoogleCalendarConnect
           onCalendarsLoaded={handleCalendarsLoaded}
@@ -140,24 +185,30 @@ const CalendarPage: React.FC = () => {
         )}
 
         {!loading && isAuthenticated && events.length > 0 && (
+          <>
+          <Button variant="contained" color="primary"  className="mb-4" onClick={handleNavigateToDirections}> Directions To Next Class</Button>
+          {/* Add a small vertical space */}
+          <div className="mb-4" />
           <WeekView
             events={events}
             today={today}
             onEventClick={handleEventClick}
           />
+          </>
         )}
 
         {!loading && isAuthenticated && events.length === 0 && (
           <p className="text-gray-500 text-center">No events found.</p>
         )}
-
         <EventDetailsModal
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           selectedEvent={selectedEvent}
         />
       </div>
+    
     </div>
+    
   );
 };
 
