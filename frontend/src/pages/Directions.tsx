@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import RoomIcon from '@mui/icons-material/Room';
 import { getSuggestions, getPlaceDetails } from '../services/PlaceServices';
@@ -12,6 +12,8 @@ import { LocationContext } from '../components/LocationContext';
 import { DirectionsBike } from '@mui/icons-material';
 import RouteRenderer from '../components/RouteRenderer';
 import { distanceCalculation } from '../utils/distanceCalculation';
+import ShareLocationIcon from '@mui/icons-material/ShareLocation';
+import LocationCityIcon from '@mui/icons-material/LocationCity';
 
 interface LocationType {
     name: string;
@@ -40,6 +42,7 @@ const CAMPUS_COORDINATES = {
 interface MapclickListenerProps {
     onMapClick: (destination: LocationType) => void;
 }
+
 
 
 const MapClickListener: React.FC<MapclickListenerProps> = ({ onMapClick }) => {
@@ -84,7 +87,9 @@ const MapClickListener: React.FC<MapclickListenerProps> = ({ onMapClick }) => {
 const Directions = () => {
     const location = useLocation(); //useLocation to get the state
     // const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW); // to be used to simulate being on campus
+    const eventNameQuery = location.state?.eventName || ""; // Get event name from state
     const destinationFromState = location.state?.destination || ""; // Get destination from state
+    const isFromSchedule = location.state?.isFromSchedule || false; // Check if direction is from schedule
     const [active, setActive] = useState<string>("");
     const [sourceQuery, setSourceQuery] = useState<string>("");
     const [destinationQuery, setDestinationQuery] = useState<string>(destinationFromState);
@@ -113,6 +118,61 @@ const Directions = () => {
     const DEBOUNCE_DELAY = parseInt(import.meta.env.VITE_DEBOUNCE_DELAY || "300");
     const [otherCampus, setOtherCampus] = useState<LocationType | null>(null);
     const [shouldFetchDirections, setShouldFetchDirections] = useState(false);
+    
+    const [hasArrived, setHasArrived] = useState<boolean>(false);
+
+
+    const JumpingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
+        return (
+            <div
+                onClick={onClick} onKeyDown={(e) => e.key === "Enter" && onClick}
+                className="fixed bottom-20 right-8 cursor-pointer flex items-center justify-center bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-700 transition-all"
+                style={{ zIndex: 1000 }}
+            >
+                <span className="mr-2 font-bold">Clear All</span>
+                <MyLocationIcon style={{ fontSize: 20 }} />
+            </div>
+        );
+    };
+    
+    const BuildingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
+        return (
+            <div
+                onClick={onClick} onKeyDown={(e) => e.key === "Enter" && onClick}
+                className="fixed bottom-32 right-5 cursor-pointer flex items-center justify-center bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-all animate-bounce"
+                style={{ zIndex: 1000 }}
+            >
+                <span className="mr-2 font-bold">Indoor View</span>
+                <LocationCityIcon style={{ fontSize: 20 }} />
+            </div>
+        );
+    };
+
+    const handleClearRouteAndPrompts = () => {
+        setRoutes([]);
+        setRoutesAvailable(false);
+        setSourceQuery("");
+        setDestinationQuery("");
+        setSource(undefined);
+        setDestination(undefined);
+        setSelectedRouteIndex(-1);
+        setHasArrived(false);
+    };
+
+
+    const navigate = useNavigate();
+    
+    const handleSwitchToIndoorDirections = () => {
+        navigate(`/indoordirections?dest=${encodeURIComponent(eventNameQuery)}`);
+        // Logic to switch to indoor directions view
+        console.log("Switching to indoor directions view", (eventNameQuery),destinationQuery , isFromSchedule);
+
+        
+        // Create a context to store the event name and destination
+        // Use the context to display the event name and destination in the indoor directions view
+        
+    };
+
 
 
     // Debounced suggestion fetching function (KEY CHANGE)
@@ -288,6 +348,7 @@ const Directions = () => {
         setDestinationResults([]); // Clear the destination results
         setActive(""); // Reset active field
         setSelectedRouteIndex(0); // Select the first route so that its displayed
+        setHasArrived(true);
     };
 
     // Ensure suggestions are hidden when the route is displayed
@@ -638,7 +699,10 @@ const Directions = () => {
                             setActive("end");
                         }}
                       />
+                    
                     </div>
+                    {hasArrived && <JumpingIcon onClick={handleClearRouteAndPrompts} />}
+                    {hasArrived && isFromSchedule && <BuildingIcon onClick={handleSwitchToIndoorDirections} />}
                 </div>
             </div>
         </APIProvider>
