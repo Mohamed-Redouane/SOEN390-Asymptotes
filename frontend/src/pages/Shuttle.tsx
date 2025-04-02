@@ -19,6 +19,47 @@ import { scheduleMonThu, scheduleFri } from "../components/schedule-data"
 import { fetchShuttleData } from "../services/shuttle-service"
 import type { BusLocation, DayType, TabType } from "../components/types"
 
+//error state component
+const MapErrorState = ({ isDesktop, error, onRetry}: {isDesktop: boolean; error: string; onRetry: () => void;}) => (
+  <div className={`flex flex-col items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'} bg-gray-50`}>
+  <AlertCircle className="h-10 w-10 text-orange-500 mb-2" />
+  <p className="text-gray-700 font-medium">{error}</p>
+  <Button
+    variant="outline"
+    size="sm"
+    onClick={onRetry}
+    className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+  >
+    Try Again
+  </Button>
+</div>
+)
+
+//loading state component 
+const MapLoadingState = ({ isDesktop }: { isDesktop: boolean }) => (
+  <div className={`flex items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'} bg-gray-50`}>
+    <div className="flex flex-col items-center">
+      <RefreshCw className="h-10 w-10 animate-spin mb-2 text-teal-500" />
+      <p className="text-gray-600">Loading shuttle locations...</p>
+    </div>
+  </div>
+)
+
+//empty state component 
+const MapEmptyState = ({ isDesktop, onRefresh }: { isDesktop: boolean; onRefresh: () => void }) => (
+<div className={`flex flex-col items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'} bg-gray-50`}>
+  <p className="text-gray-600">No shuttle data available</p>
+  <Button
+    variant="outline"
+    size="sm"
+    onClick={onRefresh}
+    className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+  >
+    Refresh
+  </Button>
+</div>
+)
+
 const ConcordiaShuttle = () => {
   const [selectedDay, setSelectedDay] = useState<DayType>("mon-thu")
   const [busLocations, setBusLocations] = useState<BusLocation[]>([])
@@ -28,7 +69,7 @@ const ConcordiaShuttle = () => {
   const [hasMounted, setHasMounted] = useState(false)
   const [currentMinutes, setCurrentMinutes] = useState<number>(0)
   const [currentDay, setCurrentDay] = useState<number>(0)
-  const [, setActiveTab] = useState<TabType>("map")
+  const [activeTab, setActiveTab] = useState<TabType>("map")
   const [routeDialogOpen, setRouteDialogOpen] = useState(false)
   const centerMapRef = useRef<(location: { lat: number; lng: number }) => void>(() => {})
 
@@ -113,84 +154,103 @@ const ConcordiaShuttle = () => {
     setRouteDialogOpen(true)
   }
 
-  // Reusable Map Card Component
-  const renderMapCard = (isDesktop: boolean) => (
-    <Card className={`${isDesktop ? 'lg:col-span-2' : ''} overflow-hidden bg-white border border-gray-200`}>
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="flex items-center gap-2 text-gray-800">
-          <MapPin className="h-5 w-5 text-teal-600" />
-          Live Map
-        </CardTitle>
-        <div className="flex items-center gap-2">
-          {['Loyola', 'SGW', 'Shuttles'].map((location,_) => (
-            <Badge 
-              key={location} 
-              variant="outline" 
-              className={`bg-white ${
-                location === 'Loyola' ? 'text-teal-700 hover:bg-teal-50 border-teal-200' :
-                location === 'SGW' ? 'text-orange-700 hover:bg-orange-50 border-orange-200' :
-                'text-green-700 hover:bg-green-50 border-green-200'
-              }`}
-            >
-              <div className={`w-2 h-2 rounded-full ${
-                location === 'Loyola' ? 'bg-teal-500' :
-                location === 'SGW' ? 'bg-orange-500' :
-                'bg-green-500'
-              } mr-1 animate-pulse`}></div>
-              {location}
-            </Badge>
-          ))}
-        </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        {error ? (
-          <div className={`flex flex-col items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'} bg-gray-50`}>
-            <AlertCircle className="h-10 w-10 text-orange-500 mb-2" />
-            <p className="text-gray-700 font-medium">{error}</p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleFetchShuttleData}
-              className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
-            >
-              Try Again
-            </Button>
+  const mapBadgesStyle = (location: string) => {
+    if(location === 'Loyola') {
+      return 'text-teal-700 hover:bg-teal-50 border-teal-200'
+    }
+    else if(location === 'SGW') {
+      return 'text-orange-700 hover:bg-orange-50 border-orange-200'
+    }
+    else {
+      return 'text-green-700 hover:bg-green-50 border-green-200'
+    }
+  }
+
+  const onMapLocationsStyle = (location: string) => {
+    if(location === 'Loyola') {
+      return 'bg-teal-500'
+    }
+    else if(location === 'SGW') {
+      return 'bg-orange-500'
+    }
+    else {
+      return 'bg-green-500'
+    }
+
+  }
+
+
+  // refactored Reusable Map Card Component
+  const renderMapCard = (isDesktop: boolean) => {
+    const getMapContent = () => {
+      if (error) {
+        return <MapErrorState 
+          isDesktop={isDesktop} 
+          error={error} 
+          onRetry={handleFetchShuttleData} 
+        />
+      }
+      
+      if (loading && busLocations.length === 0) {
+        return <MapLoadingState isDesktop={isDesktop} />
+      }
+      
+      if (busLocations.length === 0) {
+        return <MapEmptyState 
+          isDesktop={isDesktop} 
+          onRefresh={handleFetchShuttleData} 
+        />
+      }
+  
+      const handleCenterMap = (loc: { lat: number; lng: number }) => {
+        if (loc) {
+          centerMap(loc);
+        }
+      }
+  
+      const setupCenterMapRef = () => {
+        centerMapRef.current = handleCenterMap;
+      }
+  
+      return (
+        <MapComponent
+          busLocations={shuttleBuses}
+          campusPoints={campusPoints}
+          onCenterMap={setupCenterMapRef}
+        />
+      )
+    }
+  
+    return (
+      <Card className={`${isDesktop ? 'lg:col-span-2' : ''} overflow-hidden bg-white border border-gray-200`}>
+        <CardHeader className="pb-2 flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-gray-800">
+            <MapPin className="h-5 w-5 text-teal-600" />
+            Live Map
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            {['Loyola', 'SGW', 'Shuttles'].map((location) => (
+              <Badge 
+                key={location} 
+                variant="outline" 
+                className={`bg-white ${
+                  mapBadgesStyle(location)
+                }`}
+              >
+                <div className={`w-2 h-2 rounded-full ${
+                  onMapLocationsStyle(location)
+                } mr-1 animate-pulse`}></div>
+                {location}
+              </Badge>
+            ))}
           </div>
-        ) : loading && busLocations.length === 0 ? (
-          <div className={`flex items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'} bg-gray-50`}>
-            <div className="flex flex-col items-center">
-              <RefreshCw className="h-10 w-10 animate-spin mb-2 text-teal-500" />
-              <p className="text-gray-600">Loading shuttle locations...</p>
-            </div>
-          </div>
-        ) : busLocations.length === 0 ? (
-          <div className={`flex flex-col items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'} bg-gray-50`}>
-            <p className="text-gray-600">No shuttle data available</p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleFetchShuttleData}
-              className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
-            >
-              Refresh
-            </Button>
-          </div>
-        ) : (
-          <MapComponent
-            busLocations={shuttleBuses}
-            campusPoints={campusPoints}
-            onCenterMap={(_) => {
-              centerMapRef.current = (loc) => {
-                if (loc) {
-                  centerMap(loc)
-                }
-              }
-            }}
-          />
-        )}
-      </CardContent>
-    </Card>
-  )
+        </CardHeader>
+        <CardContent className="p-0">
+          {getMapContent()}
+        </CardContent>
+      </Card>
+    )
+  }
 
   // Reusable Schedule Table
   const renderScheduleTable = (scheduleData: any[]) => (
@@ -215,7 +275,7 @@ const ConcordiaShuttle = () => {
             const isNext = index === nextDepartureIndex
             return (
               <ScheduleItem
-                key={index}
+                key={`${item.loy}-${item.sgw}`} // Stable key from time values
                 loy={item.loy}
                 sgw={item.sgw}
                 isUpcoming={isUpcoming}
@@ -282,19 +342,17 @@ const ConcordiaShuttle = () => {
 
           {/* Mobile Layout */}
           <div className="md:hidden mb-24">
-            <Tabs defaultValue="map" className="w-full">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabType)} className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-4 sticky top-0 z-10 bg-white border-b border-gray-200">
                 <TabsTrigger
-                  value="map"
-                  onClick={() => setActiveTab("map")}
+                  value= "map"
                   className="flex items-center gap-1 data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700"
                 >
                   <MapPin className="h-4 w-4" />
                   Live Map
                 </TabsTrigger>
                 <TabsTrigger
-                  value="schedule"
-                  onClick={() => setActiveTab("schedule")}
+                  value= "schedule"
                   className="flex items-center gap-1 data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700"
                 >
                   <Clock className="h-4 w-4" />

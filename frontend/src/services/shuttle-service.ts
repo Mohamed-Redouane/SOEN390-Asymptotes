@@ -32,12 +32,12 @@ export const fetchShuttleData = async (): Promise<{
     }
 
     const contentType = response.headers.get("content-type")
-    if (!contentType || !contentType.includes("application/json")) {
+    if (!contentType?.includes("application/json")) {
       throw new Error("Response is not JSON")
     }
 
     const data = await response.json()
-    if (data && data.d && Array.isArray(data.d.Points)) {
+    if (data?.d && Array.isArray(data.d.Points)) {
       return {
         busLocations: data.d.Points,
         error: null,
