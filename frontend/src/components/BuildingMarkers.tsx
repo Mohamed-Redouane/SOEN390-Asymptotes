@@ -5,12 +5,12 @@ import getCentral from "../utils/CoordinateBuilding";
 import { useNavigate } from "react-router-dom";
 import { createInfoWindow, getAddress } from "../utils/infoBuilding";
 
-interface GeoJsonBuildingMarkersProps {
+interface BuildingMarkersProps {
   geoJsonData: any;
 }
 
 
-const BuildingMarkers: React.FC<GeoJsonBuildingMarkersProps> = ({ geoJsonData }) => {
+const BuildingMarkers: React.FC<BuildingMarkersProps> = ({ geoJsonData }) => {
   const map = useMap();
   const [activeInfoWindow, setActiveInfoWindow] = useState<google.maps.InfoWindow | null>(null);
   const navigate = useNavigate();
