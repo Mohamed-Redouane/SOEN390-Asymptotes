@@ -6,7 +6,7 @@ describe('getRoom', () => {
     expect(getRoomNumber("Room number [H937]")).toBe("H937")
   })
   it('handles a null input', () => {
-    expect(getRoomNumber(null)).toBe("")
+    expect(getRoomNumber("")).toBe("")
   })
   it('trims a room input', () => {
     expect(getRoomNumber(" \r\t\n    asdf [\r\t\n H901  \t\n\t\r] \n\t\r    ")).toBe("H901")

@@ -108,8 +108,7 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
     <Card
       className={cn(
         "border transition-all duration-300",
-        isUrgent ? "border-orange-200" : isSoon ? "border-teal-200" : "border-gray-200",
-      )}
+        getBorderColor(isUrgent, isSoon))}
     >
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2">

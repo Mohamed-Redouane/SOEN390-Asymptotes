@@ -6,13 +6,12 @@ describe('getNextClass', () => {
     const later = new Date();
     later.setHours(later.getHours() + 1);
     const classArr = [
-      {start: { dateTime: String(later) }, location: "Building A"},
+      {start: { dateTime: String(later) }, location: "Building A", summary: ""},
     ];
     expect(getNextClass(classArr)).toBe(classArr[0]);
   })
   it('should return an empty array of classes', () => {
-    const later = new Date();
-    const classArr = []
+    const classArr: Array<{ start: { dateTime: string }, location: string, summary: string}> = []
     expect(getNextClass(classArr)).toStrictEqual(null);
   })
   it('should return the next class', () => {
@@ -25,7 +24,7 @@ describe('getNextClass', () => {
       new Date(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours()+3, today.getSeconds()),
     ]
     const classArr = dates.map((date, index) => {
-      return {start: {dateTime: String(date)}, location: "Location " + index}
+      return {start: {dateTime: String(date)}, location: "Location " + index, summary: ""}
     })
     expect(getNextClass(classArr)).toBe(classArr[0]);
   })

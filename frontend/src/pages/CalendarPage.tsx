@@ -12,7 +12,7 @@ import WeekView from '../components/WeekView';
 const CalendarPage: React.FC = () => {
   const [calendars, setCalendars] = useState<any[]>([]);
   const [selectedCalendarId, setSelectedCalendarId] = useState<string | null>(null);
-  const [events, setEvents] = useState<{ start: { dateTime: string }, location: string }[]>([]);
+  const [events, setEvents] = useState<{ start: { dateTime: string }, location: string, summary: string}[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showError, setShowError] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
