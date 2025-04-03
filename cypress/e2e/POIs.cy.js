@@ -12,9 +12,9 @@
 
     it("should open and close the modal", () => {
         cy.get('button').contains('Explore').click();
-        cy.get('.modal-content').should('be.visible');
-        cy.get('.modal-overlay').click({ force: true });
-        cy.get('.modal-content').should('not.exist');
+        cy.get('#poimodal-content').should('be.visible');
+        cy.get('#poimodal-overlay').click({ force: true });
+        cy.get('#poimodal-content').should('not.exist');
     });
 
     it("should change the radius and POI type", () => {

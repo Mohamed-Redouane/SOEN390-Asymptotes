@@ -33,8 +33,8 @@ const WeekView: React.FC<WeekViewProps> = ({ events, today, onEventClick }) => {
         return (
           <div
             key={day}
-            className={`p-4 rounded-lg shadow-md border border-gray-200 ${
-              isToday ? "bg-blue-50" : "bg-white"
+            className={`p-4 rounded-lg shadow-md border ${
+              isToday ? "bg-blue-50 dark:bg-gray-900" : ""
             }`}
           >
             <h2 className="text-lg font-bold text-center mb-2">
