@@ -103,8 +103,6 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
     if (isSoon) return "Departing soon";
     return "";
   };
-  
->>>>>>> main
 
   return (
     <Card
@@ -139,7 +137,7 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
           </div>
           <div className="text-right">
             <p className={cn("text-2xl font-bold", isUrgent ? "text-orange-600" : "text-teal-600")}>
-              {formatDepartureTime(nextDepartureMinutes)}
+              {formatDepartureTime(nextDepartureContext.minutes)}
             </p>
         </div>
       </div>
@@ -153,7 +151,7 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
         />
 
         <div className="mt-3 flex justify-between items-center">
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-primary">
             {getStatusMessage(isUrgent, isSoon)}
           </span>
           <Button

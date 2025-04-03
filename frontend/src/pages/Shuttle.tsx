@@ -21,14 +21,14 @@ import type { BusLocation, DayType, TabType } from "../components/types"
 
 //error state component
 const MapErrorState = ({ isDesktop, error, onRetry}: {isDesktop: boolean; error: string; onRetry: () => void;}) => (
-  <div className={`flex flex-col items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'} bg-gray-50`}>
+  <div className={`flex flex-col items-center justify-center ${isDesktop ? 'h-[500px]' : 'h-[400px]'}`}>
   <AlertCircle className="h-10 w-10 text-orange-500 mb-2" />
   <p className="text-gray-700 font-medium">{error}</p>
   <Button
     variant="outline"
     size="sm"
     onClick={onRetry}
-    className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+    className="mt-4 border-gray-200 text-gray-700 hover:bg-secondary"
   >
     Try Again
   </Button>
@@ -53,7 +53,7 @@ const MapEmptyState = ({ isDesktop, onRefresh }: { isDesktop: boolean; onRefresh
     variant="outline"
     size="sm"
     onClick={onRefresh}
-    className="mt-4 bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+    className="mt-4 border-gray-200 text-gray-700 hover:bg-secondary"
   >
     Refresh
   </Button>
@@ -156,13 +156,16 @@ const ConcordiaShuttle = () => {
   
   const mapBadgesStyle = (location: string) => {
     if(location === 'Loyola') {
-      return 'text-teal-700 hover:bg-teal-50 border-teal-200'
+      return `text-teal-700 hover:bg-teal-50 border-teal-200
+        dark:text-teal-500 dark:hover:bg-teal-900`
     }
     else if(location === 'SGW') {
-      return 'text-orange-700 hover:bg-orange-50 border-orange-200'
+      return `text-orange-700 hover:bg-orange-50 border-orange-200
+        dark:text-orange-500 dark:hover:bg-orange-900`
     }
     else {
-      return 'text-green-700 hover:bg-green-50 border-green-200'
+      return `text-green-700 hover:bg-green-50 border-green-200
+        dark:text-green-500 dark:hover:bg-green-900`
     }
   }
 
@@ -223,7 +226,7 @@ const ConcordiaShuttle = () => {
     return (
       <Card className={`${isDesktop ? 'lg:col-span-2' : ''} overflow-hidden border border-gray-200`}>
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-gray-800">
+          <CardTitle className="flex items-center gap-2 text-primary">
             <MapPin className="h-5 w-5 text-teal-600" />
             Live Map
           </CardTitle>
@@ -232,7 +235,7 @@ const ConcordiaShuttle = () => {
               <Badge 
                 key={location} 
                 variant="outline" 
-                className={`bg-white ${
+                className={`${
                   mapBadgesStyle(location)
                 }`}
               >
@@ -342,17 +345,17 @@ const ConcordiaShuttle = () => {
           {/* Mobile Layout */}
           <div className="md:hidden mb-24">
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabType)} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-4 sticky top-0 z-10 bg-white border-b border-gray-200">
+              <TabsList className="grid w-full grid-cols-2 mb-4 sticky top-0 z-10 border-b border-gray-200">
                 <TabsTrigger
                   value= "map"
-                  className="flex items-center gap-1 data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700"
+                  className="flex items-center gap-1 data-[state=active]:bg-background data-[state=active]:text-primary"
                 >
                   <MapPin className="h-4 w-4" />
                   Live Map
                 </TabsTrigger>
                 <TabsTrigger
                   value= "schedule"
-                  className="flex items-center gap-1 data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700"
+                  className="flex items-center gap-1 data-[state=active]:bg-background data-[state=active]:text-primary"
                 >
                   <Clock className="h-4 w-4" />
                   Schedule
@@ -383,18 +386,18 @@ const ConcordiaShuttle = () => {
                   </CardHeader>
                   <CardContent>
                     <Tabs value={selectedDay} className="w-full">
-                      <TabsList className="grid w-full grid-cols-2 mb-4 bg-gray-50">
+                      <TabsList className="grid w-full grid-cols-2 mb-4">
                         <TabsTrigger
                           value="mon-thu"
                           onClick={() => setSelectedDay("mon-thu")}
-                          className="flex items-center gap-1 data-[state=active]:text-teal-700"
+                          className="flex items-center gap-1 data-[state=active]:text-primary"
                         >
                           Mon–Thu
                         </TabsTrigger>
                         <TabsTrigger
                           value="fri"
                           onClick={() => setSelectedDay("fri")}
-                          className="flex items-center gap-1 data-[state=active]:text-teal-700"
+                          className="flex items-center gap-1 data-[state=active]:text-primary"
                         >
                           Friday
                         </TabsTrigger>
@@ -409,7 +412,7 @@ const ConcordiaShuttle = () => {
                       </TabsContent>
                     </Tabs>
 
-                    <div className="mt-4 text-xs text-gray-500">
+                    <div className="mt-4 text-xs text-primary">
                       <p>* Last departure of the day</p>
                       <p>Highlighted times indicate upcoming departures</p>
                     </div>
