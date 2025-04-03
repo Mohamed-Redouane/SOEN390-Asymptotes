@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
 import { gapi } from 'gapi-script';
-import GoogleCalendarConnect from '../components/GoogleCalendarConnect';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getNextClass } from '../utils/calendar-utils';
+import Button from '@mui/material/Button';
+import CalendarSelector from '../components/CalendarSelector';
 import ErrorMessage from '../components/ErrorMessage';
 import EventDetailsModal from '../components/EventDetailsModal';
-import CalendarSelector from '../components/CalendarSelector';
+import GoogleCalendarConnect from '../components/GoogleCalendarConnect';
 import WeekView from '../components/WeekView';
-import Button from '@mui/material/Button';
-import { useNavigate } from 'react-router-dom';
 
 const CalendarPage: React.FC = () => {
   const [calendars, setCalendars] = useState<any[]>([]);
   const [selectedCalendarId, setSelectedCalendarId] = useState<string | null>(null);
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<{ start: { dateTime: string }, location: string }[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showError, setShowError] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
@@ -21,8 +22,7 @@ const CalendarPage: React.FC = () => {
 
   const navigate = useNavigate();
   const handleNavigateToDirections = () => {
-    const nextClass = handleGoToNextClass();
-    
+    const nextClass = getNextClass(events);
     if (nextClass) {
       navigate('/directions', {
         state: {
@@ -31,36 +31,11 @@ const CalendarPage: React.FC = () => {
           isFromSchedule: true
         }
       });
+    } else {
+      alert("No upcoming classes found for today.");
+      
     }
   };
-
-  const handleGoToNextClass = () => {
-    // In here we check all the events for today, and based on the current time we find the next class.
-    const currentDate = new Date();
-    // Use 2025-03-25 at 9:00 AM as a test case.
-    // const currentDate = new Date("2025-03-26T09:00:00Z"); // Test case
-
-    // First we filter only the next upcoming event
-    const upcomingClasses = events.filter(event => {
-      const startTime = new Date(event.start.dateTime || event.start.date);
-      return (
-        startTime > currentDate &&
-        event.location &&
-        startTime.getDate() === currentDate.getDate() &&
-        startTime.getMonth() === currentDate.getMonth() &&
-        startTime.getFullYear() === currentDate.getFullYear()
-      );
-    });
-
-    const nextClass = upcomingClasses[0]; // Get the first upcoming class
-    if (!nextClass) {
-      alert("No upcoming classes found for today.");
-      return;
-    }
-    // Now just 
-    console.log("Current Time:", nextClass.summary);
-    return nextClass;
-  }
 
   const handleCalendarsLoaded = (loadedCalendars: any[]) => {
     setCalendars(loadedCalendars);
