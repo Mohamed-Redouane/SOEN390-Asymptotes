@@ -109,7 +109,7 @@ const ConcordiaShuttle = () => {
       setLoading(false)
     }
   }
-
+  
   // Initialize Leaflet when component mounts
   useEffect(() => {
     initializeLeaflet()

@@ -30,9 +30,7 @@ const BaseScheduleItem = ({
   status: "urgent" | "upcoming" | "inactive";
   locationName: string;
 }) => {
-
   const style = ScheduleItemStyles[status]
-
   return (
     <div className="flex items-center gap-3 w-1/2">
       <div
