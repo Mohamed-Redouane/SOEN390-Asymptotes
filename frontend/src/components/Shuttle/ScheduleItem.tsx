@@ -3,32 +3,42 @@ import { MapPin } from "lucide-react";
 import { timeToMinutes, formatMinutes } from "../../utils/time-utils";
 import type { ScheduleItemProps } from "../types";
 
+const ScheduleItemStyles = {
+  urgent: {
+    container: "bg-orange-500 text-white",
+    text: "text-orange-500"
+  },
+  upcoming: {
+    container: "bg-teal-500 text-white",
+    text: "text-teal-500"
+  },
+  inactive: {
+    container: "text-gray-500",
+    text: "text-gray-500"
+  }
+}
+
 // Base Schedule Item Component
 const BaseScheduleItem = ({
   time,
   minutesUntil,
-  isUpcoming,
-  isUrgent = false,
+  status,
   locationName,
 }: {
-  location: string;
   time: string;
   minutesUntil: number;
-  isUpcoming: boolean;
-  isUrgent?: boolean;
-  isNext?: boolean;
+  status: "urgent" | "upcoming" | "inactive";
   locationName: string;
 }) => {
+
+  const style = ScheduleItemStyles[status]
+
   return (
     <div className="flex items-center gap-3 w-1/2">
       <div
         className={cn(
           "flex flex-col items-center justify-center rounded-full w-8 h-8",
-          isUpcoming && minutesUntil > 0
-            ? isUrgent
-              ? "bg-orange-500 text-white"
-              : "bg-teal-500 text-white"
-            : "bg-gray-200 dark:bg-gray-800"
+          style.container
         )}
       >
         <MapPin className="h-4 w-4" />
@@ -37,22 +47,18 @@ const BaseScheduleItem = ({
         <span
           className={cn(
             "font-medium",
-            isUpcoming && minutesUntil > 0
-              ? isUrgent
-                ? "text-orange-600"
-                : "text-teal-600"
-              : "text-gray-500 dark:text-gray-200"
+            style.text
           )}
         >
           {time}
           {time.includes("*")}
         </span>
-        <span className="text-xs">{locationName}</span>
-        {isUpcoming && minutesUntil > 0 && (
+        <span className="text-xs text-gray-500">{locationName}</span>
+        {status !== "inactive" && minutesUntil > 0 && (
           <span
             className={cn(
               "text-xs font-medium mt-1",
-              isUrgent ? "text-orange-500" : "text-teal-500"
+              status == "urgent" ? "text-orange-600" : "text-teal-600"
             )}
           >
             {formatMinutes(minutesUntil)}
@@ -63,6 +69,13 @@ const BaseScheduleItem = ({
   );
 };
 
+const ContainerStyles = {
+  next: "bg-white border border-teal-200",
+  urgent: "bg-white border border-orange-200",
+  upcoming: "bg-white hover:bg-gray-50",
+  default: "hover:bg-gray-50"
+}
+
 // Main Schedule Item Component
 export const ScheduleItem = ({ loy, sgw, isUpcoming, isNext, currentMinutes }: ScheduleItemProps) => {
   const loyMinutesUntil = timeToMinutes(loy) - currentMinutes;
@@ -70,35 +83,38 @@ export const ScheduleItem = ({ loy, sgw, isUpcoming, isNext, currentMinutes }: S
 
   const isUrgent = (loyMinutesUntil > 0 && loyMinutesUntil <= 5) || (sgwMinutesUntil > 0 && sgwMinutesUntil <= 5);
 
+  const getContainerStyle = () => {
+    if (isNext) return ContainerStyles.next;
+    if (isUrgent) return ContainerStyles.urgent;
+    if (isUpcoming) return ContainerStyles.upcoming;
+    return ContainerStyles.default;
+  }
+
+  const getItemStatus = (minutesUntil: number): "urgent" | "upcoming" | "inactive" => {
+    if (minutesUntil > 0 && minutesUntil <= 5) return "urgent";
+    if (minutesUntil > 0) return "upcoming";
+    return "inactive";
+  };
+
   return (
     <div
       className={cn(
         "flex justify-between py-3 px-4 rounded-md transition-all",
-        isNext
-          ? "border border-teal-200"
-          : isUrgent
-          ? "border border-orange-200"
-          : "hover:bg-gray-50 dark:hover:bg-gray-900"
+        getContainerStyle()
       )}
     >
       <BaseScheduleItem
-        location="Loyola"
         time={loy}
         minutesUntil={loyMinutesUntil}
-        isUpcoming={isUpcoming}
-        isUrgent={loyMinutesUntil > 0 && loyMinutesUntil <= 5}
-        isNext={isNext}
+        status={getItemStatus(loyMinutesUntil)}
         locationName="Loyola"
       />
 
       <div className="flex items-center gap-3 w-1/2 justify-end">
         <BaseScheduleItem
-          location="SGW"
           time={sgw}
           minutesUntil={sgwMinutesUntil}
-          isUpcoming={isUpcoming}
-          isUrgent={sgwMinutesUntil > 0 && sgwMinutesUntil <= 5}
-          isNext={isNext}
+          status={getItemStatus(sgwMinutesUntil)}
           locationName="SGW"
         />
       </div>
