@@ -207,8 +207,8 @@ function CampusMap() {
                         alignItems: 'center', 
                         marginTop: '0px', 
                         marginLeft: '10px', 
-                        padding: '5px 10px', 
-                        fontSize: '14px' 
+                        padding: '7px 10px', 
+                        fontSize: '15px' 
                     }}
                 >
                     <FaStar style={{ marginRight: '5px' }} />
@@ -220,8 +220,8 @@ function CampusMap() {
                         display: 'flex', 
                         alignItems: 'center', 
                         marginTop: '0px', 
-                        padding: '5px 10px', 
-                        fontSize: '14px' 
+                        padding: '7px 10px', 
+                        fontSize: '15px' 
                     }}
                 >
                     {showBuildings ? "Hide Buildings" : "Show Buildings"}
