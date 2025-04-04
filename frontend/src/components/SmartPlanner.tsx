@@ -3,6 +3,7 @@ import { Dialog, DialogPanel, DialogTitle, Transition } from '@headlessui/react'
 import { FaRoute, FaClock, FaMapMarkerAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import CircularProgress from '@mui/material/CircularProgress';
 import OpenAI from 'openai';
+import { Link } from 'react-router-dom';
 
 interface SmartPlannerProps {
     isOpen: boolean;
@@ -45,10 +46,38 @@ const SmartPlanner: React.FC<SmartPlannerProps> = ({
     const generatePlan = async () => {
         setIsLoading(true);
         setError(null);
-    
+        console.log("Today's events:");
         try {
             // Sort events by start time
-            const sortedEvents = [...events].sort((a, b) => {
+            // Get current date and time
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentDateString = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+
+            // Filter events to only today's events (and after current hour)
+            const todaysEvents = events.filter(event => {
+                const eventStart = new Date(event.start.dateTime || event.start.date);
+                const eventDateString = eventStart.toISOString().split('T')[0];
+                
+                // Check if event is today
+                if (eventDateString !== currentDateString) return false;
+                
+                // For all-day events, keep them
+                if (!event.start.dateTime) return true;
+                
+                // For timed events, check if they're after current hour
+                const eventHour = eventStart.getHours();
+                return eventHour >= currentHour;
+            });
+
+                        
+            if (todaysEvents.length === 0) {
+                setError("No events scheduled for today.");
+                return;
+            }
+    
+
+            const sortedEvents = [...todaysEvents].sort((a, b) => {
                 const aStart = new Date(a.start.dateTime || a.start.date);
                 const bStart = new Date(b.start.dateTime || b.start.date);
                 return aStart.getTime() - bStart.getTime();
@@ -65,7 +94,7 @@ const SmartPlanner: React.FC<SmartPlannerProps> = ({
                     ? new Date(event.end.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                     : "All day"
             }));
-    
+
             // Create a prompt for the OpenAI model
             const prompt = `
               I have the following events scheduled for today:
@@ -90,7 +119,7 @@ const SmartPlanner: React.FC<SmartPlannerProps> = ({
                   {
                     "time": "Time of activity",
                     "activity": "Description of the activity (event or travel)",
-                    "location": "Location, if applicable",
+                    "location": "Location, keep the exact name of the location given in the events",
                     "directions": "Transportation instructions, if this is a travel segment"
                   }
                 ]
@@ -188,7 +217,20 @@ const SmartPlanner: React.FC<SmartPlannerProps> = ({
                                                     {item.location && (
                                                         <div className="flex items-center text-gray-600 text-xs mt-1">
                                                             <FaMapMarkerAlt className="mr-1" size={10} />
-                                                            {item.location}
+                                                           
+                                                            {/* Make the item location a link */}
+                                                            <Link
+                                                                to="/directions"
+                                                                state={{
+                                                                    eventName: plan.summary,
+                                                                    destination: item.location,
+                                                                    isFromSchedule: false
+                                                                }}
+>
+
+                                                            {item.location} {/* Location name */} 
+                
+                                                            </Link>
                                                         </div>
                                                     )}
                                                     {item.directions && (
