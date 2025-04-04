@@ -175,7 +175,7 @@ const SmartPlanner: React.FC<SmartPlannerProps> = ({
         <Transition appear show={isOpen} as={React.Fragment}>
             <Dialog as="div" className="relative z-10" onClose={onClose}>
                 <div className="fixed inset-0 bg-black bg-opacity-30" />
-                <div className="fixed inset-0 flex items-center justify-center p-4">
+                <div className="fixed inset-0 flex items-center justify-center p-4  data-cy='generated-modal'">
                     <DialogPanel className="max-w-sm w-full bg-white rounded-xl shadow-xl p-6 flex flex-col">
                         <DialogTitle className="text-lg font-semibold text-gray-900">
                             📝 Generated Plan
@@ -187,7 +187,8 @@ const SmartPlanner: React.FC<SmartPlannerProps> = ({
                                 <p className="ml-2 text-gray-600 text-sm">Generating plan...</p>
                             </div>
                         ) : error ? (
-                            <div className="my-2 p-3 bg-red-50 text-red-600 rounded-md text-sm">
+                            <div className="my-2 p-3 bg-red-50 text-red-600 rounded-md text-sm  data-cy='error-message-modal'">
+                                
                                 {error}
                             </div>
                         ) : plan ? (
@@ -274,6 +275,7 @@ const SmartPlanner: React.FC<SmartPlannerProps> = ({
                             <button
                                 className="flex-1 bg-gray-200 text-gray-800 py-2 rounded-md text-sm hover:bg-gray-300 transition duration-200"
                                 onClick={onClose}
+                                data-cy="close-smart-planner-button"  // Preferred for Cypress
                             >
                                 Close
                             </button>

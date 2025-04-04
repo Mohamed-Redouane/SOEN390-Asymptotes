@@ -210,6 +210,7 @@ const CalendarPage: React.FC = () => {
           {/* Smart Planner Button */}
           <div className="mb-6 text-center">
             <button
+              data-cy="smart-planner-button"  // Preferred for Cypress
               onClick={handleSmartPlannerClick}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 shadow-md"
               disabled={events.length === 0}
