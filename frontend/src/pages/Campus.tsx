@@ -138,6 +138,7 @@ function CampusMap() {
 
     const togglePOIs = () => {
         setShowPOIs((prevShowPOIs) => !prevShowPOIs);
+        setIsModalOpen(false);
     };
 
     const toggleModal = () => {
@@ -258,8 +259,8 @@ function CampusMap() {
                                 position={selectedPoi.geometry.location}
                                 onCloseClick={() => setSelectedPoi(null)}
                             >
-                                <div style={{ color: 'black', padding: '10px', maxWidth: '250px', fontFamily: 'Arial, sans-serif' }}>
-                                    <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', fontWeight: 'bold' }}>{selectedPoi.name}</h3>
+                                <div className="max-w-[250px] bg-white rounded-lg p-3 shadow-md text-gray-800 font-sans">
+                                    <h3 className="text-xl font-bold text-[#5A2DA2] mb-2">{selectedPoi.name}</h3>
                                     <p style={{ margin: '0 0 5px 0', fontSize: '14px' }}>{selectedPoi.vicinity}</p>
                                     <p style={{ margin: '0 0 5px 0', fontSize: '14px' }}>Rating: {selectedPoi.rating}</p>
                                     {selectedPoi.opening_hours && (
@@ -275,7 +276,7 @@ function CampusMap() {
                                         />
                                     )}
                                     <button
-                                    style={{ marginTop: '10px', padding: '5px 10px', fontSize: '14px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px' }}
+                                    className="mt-3 rounded-lg bg-[#5A2DA2] text-white font-bold px-4 py-2 cursor-pointer hover:bg-[#4b29f1]"
                                     onClick={() => {
                                         const modifiedAddress = `${selectedPoi.vicinity} `;
                                         setDestination(modifiedAddress); // Set the destination address
