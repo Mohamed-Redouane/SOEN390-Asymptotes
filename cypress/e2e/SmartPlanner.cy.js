@@ -138,7 +138,7 @@ describe("Smart Planner", () => {
     return attemptSignIn(maxAttempts);
   });
 
-
+  // Test cases
   it("should show no events when there are no active events", () => {
     // Sign in
     cy.reliableSignIn();
