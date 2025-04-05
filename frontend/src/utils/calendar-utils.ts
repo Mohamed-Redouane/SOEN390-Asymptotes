@@ -3,6 +3,8 @@ export const getNextClass = (eventArr: { start: { dateTime: string }, location: 
   // In here we check all the events for today, and based on the current time we find the next class.
   const currentDate = new Date();
   
+  console.log("got:", eventArr);
+  
   // First we filter only the next upcoming event
   const nextClass = eventArr.find(event => {
     const startTime = new Date(event.start.dateTime);
