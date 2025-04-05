@@ -10,14 +10,14 @@ describe('getNextClass', () => {
     ];
     expect(getNextClass(classArr)).toBe(classArr[0]);
   })
-  it('should return an empty array of classes', () => {
+  it('should return null', () => {
     const classArr: Array<{ start: { dateTime: string }, location: string, summary: string}> = []
     expect(getNextClass(classArr)).toStrictEqual(null);
   })
   it('should return the next class', () => {
     const today = new Date();
     
-    // The earliest class is dates[1].
+    // The earliest class is dates[0].
     const dates = [
       new Date(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours()+1, today.getSeconds()),
       new Date(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours()+2, today.getSeconds()),
