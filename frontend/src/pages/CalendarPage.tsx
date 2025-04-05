@@ -85,7 +85,7 @@ const CalendarPage: React.FC = () => {
 
     // First we filter only the next upcoming event
     const upcomingClasses = events.filter(event => {
-      const startTime = new Date(event.start.dateTime || '');
+      const startTime = new Date(event.start.dateTime ?? '');
       return (
         startTime > currentDate &&
         event.location &&
@@ -174,7 +174,7 @@ const CalendarPage: React.FC = () => {
         orderBy: 'startTime',
       });
 
-      const events = response.result.items || [];
+      const events = response.result.items ?? [];
       setEvents(events);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -214,7 +214,7 @@ const CalendarPage: React.FC = () => {
         />
 
         <ErrorMessage
-          message={errorMessage || "An unknown error occurred."}
+          message={errorMessage ?? "An unknown error occurred."}
           show={showError}
         />
 
