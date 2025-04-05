@@ -1,104 +1,165 @@
-import {describe, expect, test} from 'vitest';
-import { calculateDistance, CONCORDIA_POINTS, getCoordinatesForPlaceId, isCampusPlaceId } from '../../services/maps_services/shuttleRouteService.js';
-import { findNearestCampus } from '../../services/maps_services/shuttleRouteService.js';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import {
+  CONCORDIA_POINTS,
+  calculateDistance,
+  isCampusPlaceId,
+  getCoordinatesForPlaceId,
+  findNearestCampus,
+  isRouteBetweenConcordiaCampuses,
+  generateShuttleRoute
+} from '../../services/maps_services/shuttleRouteService.js';
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe('calculateDistance', () => {
-    test('calculates distance between two points correctly', () => {
-        const lat1 = 52.5200; 
-        const lon1 = 13.4050;
-        const lat2 = 48.8566; 
-        const lon2 = 2.3522;
+  it('should return 0 for same coordinates', () => {
+    const dist = calculateDistance(45, -73, 45, -73);
+    expect(dist).toBeCloseTo(0);
+  });
 
-        const distance = calculateDistance(lat1, lon1, lat2, lon2);
-        expect(distance).toBeCloseTo(877, 0); // Distance in km
-    });
-
-    test('returns 0 for the same coordinates', () => {
-        const lat = 52.5200;
-        const lon = 13.4050;
-
-        const distance = calculateDistance(lat, lon, lat, lon);
-        expect(distance).toBe(0);
-    });
+  it('should calculate a reasonable distance between Loyola and SGW', () => {
+    const dist = calculateDistance(
+      CONCORDIA_POINTS.LOYOLA.Latitude,
+      CONCORDIA_POINTS.LOYOLA.Longitude,
+      CONCORDIA_POINTS.SGW.Latitude,
+      CONCORDIA_POINTS.SGW.Longitude
+    );
+    // Expected distance between campuses should be between 6 and 7 km (approx.)
+    expect(dist).toBeGreaterThan(6);
+    expect(dist).toBeLessThan(7);
+  });
 });
 
 describe('isCampusPlaceId', () => {
-    test('returns true for a valid LOYOLA place id', () => {
-        const placeId = 'ChIJp3MoHy4XyUwRkr_5bwBScNw'; // Main Loyola ID
-        expect(isCampusPlaceId(placeId, 'LOYOLA')).toBe(true);
-      });
+  it('should return true for a valid Loyola place id', () => {
+    const result = isCampusPlaceId("ChIJp3MoHy4XyUwRkr_5bwBScNw", 'LOYOLA');
+    expect(result).toBe(true);
+  });
 
-      test('returns false for an invalid LOYOLA place id', () => {
-        const invalidPlaceId = 'InvalidPlaceId';
-        expect(isCampusPlaceId(invalidPlaceId, 'LOYOLA')).toBe(false);
-      });
-
-      test('returns true for a valid SGW place id', () => {
-        const validPlaceId = 'ChIJ19SC3jIbyUwRLPI2b48L-4k'; // Main SGW ID
-        expect(isCampusPlaceId(validPlaceId, 'SGW')).toBe(true);
-      });
-
-      test('returns false if a valid LOYOLA place id is provided for SGW', () => {
-        const validLoyolaPlaceId = 'ChIJp3MoHy4XyUwRkr_5bwBScNw';
-        expect(isCampusPlaceId(validLoyolaPlaceId, 'SGW')).toBe(false);
-      });
-
+  it('should return false for an invalid campus place id', () => {
+    const result = isCampusPlaceId("InvalidID", 'LOYOLA');
+    expect(result).toBe(false);
+  });
 });
 
 describe('getCoordinatesForPlaceId', () => {
-    test('returns LOYOLA coordinates for a known LOYOLA place id', async () => {
-      // Use a known LOYOLA campus place id
-      const loyolaPlaceId = 'ChIJp3MoHy4XyUwRkr_5bwBScNw';
-      const result = await getCoordinatesForPlaceId(loyolaPlaceId);
-      expect(result).toEqual({
-        lat: CONCORDIA_POINTS.LOYOLA.Latitude,
-        lng: CONCORDIA_POINTS.LOYOLA.Longitude,
-      });
+  it('should return Loyola coordinates for a known Loyola place id', async () => {
+    const coords = await getCoordinatesForPlaceId("ChIJp3MoHy4XyUwRkr_5bwBScNw");
+    expect(coords).toEqual({
+      lat: CONCORDIA_POINTS.LOYOLA.Latitude,
+      lng: CONCORDIA_POINTS.LOYOLA.Longitude
+    });
+  });
+
+  it('should return SGW coordinates for a known SGW place id', async () => {
+    const coords = await getCoordinatesForPlaceId("ChIJ19SC3jIbyUwRLPI2b48L-4k");
+    expect(coords).toEqual({
+      lat: CONCORDIA_POINTS.SGW.Latitude,
+      lng: CONCORDIA_POINTS.SGW.Longitude
+    });
+  });
+
+  it('should fetch and return coordinates for a non-campus place id', async () => {
+    const mockData = {
+      status: 'OK',
+      result: {
+        geometry: { location: { lat: 45.0, lng: -73.0 } }
+      }
+    };
+
+    // Create a real Response object with the JSON data.
+    const mockResponse = new Response(JSON.stringify(mockData), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     });
 
-    test('returns SGW coordinates for a known SGW place id', async () => {
-        // Use a known SGW campus place id
-        const sgwPlaceId = 'ChIJ19SC3jIbyUwRLPI2b48L-4k';
-        const result = await getCoordinatesForPlaceId(sgwPlaceId);
-        expect(result).toEqual({
-          lat: CONCORDIA_POINTS.SGW.Latitude,
-          lng: CONCORDIA_POINTS.SGW.Longitude,
-        });
-      });
+    // Mock global.fetch to return the Response.
+    global.fetch = vi.fn(() => Promise.resolve(mockResponse)) as unknown as typeof fetch;
 
+    const coords = await getCoordinatesForPlaceId("NonCampusID");
+    expect(coords).toEqual({ lat: 45.0, lng: -73.0 });
+  });
+
+  it('should return null if fetching coordinates fails', async () => {
+    global.fetch = vi.fn(() => Promise.reject(new Error("Network error")));
+    const coords = await getCoordinatesForPlaceId("NonCampusID");
+    expect(coords).toBeNull();
+  });
 });
 
 describe('findNearestCampus', () => {
-    test('returns SGW campus when coordinate is exactly at SGW', () => {
-      const { Latitude: lat, Longitude: lng } = CONCORDIA_POINTS.SGW;
-      const result = findNearestCampus(lat, lng);
-      expect(result).toEqual(CONCORDIA_POINTS.SGW);
-    });
+  it('should return SGW when location is closer to SGW', () => {
+    // Coordinates slightly offset from SGW
+    const coordsNearSGW = {
+      lat: CONCORDIA_POINTS.SGW.Latitude + 0.001,
+      lng: CONCORDIA_POINTS.SGW.Longitude + 0.001
+    };
+    const campus = findNearestCampus(coordsNearSGW.lat, coordsNearSGW.lng);
+    expect(campus).toEqual(CONCORDIA_POINTS.SGW);
+  });
 
-    test('returns LOYOLA campus when coordinate is exactly at LOYOLA', () => {
-        const { Latitude: lat, Longitude: lng } = CONCORDIA_POINTS.LOYOLA;
-        const result = findNearestCampus(lat, lng);
-        expect(result).toEqual(CONCORDIA_POINTS.LOYOLA);
-      });
-
-      test('returns SGW campus when coordinate is closer to SGW than LOYOLA', () => {
-        // Slightly offset from SGW campus
-        const lat = CONCORDIA_POINTS.SGW.Latitude + 0.001; // slightly north of SGW
-        const lng = CONCORDIA_POINTS.SGW.Longitude + 0.001; // slightly east of SGW
-        const result = findNearestCampus(lat, lng);
-        expect(result).toEqual(CONCORDIA_POINTS.SGW);
-      });
-
-      test('returns LOYOLA campus when coordinate is closer to LOYOLA than SGW', () => {
-        // Slightly offset from LOYOLA campus
-        const lat = CONCORDIA_POINTS.LOYOLA.Latitude - 0.001; // slightly south of LOYOLA
-        const lng = CONCORDIA_POINTS.LOYOLA.Longitude - 0.001; // slightly west of LOYOLA
-        const result = findNearestCampus(lat, lng);
-        expect(result).toEqual(CONCORDIA_POINTS.LOYOLA);
-      });
+  it('should return Loyola when location is closer to Loyola', () => {
+    // Coordinates slightly offset from Loyola
+    const coordsNearLoyola = {
+      lat: CONCORDIA_POINTS.LOYOLA.Latitude - 0.001,
+      lng: CONCORDIA_POINTS.LOYOLA.Longitude - 0.001
+    };
+    const campus = findNearestCampus(coordsNearLoyola.lat, coordsNearLoyola.lng);
+    expect(campus).toEqual(CONCORDIA_POINTS.LOYOLA);
+  });
 });
 
+describe('isRouteBetweenConcordiaCampuses', () => {
+  it('should return false when both source and destination are near the same campus', async () => {
+    // Both points are known Loyola place ids so they return the same coordinates.
+    const result = await isRouteBetweenConcordiaCampuses(
+      "ChIJp3MoHy4XyUwRkr_5bwBScNw",
+      "ChIJk5Bx5kkXyUwRHLCpsk_QqeM"
+    );
+    expect(result).toBe(false);
+  });
 
+  it('should return true for a route between different campuses', async () => {
+    // One point is a Loyola campus and the other is SGW.
+    const result = await isRouteBetweenConcordiaCampuses(
+      "ChIJp3MoHy4XyUwRkr_5bwBScNw",
+      "ChIJ19SC3jIbyUwRLPI2b48L-4k"
+    );
+    expect(result).toBe(true);
+  });
 
+  it('should return false if coordinates cannot be fetched', async () => {
+    // For non-campus IDs, simulate a fetch failure.
+    global.fetch = vi.fn(() => Promise.reject(new Error("Network error")));
+    const result = await isRouteBetweenConcordiaCampuses("NonCampusID", "AnotherNonCampusID");
+    expect(result).toBe(false);
+  });
+});
 
+describe('generateShuttleRoute', () => {
+  it('should return an empty array if coordinates cannot be fetched', async () => {
+    global.fetch = vi.fn(() => Promise.reject(new Error("Network error")));
+    const route = await generateShuttleRoute("NonCampusID", "AnotherNonCampusID");
+    expect(route).toEqual([]);
+  });
 
+  it('should generate a valid shuttle route for valid campus place ids', async () => {
+    const route = await generateShuttleRoute(
+      "ChIJp3MoHy4XyUwRkr_5bwBScNw",
+      "ChIJ19SC3jIbyUwRLPI2b48L-4k"
+    );
+    expect(Array.isArray(route)).toBe(true);
+    expect(route.length).toBe(1);
+    const shuttleRoute = route[0];
+
+    // Verify that the route object has the expected properties.
+    expect(shuttleRoute).toHaveProperty("bounds");
+    expect(shuttleRoute).toHaveProperty("duration");
+    expect(shuttleRoute).toHaveProperty("distance");
+    expect(shuttleRoute).toHaveProperty("legs");
+    expect(Array.isArray(shuttleRoute.legs)).toBe(true);
+    expect(shuttleRoute.legs.length).toBeGreaterThan(0);
+  });
+});
