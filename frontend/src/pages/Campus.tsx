@@ -379,7 +379,7 @@ function CampusMap() {
             {showPOIs &&
               filterPointsOfInterest().map((poi, index) => (
                 <Marker
-                  key={index}
+                  key={poi.place_id}
                   position={poi.geometry.location}
                   onClick={() => {
                     console.log("Selected POI:", poi)
