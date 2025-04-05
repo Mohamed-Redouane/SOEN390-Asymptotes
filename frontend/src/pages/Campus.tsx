@@ -65,7 +65,6 @@ function CampusMap() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [center, setCenter] = useState(CAMPUS_COORDINATES.SGW)
   const [showBuildings, setShowBuildings] = useState(false)
-  const [, setDestination] = useState<string>("")
   const navigate = useNavigate()
   const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 0)
 
@@ -391,7 +390,6 @@ function CampusMap() {
                     className="mt-3 rounded-lg bg-[#5A2DA2] text-white font-bold px-4 py-2 cursor-pointer hover:bg-[#4b29f1]"
                     onClick={() => {
                       const modifiedAddress = `${selectedPoi.vicinity} `
-                      setDestination(modifiedAddress)
                       navigate("/directions", { state: { destination: modifiedAddress } })
                     }}
                   >
