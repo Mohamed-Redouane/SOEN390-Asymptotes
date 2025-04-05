@@ -109,6 +109,25 @@ function CampusMap() {
     }
   }
 
+  // Extracted handler for nearby search results
+  const handleNearbySearchResults = (
+    results: PlaceResult[] | null, 
+    status: PlacesServiceStatus
+  ) => {
+    setLoading(false)
+    if (status !== window.google.maps.places.PlacesServiceStatus.OK || !results) {
+      console.error("Nearby search failed:", status)
+      return
+    }
+
+    const newPoints = results.filter(
+      (newPoint) => !pointsOfInterest.some(
+        (prevPoint) => prevPoint.place_id === newPoint.place_id
+      )
+    )
+    setPointsOfInterest([...pointsOfInterest, ...newPoints])
+  }
+
   const performNearbySearch = (location: { lat: number; lng: number }, map?: google.maps.Map) => {
     if (typeof window === "undefined" || !window.google?.maps?.places) {
       console.error("Google Maps API is not fully loaded.")
@@ -129,20 +148,7 @@ function CampusMap() {
       type: poiType,
     }
 
-    service.nearbySearch(request, (results: PlaceResult[] | null, status: PlacesServiceStatus) => {
-      setLoading(false)
-      if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
-        console.log("Nearby search results:", results)
-        setPointsOfInterest((prevPoints) => {
-          const newPoints = results.filter(
-            (newPoint: PlaceResult) => !prevPoints.some((prevPoint) => prevPoint.place_id === newPoint.place_id),
-          )
-          return [...prevPoints, ...newPoints]
-        })
-      } else {
-        console.error("Nearby search failed:", status)
-      }
-    })
+    service.nearbySearch(request, handleNearbySearchResults)
   }
 
   const filterPointsOfInterest = () => {
@@ -150,9 +156,15 @@ function CampusMap() {
 
     const userLatLng = new window.google.maps.LatLng(userLocation.lat, userLocation.lng)
     return pointsOfInterest.filter((poi) => {
-      const poiLatLng = new window.google.maps.LatLng(poi.geometry.location.lat(), poi.geometry.location.lng())
-      const distance = window.google.maps.geometry.spherical.computeDistanceBetween(userLatLng, poiLatLng)
-      return distance <= radius
+      const poiLocation = poi.geometry.location;
+      const poiLatLng = new window.google.maps.LatLng(
+        poiLocation.lat(), 
+        poiLocation.lng()
+      )
+      return window.google.maps.geometry.spherical.computeDistanceBetween(
+        userLatLng, 
+        poiLatLng
+      ) <= radius;
     })
   }
 
