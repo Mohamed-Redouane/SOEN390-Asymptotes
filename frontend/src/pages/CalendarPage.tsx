@@ -8,6 +8,8 @@ import ErrorMessage from '../components/ErrorMessage';
 import EventDetailsModal from '../components/EventDetailsModal';
 import GoogleCalendarConnect from '../components/GoogleCalendarConnect';
 import WeekView from '../components/WeekView';
+import SmartPlanner from '../components/SmartPlanner';
+
 
 const CalendarPage: React.FC = () => {
   const [calendars, setCalendars] = useState<any[]>([]);
@@ -19,6 +21,28 @@ const CalendarPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
+  
+  const [isSmartPlannerOpen, setIsSmartPlannerOpen] = useState(false);
+  const [currentPosition, setCurrentPosition] = useState<{ lat: number; lng: number } | null>(null);
+
+   // Get user's current position on component mount
+   useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCurrentPosition({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          // Handle error silently - current position will remain null
+        }
+      );
+    }
+  }, []);
 
   const navigate = useNavigate();
   const handleNavigateToDirections = () => {
@@ -42,6 +66,11 @@ const CalendarPage: React.FC = () => {
     if (loadedCalendars.length > 0) {
       setSelectedCalendarId(loadedCalendars[0].id);
     }
+  };
+
+  
+  const handleSmartPlannerClick = () => {
+    setIsSmartPlannerOpen(true);
   };
 
   const handleAuthChange = (authStatus: boolean) => {
@@ -146,11 +175,25 @@ const CalendarPage: React.FC = () => {
         />
 
         {isAuthenticated && calendars.length > 0 && (
+          <div>
           <CalendarSelector
             calendars={calendars}
             selectedCalendarId={selectedCalendarId}
             onSelectCalendar={(calendarId) => setSelectedCalendarId(calendarId)}
           />
+
+          {/* Smart Planner Button */}
+          <div className="mb-6 text-center">
+            <button
+              data-cy="smart-planner-button"  // Preferred for Cypress
+              onClick={handleSmartPlannerClick}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 shadow-md"
+              disabled={events.length === 0}
+            >
+              🧠 Smart Planner
+            </button>
+          </div>
+        </div>
         )}
         
         {loading && (
@@ -180,9 +223,16 @@ const CalendarPage: React.FC = () => {
           onClose={() => setIsOpen(false)}
           selectedEvent={selectedEvent}
         />
+                <SmartPlanner
+          isOpen={isSmartPlannerOpen}
+          onClose={() => setIsSmartPlannerOpen(false)}
+          events={events}
+          currentPosition={currentPosition}
+        />
       </div>
     
     </div>
+    
     
   );
 };
