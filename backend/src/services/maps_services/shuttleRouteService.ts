@@ -1,4 +1,6 @@
 // Constants for Concordia campus locations
+import { calculateDistance } from "../../utils/distanceCalculation.js";
+
 export const CONCORDIA_POINTS = {
     LOYOLA: {
         ID: "GPLoyola",
@@ -23,7 +25,7 @@ export const CONCORDIA_POINTS = {
         ]
     }
 };
-
+/*
 // Helper function to calculate distance between two coordinates in kilometers
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Radius of the earth in km
@@ -37,14 +39,14 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
     const distance = R * c; // Distance in km
     return distance;
 };
-
+*/
 // Helper function to check if a place ID belongs to a campus
-const isCampusPlaceId = (placeId: string, campus: 'LOYOLA' | 'SGW'): boolean => {
+export const isCampusPlaceId = (placeId: string, campus: 'LOYOLA' | 'SGW'): boolean => {
     return CONCORDIA_POINTS[campus].place_ids.includes(placeId);
 };
 
 // Function to get coordinates from a place_id using Google Maps API
-const getCoordinatesForPlaceId = async (placeId: string): Promise<{lat: number, lng: number} | null> => {
+export const getCoordinatesForPlaceId = async (placeId: string): Promise<{lat: number, lng: number} | null> => {
     try {
         // First check if it's a known campus place ID
         if (isCampusPlaceId(placeId, 'LOYOLA')) {
@@ -79,7 +81,7 @@ const getCoordinatesForPlaceId = async (placeId: string): Promise<{lat: number, 
 };
 
 // Helper function to find the nearest campus to a location
-const findNearestCampus = (lat: number, lng: number): typeof CONCORDIA_POINTS.SGW | typeof CONCORDIA_POINTS.LOYOLA => {
+export const findNearestCampus = (lat: number, lng: number): typeof CONCORDIA_POINTS.SGW | typeof CONCORDIA_POINTS.LOYOLA => {
     const distanceToSGW = calculateDistance(lat, lng, CONCORDIA_POINTS.SGW.Latitude, CONCORDIA_POINTS.SGW.Longitude);
     const distanceToLoyola = calculateDistance(lat, lng, CONCORDIA_POINTS.LOYOLA.Latitude, CONCORDIA_POINTS.LOYOLA.Longitude);
     return distanceToSGW < distanceToLoyola ? CONCORDIA_POINTS.SGW : CONCORDIA_POINTS.LOYOLA;
