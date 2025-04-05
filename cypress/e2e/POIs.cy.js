@@ -26,11 +26,16 @@
     });
 
     it("should toggle the visibility of POIs", () => {
+      
+        
         cy.get('button').contains('Explore').click();
         cy.get('button').contains('Show POIs').click();
+        cy.get('button').contains('Explore').click();
         cy.get('button').contains('Hide POIs').should('exist');
         cy.get('button').contains('Hide POIs').click();
+        cy.get('button').contains('Explore').click();
         cy.get('button').contains('Show POIs').should('exist');
+        
     });
 
 });
