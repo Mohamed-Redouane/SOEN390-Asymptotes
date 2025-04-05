@@ -6,7 +6,7 @@ const BottomNavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [showDirectionOptions, setShowDirectionOptions] = useState(false);
-  const [directionType, setDirectionType] = useState<'indoor' | 'outdoor'>('indoor');
+  const [directionType, setDirectionType] = useState<'indoor' | 'outdoor'>('outdoor');
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -54,7 +54,7 @@ const BottomNavBar = () => {
 
 
   // Handle direction type selection
-  const handleDirectionTypeChange = (type: 'outdoor' | 'indoor') => {
+  const handleDirectionTypeChange = (type: 'indoor' | 'outdoor') => {
     setDirectionType(type);
 
     // Use a more robust state management approach
