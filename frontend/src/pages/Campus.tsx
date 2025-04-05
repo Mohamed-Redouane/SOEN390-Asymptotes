@@ -209,6 +209,19 @@ function CampusMap() {
     }
   }
 
+  // Common event handlers for hover/focus effects
+  const handleElementEnter = (e: React.SyntheticEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.transform = "translateY(-2px)"
+    e.currentTarget.style.boxShadow = "0 6px 15px rgba(31, 38, 135, 0.5)"
+    e.currentTarget.style.background = "rgba(90, 45, 162, 0.85)"
+  }
+
+  const handleElementLeave = (e: React.SyntheticEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.transform = "translateY(0)"
+    e.currentTarget.style.boxShadow = "0 4px 10px rgba(31, 38, 135, 0.3)"
+    e.currentTarget.style.background = "rgba(90, 45, 162, 0.7)"
+  }
+
   // Determine if we're on a small screen
   const isSmallScreen = windowWidth < 768
   const buttonContainerTop = isSmallScreen ? "70px" : "80px"
@@ -278,16 +291,11 @@ function CampusMap() {
           <button
             onClick={toggleModal}
             style={getButtonStyles(isSmallScreen)}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)"
-              e.currentTarget.style.boxShadow = "0 6px 15px rgba(31, 38, 135, 0.5)"
-              e.currentTarget.style.background = "rgba(90, 45, 162, 0.85)"
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = "translateY(0)"
-              e.currentTarget.style.boxShadow = "0 4px 10px rgba(31, 38, 135, 0.3)"
-              e.currentTarget.style.background = "rgba(90, 45, 162, 0.7)"
-            }}
+            onMouseOver={handleElementEnter}
+            onMouseOut={handleElementLeave}
+            onFocus={handleElementEnter}
+            onBlur={handleElementLeave}
+            aria-label="Explore points of interest"
           >
             <FaStar style={{ marginRight: isSmallScreen ? "4px" : "6px", fontSize: isSmallScreen ? "10px" : "12px" }} />
             Explore
@@ -295,16 +303,11 @@ function CampusMap() {
           <button
             onClick={() => setShowBuildings((prev) => !prev)}
             style={getButtonStyles(isSmallScreen)}
-            onMouseOver={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)"
-              e.currentTarget.style.boxShadow = "0 6px 15px rgba(31, 38, 135, 0.5)"
-              e.currentTarget.style.background = "rgba(90, 45, 162, 0.85)"
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.transform = "translateY(0)"
-              e.currentTarget.style.boxShadow = "0 4px 10px rgba(31, 38, 135, 0.3)"
-              e.currentTarget.style.background = "rgba(90, 45, 162, 0.7)"
-            }}
+            onMouseOver={handleElementEnter}
+            onMouseOut={handleElementLeave}
+            onFocus={handleElementEnter}
+            onBlur={handleElementLeave}
+            aria-label={showBuildings ? "Hide buildings" : "Show buildings"}
           >
             <FaBuilding
               style={{ marginRight: isSmallScreen ? "4px" : "6px", fontSize: isSmallScreen ? "10px" : "12px" }}
