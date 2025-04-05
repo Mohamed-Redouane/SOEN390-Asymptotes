@@ -33,13 +33,16 @@ router.get('/addressFromCoordinates', async (req: Request, res: Response) => {
 router.get('/placesPredictions', async (req, res) => {
     try{
         const searchQuery = req.query.searchQuery as string;
+        const lat = req.query.lat ? parseFloat(req.query.lat as string) : undefined;
+        const lng = req.query.lng ? parseFloat(req.query.lng as string) : undefined;
 
         if(!searchQuery){
             res.status(400).send('Search query is required');
             return;
         }
 
-        const predictions = await fetchPlacePredictions(searchQuery);
+        console.log(`API route - place predictions for: "${searchQuery}" at lat=${lat}, lng=${lng}`);
+        const predictions = await fetchPlacePredictions(searchQuery, lat, lng);
         res.json(predictions);
 
     }catch(error){
