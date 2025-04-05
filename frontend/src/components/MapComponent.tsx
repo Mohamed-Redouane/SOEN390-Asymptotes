@@ -36,7 +36,7 @@ function initMapGeometry(map: any, userLocation: any): boolean {
   return userInsideBuilding;
 }
 
-function MapComponent({ geoJsonData, setIsUserInsideBuilding }: MapComponentProps) {
+function MapComponent({ geoJsonData, setIsUserInsideBuilding }: Readonly<MapComponentProps>) {
   const map = useMap();
   const { location: userLocation } = useContext(LocationContext);
 
