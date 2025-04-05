@@ -86,7 +86,7 @@ const MapClickListener: React.FC<MapclickListenerProps> = ({ onMapClick }) => {
 
 const Directions = () => {
     const location = useLocation(); //useLocation to get the state
-    // const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW); // to be used to simulate being on campus
+    const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW); // to be used to simulate being on campus
     const eventNameQuery = location.state?.eventName || ""; // Get event name from state
     const destinationFromState = location.state?.destination || ""; // Get destination from state
     const isFromSchedule = location.state?.isFromSchedule || false; // Check if direction is from schedule
@@ -105,7 +105,7 @@ const Directions = () => {
     const [walkingRoutes, setWalkingRoutes] = useState<any>();
     const [bicyclingRoutes, setBicyclingRoutes] = useState<any>();
     const [shuttleRoutes, setShuttleRoutes] = useState<any[]>([]);
-    const { location: userLocation } = useContext(LocationContext);
+   // const { location: userLocation } = useContext(LocationContext);
     const [isResettingStart, setIsResettingStart] = useState(false);
     const [isUserTyping, setIsUserTyping] = useState(false); // Keep track of typing
     const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -632,7 +632,7 @@ const Directions = () => {
 
                                 <button id="shuttle-option"
                                     onClick={() => setTransportationMode("shuttle")}
-                                    className={`flex flex-row items-center justify-center focus:outline-none  bg-white  p-2 m-2 truncate rounded-full ${transportationMode === "shuttle" ? "flex-[2] sm:flex-1 bg-blue-500" : "flex-1"}`}
+                                    className={`flex flex-row items-center justify-center focus:outline-none p-2 m-2 truncate rounded-full ${transportationMode === "shuttle" ? "flex-[2] sm:flex-1 bg-blue-500" : "flex-1"}`}
                                 >
                                     <AirportShuttleIcon
                                         style={{ color: transportationMode === "shuttle" ? "white" : "gray" }}
