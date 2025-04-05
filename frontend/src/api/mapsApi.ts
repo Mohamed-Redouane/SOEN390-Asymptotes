@@ -11,17 +11,6 @@ const api = axios.create({
     },
   });
 
-
-
-  // interface LocationType {
-  //   name: string;
-  //   address: string;
-  //   place_id: string;
-  //   lat: number;
-  //   lng: number;
-  // }
-
-
 // get place predictions from the Google Maps API
 export async function getPlacePredictions(searchQuery:string,  lat:number, lng:number, description?:string,) {
   try {

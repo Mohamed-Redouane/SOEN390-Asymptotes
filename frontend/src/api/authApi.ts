@@ -14,12 +14,12 @@ api.interceptors.response.use(
   (error) => {
   
     if (
-      error.response?.status === 401 &&
-      !(error.config.url && error.config.url.includes("/api/auth/me"))
+      error.response?.status === 401 
+      && error.config.url?.includes("/api/auth/me")
     ) {
       window.location.href = '/login';
     }
-    return Promise.reject(error);
+    return Promise.reject(new Error('Illegal access'));
   }
 );
 
@@ -29,10 +29,8 @@ export interface ErrorResponse {
 
 export function isAxiosError<T = unknown>(error: unknown): error is AxiosError<T> {
   return (
-    typeof error === "object" &&
-    error !== null &&
-    "isAxiosError" in error &&
-    (error as AxiosError).isAxiosError === true
+    typeof error === "object" && error !== null &&
+    "isAxiosError" in error && (error as AxiosError).isAxiosError === true
   );
 }
 
