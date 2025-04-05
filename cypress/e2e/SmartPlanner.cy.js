@@ -13,12 +13,12 @@ describe("Smart Planner", () => {
     // Intercept API calls
     cy.intercept("GET", "/api/auth/me", {
       statusCode: 200,
-      body: { user: { id: "test-user", email: "test@example.com" } },
+      body: { user: { id: "test-user", email: "vafidarren@example.com" } },
     }).as("getCurrentUser");
 
     cy.intercept("POST", "/api/auth/google", {
       statusCode: 200,
-      body: { token: "fake-token", user: { email: "test@example.com" } },
+      body: { token: "fake-token", user: { email: "vafidarren@example.com" } },
     }).as("googleAuth");
 
     // Visit the page with geolocation stub
