@@ -14,14 +14,14 @@ import type { MapControlsProps } from "../types"
 export const MapControls = ({ onZoomIn, onZoomOut, onMyLocation, onMapTypeChange }: MapControlsProps) => {
   return (
     <div className="absolute top-3 right-3 flex flex-col gap-2 z-[1000]">
-      <div className="bg-white/95 backdrop-blur-sm p-1.5 rounded-lg shadow-md border border-gray-200 flex flex-col gap-1.5">
+      <div className="backdrop-blur-sm p-1.5 rounded-lg shadow-md border border-gray-200 flex flex-col gap-1.5">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-md bg-transparent hover:bg-gray-100 text-gray-700"
+                className="h-8 w-8 rounded-md bg-transparent text-gray-700"
                 onClick={onZoomIn}
               >
                 <span className="sr-only">Zoom In</span>
@@ -40,7 +40,7 @@ export const MapControls = ({ onZoomIn, onZoomOut, onMyLocation, onMapTypeChange
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-md bg-transparent hover:bg-gray-100 text-gray-700"
+                className="h-8 w-8 rounded-md bg-transparent text-gray-700"
                 onClick={onZoomOut}
               >
                 <span className="sr-only">Zoom Out</span>
@@ -63,7 +63,7 @@ export const MapControls = ({ onZoomIn, onZoomOut, onMyLocation, onMapTypeChange
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 rounded-md bg-transparent hover:bg-gray-100 text-gray-700"
+                    className="h-8 w-8 rounded-md bg-transparent hover:bg-secondary text-gray-700"
                   >
                     <span className="sr-only">Map Type</span>
                     <Layers className="h-4 w-4" />
@@ -109,7 +109,7 @@ export const MapControls = ({ onZoomIn, onZoomOut, onMyLocation, onMapTypeChange
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-md bg-transparent hover:bg-gray-100 text-gray-700"
+                className="h-8 w-8 rounded-md bg-transparent text-gray-700"
                 onClick={onMyLocation}
               >
                 <span className="sr-only">My Location</span>

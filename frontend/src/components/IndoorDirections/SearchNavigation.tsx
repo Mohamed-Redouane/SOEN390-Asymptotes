@@ -4,6 +4,7 @@ import { useMap } from "@mappedin/react-sdk"
 import { Search, Navigation2, Loader2, X, CornerDownLeft, History, ChevronDown } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useLocation } from 'react-router-dom';
+import { getRoomNumber } from '../../utils/location-name-utils';
 
 interface Location {
   name: string
@@ -32,15 +33,6 @@ interface SearchNavigationProps {
 
 const RECENT_SEARCHES_KEY = "recentSearches"
 const MAX_RECENT_SEARCHES = 5
-
-// TODO: Maybe move this to a utility file, so we add unit tests for it
-// This function will take the event name and return just the room number
-// Example: "SOEN 343 - WW [C080]" will return "C080"
-const getRoomNumber = (eventName: string) => {
-  const roomNumber = eventName.split("[")[1]?.split("]")[0]?.trim();
-  return roomNumber;
-}
-
 
 export default function SearchNavigation({ accessible = false }: SearchNavigationProps) {
   const { mapView, mapData } = useMap()
@@ -672,4 +664,3 @@ const floors = [...new Set(directions.path.map((p: any) => p.floor.name))] as st
 
   
 }
-
