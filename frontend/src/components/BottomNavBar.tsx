@@ -54,7 +54,7 @@ const BottomNavBar = () => {
 
 
   // Handle direction type selection
-  const handleDirectionTypeChange = (type: 'indoor' | 'outdoor') => {
+  const handleDirectionTypeChange = (type: 'outdoor' | 'indoor') => {
     setDirectionType(type);
 
     // Use a more robust state management approach
@@ -144,7 +144,7 @@ const BottomNavBar = () => {
         <NavButton
           icon={Navigation}
           label={directionLabel}
-          value="/indoordirections"
+          value="/directions"
           isActive={isDirectionsActive}
 
 
