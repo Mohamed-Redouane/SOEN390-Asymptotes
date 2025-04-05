@@ -26,7 +26,6 @@ describe('getNextClass', () => {
     const classArr = dates.map((date, index) => {
       return {start: {dateTime: String(date)}, location: "Location " + index, summary: ""}
     })
-    console.log("Input:", classArr);
     expect(getNextClass(classArr)).toBe(classArr[0]);
   })
 })
