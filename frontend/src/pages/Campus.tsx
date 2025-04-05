@@ -233,6 +233,13 @@ function CampusMap() {
     e.currentTarget.style.background = "rgba(90, 45, 162, 0.7)"
   }
 
+  const getBuildingToggleText = (isSmallScreen: boolean, showBuildings: boolean) => {
+    if (isSmallScreen) {
+      return showBuildings ? "Hide" : "Show";
+    }
+    return showBuildings ? "Hide Buildings" : "Show Buildings";
+  }
+
   // Determine if we're on a small screen
   const isSmallScreen = windowWidth < 768
   const buttonContainerTop = isSmallScreen ? "70px" : "80px"
@@ -350,7 +357,7 @@ function CampusMap() {
             <FaBuilding
               style={{ marginRight: isSmallScreen ? "4px" : "6px", fontSize: isSmallScreen ? "10px" : "12px" }}
             />
-            {isSmallScreen ? (showBuildings ? "Hide" : "Show") : showBuildings ? "Hide Buildings" : "Show Buildings"}
+            {getBuildingToggleText(isSmallScreen, showBuildings)}
           </button>
         </div>
 
