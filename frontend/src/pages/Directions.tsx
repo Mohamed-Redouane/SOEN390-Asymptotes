@@ -250,6 +250,13 @@ const Directions = () => {
         };
     }
 
+    const sourceState = location.state?.source || "";
+
+    useEffect(() => {
+        if(sourceState){
+            setSourceQuery(sourceState);
+        }
+    }), [sourceState];
 
     useEffect(() => {
         if (shouldFetchDirections && source && destination) {
