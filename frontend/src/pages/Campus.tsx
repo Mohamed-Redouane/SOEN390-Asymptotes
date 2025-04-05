@@ -231,30 +231,52 @@ function CampusMap() {
     <div>
       {loading && <div className="fixed w-full">Loading...</div>}
 
-      <ModalPOI isOpen={isModalOpen} onClose={toggleModal}>
-        <div>
-          <label htmlFor="radius">Select Radius: </label>
-          <div>
-            <select id="radius" className="w-full" value={radius} onChange={handleRadiusChange}>
+    <ModalPOI isOpen={isModalOpen} onClose={toggleModal} title="Explore">
+      <div className="space-y-4">
+        {/* Radius Selection */}
+        <div className="space-y-2">
+          <label htmlFor="radius" className="text-[#5A2DA2] font-medium text-sm">
+            Search Radius
+          </label>
+          <div className="space-y-2">
+            <select
+              id="radius"
+              value={radius}
+              onChange={handleRadiusChange}
+              className="w-full p-2 text-sm rounded-lg bg-white/70 border border-white/40 backdrop-blur-sm focus:border-[#5A2DA2]/50 focus:ring-1 focus:ring-[#5A2DA2]/20 outline-none transition-all"
+            >
               <option value={100}>100 meters</option>
               <option value={200}>200 meters</option>
               <option value={500}>500 meters</option>
               <option value={1000}>1000 meters</option>
             </select>
-            <input
-              className="w-full"
-              type="number"
-              min="1"
-              placeholder="Enter custom radius"
-              onBlur={(e) => {
-                setRadius(+e.target.value > 0 ? Number(e.target.value) : 1)
-              }}
-            />
+
+            <div className="relative">
+              <input
+                type="number"
+                min="1"
+                placeholder="Custom radius"
+                className="w-full p-2 text-sm pl-3 pr-7 rounded-lg bg-white/70 border border-white/40 backdrop-blur-sm focus:border-[#5A2DA2]/50 focus:ring-1 focus:ring-[#5A2DA2]/20 outline-none transition-all"
+                onBlur={(e) => {
+                  setRadius(+e.target.value > 0 ? Number(e.target.value) : 1)
+                }}
+              />
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">m</span>
+            </div>
           </div>
         </div>
-        <div>
-          <label htmlFor="poiType">Select POI Type: </label>
-          <select id="poiType" className="w-full" value={poiType} onChange={handlePoiTypeChange}>
+
+        {/* POI Type Selection */}
+        <div className="space-y-2">
+          <label htmlFor="poiType" className="text-[#5A2DA2] font-medium text-sm">
+            Point of Interest Type
+          </label>
+          <select
+            id="poiType"
+            value={poiType}
+            onChange={handlePoiTypeChange}
+            className="w-full p-2 text-sm rounded-lg bg-white/70 border border-white/40 backdrop-blur-sm focus:border-[#5A2DA2]/50 focus:ring-1 focus:ring-[#5A2DA2]/20 outline-none transition-all"
+          >
             <option value="restaurant">Restaurant</option>
             <option value="cafe">Cafe</option>
             <option value="library">Library</option>
@@ -266,13 +288,18 @@ function CampusMap() {
             <option value="school">School</option>
           </select>
         </div>
+      </div>
+
+      {/* Action Button */}
+      <div className="mt-4">
         <button
           onClick={togglePOIs}
-          className="bg-[#007bff] text-white transition duration-300 hover:bg-[#0056b3] w-full"
+          className="w-full py-2 px-3 bg-[#5A2DA2] hover:bg-[#4b29f1] text-white font-medium rounded-lg transition-all duration-300 text-sm"
         >
-          {showPOIs ? "Hide POIs" : "Show POIs"}
+          {showPOIs ? "Hide Points of Interest" : "Show Points of Interest"}
         </button>
-      </ModalPOI>
+      </div>
+    </ModalPOI>
       <div style={{ height: "86vh", width: "100vw", zIndex: -1 }} id="map" data-center={campus}>
         <ToggleCampus campus={campus} onClick={handleToggle} data-testid="toggle-button" />
 
