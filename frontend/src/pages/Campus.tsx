@@ -110,7 +110,7 @@ function CampusMap() {
   }
 
   const performNearbySearch = (location: { lat: number; lng: number }, map?: google.maps.Map) => {
-    if (typeof window === "undefined" || !window.google || !window.google.maps || !window.google.maps.places) {
+    if (typeof window === "undefined" || !window.google?.maps?.places) {
       console.error("Google Maps API is not fully loaded.")
       return
     }
