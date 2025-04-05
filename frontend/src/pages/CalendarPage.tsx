@@ -9,14 +9,33 @@ import SmartPlanner from '../components/SmartPlanner';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 
+interface Calendar {
+  id: string;
+  summary: string;
+}
+
+interface CalendarEvent {
+  id: string;
+  summary: string;
+  location?: string;
+  start: {
+    dateTime?: string;
+    date?: string;
+  };
+  end: {
+    dateTime?: string;
+    date?: string;
+  };
+}
+
 
 const CalendarPage: React.FC = () => {
-  const [calendars, setCalendars] = useState<any[]>([]);
+  const [calendars, setCalendars] = useState<Calendar[]>([]);
   const [selectedCalendarId, setSelectedCalendarId] = useState<string | null>(null);
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showError, setShowError] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -66,7 +85,7 @@ const CalendarPage: React.FC = () => {
 
     // First we filter only the next upcoming event
     const upcomingClasses = events.filter(event => {
-      const startTime = new Date(event.start.dateTime || event.start.date);
+      const startTime = new Date(event.start.dateTime || '');
       return (
         startTime > currentDate &&
         event.location &&
