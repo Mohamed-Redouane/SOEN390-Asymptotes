@@ -7,6 +7,52 @@ import { AlertCircle, Clock, MapPin, Route } from "lucide-react"
 import { timeToMinutes } from "../../utils/time-utils"
 import type { NextDepartureProps } from "../types"
 
+// extract no depratures part into a separate component
+const NoDeparturesCard = () => (
+  <Card className="bg-white border border-gray-200 text-gray-800">
+    <CardHeader>
+      <CardTitle className="text-base flex items-center gap-2">
+        <Clock className="h-4 w-4 text-teal-600" />
+        Next Departure
+      </CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="flex items-center gap-2 text-gray-600">
+        <AlertCircle className="h-4 w-4 text-orange-500" />
+        <p className="text-sm">No more departures today.</p>
+      </div>
+      <p className="text-xs text-gray-500 mt-2">Check back tomorrow for the next available shuttle.</p>
+    </CardContent>
+  </Card>
+)
+
+// helper function for status logic
+const getDepartureStatus = (minutes: number) => {
+  if (minutes <= 5) return { isUrgent: true, isSoon: false }
+  if (minutes <= 15) return { isUrgent: false, isSoon: true }
+  return { isUrgent: false, isSoon: false }
+}
+
+// helper function for time formatting
+const formatDepartureTime = (minutes: number) => {
+  if (minutes >= 60) {
+    return (
+      <>
+        {Math.floor(minutes / 60)}
+        <span className="text-sm font-normal">h</span>
+        {minutes % 60 > 0 && (
+          <>
+            {" "}
+            {minutes % 60}
+            <span className="text-sm font-normal">min</span>
+          </>
+        )}
+      </>
+    )
+  }
+  return <>{minutes} <span className="text-sm font-normal">min</span></>
+}
+
 export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDepartureProps) => {
   const nextDeparture = schedule.find((item) => {
     const loyMinutes = timeToMinutes(item.loy)
@@ -14,25 +60,10 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
     return loyMinutes > currentMinutes || sgwMinutes > currentMinutes
   })
 
-  if (!nextDeparture) {
-    return (
-      <Card className="bg-white border border-gray-200 text-gray-800">
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Clock className="h-4 w-4 text-teal-600" />
-            Next Departure
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-2 text-gray-600">
-            <AlertCircle className="h-4 w-4 text-orange-500" />
-            <p className="text-sm">No more departures today.</p>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">Check back tomorrow for the next available shuttle.</p>
-        </CardContent>
-      </Card>
-    )
-  }
+  if (!nextDeparture){
+    return <NoDeparturesCard />
+  } 
+  
 
   const loyMinutes = timeToMinutes(nextDeparture.loy)
   const sgwMinutes = timeToMinutes(nextDeparture.sgw)
@@ -46,14 +77,27 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
 
   const progressValue = Math.min(100, Math.max(0, ((15 - Math.min(15, nextDepartureMinutes)) / 15) * 100))
 
-  const isUrgent = nextDepartureMinutes <= 5
-  const isSoon = nextDepartureMinutes <= 15 && !isUrgent
+  // use helper function for the status
+  const {isUrgent, isSoon} = getDepartureStatus(nextDepartureMinutes)
+
+  const getBorderColor = (isUrgent: boolean, isSoon: boolean) => {
+    if (isUrgent) return "border-orange-200"
+    if(isSoon) return "border-teal-200"
+    return "border-gray-200";
+  }
+
+  const getStatusMessage = (isUrgent: boolean, isSoon: boolean): string => {
+    if (isUrgent) return "Hurry! Departing soon";
+    if (isSoon) return "Departing soon";
+    return "";
+  };
+  
 
   return (
     <Card
       className={cn(
         "border transition-all duration-300 bg-white",
-        isUrgent ? "border-orange-200" : isSoon ? "border-teal-200" : "border-gray-200",
+        getBorderColor(isUrgent, isSoon)
       )}
     >
       <CardHeader className="pb-2">
@@ -82,42 +126,22 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
           </div>
           <div className="text-right">
             <p className={cn("text-2xl font-bold", isUrgent ? "text-orange-600" : "text-teal-600")}>
-              {nextDepartureMinutes >= 60 ? (
-                <>
-                  {Math.floor(nextDepartureMinutes / 60)}
-                  <span className="text-sm font-normal">h</span>
-                  {nextDepartureMinutes % 60 > 0 && (
-                    <>
-                      {" "}
-                      {nextDepartureMinutes % 60}
-                      <span className="text-sm font-normal">min</span>
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  {nextDepartureMinutes} <span className="text-sm font-normal">min</span>
-                </>
-              )}
+              {formatDepartureTime(nextDepartureMinutes)}
             </p>
-          </div>
         </div>
+      </div>
 
         <Progress
           value={progressValue}
           className={cn(
             "h-2",
-            isUrgent
-              ? "bg-gray-100 text-orange-500"
-              : isSoon
-                ? "bg-gray-100 text-teal-500"
-                : "bg-gray-100 text-teal-500",
+            isUrgent ? "bg-gray-100 text-orange-500" : "bg-gray-100 text-teal-500"
           )}
         />
 
         <div className="mt-3 flex justify-between items-center">
           <span className="text-xs text-gray-500">
-            {isUrgent ? "Hurry! Departing soon" : isSoon ? "Departing soon" : ""}
+            {getStatusMessage(isUrgent, isSoon)}
           </span>
           <Button
             variant="outline"
@@ -133,4 +157,3 @@ export const NextDeparture = ({ schedule, currentMinutes, onViewRoute }: NextDep
     </Card>
   )
 }
-

@@ -7,7 +7,7 @@ export const MapController = ({ center, zoom }: MapControllerProps) => {
 
   useEffect(() => {
     if (center) {
-      map.setView(center, zoom || map.getZoom())
+      map.setView(center, zoom ?? map.getZoom())
     }
   }, [center, zoom, map])
 

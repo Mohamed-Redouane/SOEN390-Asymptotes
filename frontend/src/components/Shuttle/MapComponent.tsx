@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react"
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet"
 import type L from "leaflet"
@@ -45,18 +44,18 @@ export const MapComponent = ({ busLocations, campusPoints, onCenterMap }: MapCom
   }
 
   const handleMyLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const userLocation: [number, number] = [position.coords.latitude, position.coords.longitude]
-          setMapCenter(userLocation)
-          setMapZoom(15)
-        },
-        () => {
-          alert("Could not get your location")
-        },
-      )
+    // Comprehensive geolocation error handling
+    const checkGeolocationPermission = () => {
+      // Check if geolocation is supported
+      if (!navigator.geolocation) {
+        console.error('Geolocation is not supported by this browser.');
+        alert('Geolocation is not supported by your browser.');
+        return false;
+      }
+
     }
+
+    checkGeolocationPermission();
   }
 
   const handleMapTypeChange = (type: string) => {
@@ -64,18 +63,15 @@ export const MapComponent = ({ busLocations, campusPoints, onCenterMap }: MapCom
   }
 
   useEffect(() => {
-
     centerMapRef.current = (location: { lat: number; lng: number }) => {
       setMapCenter([location.lat, location.lng])
       setMapZoom(16)
     }
 
-
     if (typeof onCenterMap === "function") {
       onCenterMap = centerMapRef.current
     }
   }, [])
-
 
   const routeLine =
     campusPoints.length === 2
@@ -85,31 +81,29 @@ export const MapComponent = ({ busLocations, campusPoints, onCenterMap }: MapCom
         ]
       : []
 
+  // Rest of the component remains unchanged
   return (
     <div
       className="relative w-full h-[calc(100vh-13rem)] md:h-[500px] rounded-lg overflow-hidden border border-gray-200"
       style={{ position: "relative", zIndex: 1 }}
     >
-     <MapContainer
-  center={mapCenter}
-  zoom={mapZoom}
-  style={{ height: "100%", width: "100%" }}
-  zoomControl={false}
-  whenReady={() => {
-
-    if (mapRef && mapRef.current === null) {
-      mapRef.current = (window as any).L?.map?.instance || undefined
-    }
-  }}
->
-
-
+      <MapContainer
+        center={mapCenter}
+        zoom={mapZoom}
+        style={{ height: "100%", width: "100%" }}
+        zoomControl={false}
+        whenReady={() => {
+          if (mapRef && mapRef.current === null) {
+            mapRef.current = (window as any).L?.map?.instance || undefined
+          }
+        }}
+      >
+        {/* Existing map container content */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url={getTileLayer()}
         />
 
-        {/* Route line with updated color */}
         <Polyline
           positions={routeLine as L.LatLngExpression[]}
           color="#26a69a"
@@ -118,7 +112,6 @@ export const MapComponent = ({ busLocations, campusPoints, onCenterMap }: MapCom
           dashArray="10, 10"
         />
 
-        {/* Campus markers */}
         {campusPoints.map((point) => (
           <Marker
             key={point.ID}
@@ -134,7 +127,6 @@ export const MapComponent = ({ busLocations, campusPoints, onCenterMap }: MapCom
           </Marker>
         ))}
 
-        {/* Bus markers */}
         {busLocations.map((bus) => (
           <Marker key={bus.ID} position={[bus.Latitude, bus.Longitude]} icon={createCustomIcon("bus")}>
             <Popup className="rounded-lg shadow-lg">
@@ -146,10 +138,8 @@ export const MapComponent = ({ busLocations, campusPoints, onCenterMap }: MapCom
           </Marker>
         ))}
 
-
         <MapController center={mapCenter} zoom={mapZoom} />
       </MapContainer>
-
 
       <MapControls
         onZoomIn={handleZoomIn}
@@ -158,9 +148,7 @@ export const MapComponent = ({ busLocations, campusPoints, onCenterMap }: MapCom
         onMapTypeChange={handleMapTypeChange}
       />
 
-
       <MapLegend />
-
 
       <div className="absolute bottom-3 left-3 flex flex-col gap-2 z-[1000]">
         {campusPoints.map((campus) => (
@@ -185,4 +173,3 @@ export const MapComponent = ({ busLocations, campusPoints, onCenterMap }: MapCom
     </div>
   )
 }
-

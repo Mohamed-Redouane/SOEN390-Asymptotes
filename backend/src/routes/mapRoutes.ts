@@ -1,5 +1,4 @@
 import { Router, Request, Response } from 'express';
-import axios from 'axios';
 const router = Router();
 import { fetchDirections } from '../services/maps_services/directionsService.js';
 import { fetchPlaceDetails, fetchPlacePredictions } from '../services/maps_services/placesServices.js';

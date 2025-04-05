@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import RoomIcon from '@mui/icons-material/Room';
 import { getSuggestions, getPlaceDetails } from '../services/PlaceServices';
@@ -13,6 +13,7 @@ import { LocationContext } from '../components/LocationContext';
 import { DirectionsBike } from '@mui/icons-material';
 import RouteRenderer from '../components/RouteRenderer';
 import { distanceCalculation } from '../utils/distanceCalculation';
+import LocationCityIcon from '@mui/icons-material/LocationCity';
 
 interface LocationType {
     name: string;
@@ -42,9 +43,7 @@ interface MapclickListenerProps {
     onMapClick: (destination: LocationType) => void;
 }
 
-// interface DirectionsToNextClass {
-//     locationName: string;
-// }
+
 
 const MapClickListener: React.FC<MapclickListenerProps> = ({ onMapClick }) => {
     const map = useMap();
@@ -88,7 +87,9 @@ const MapClickListener: React.FC<MapclickListenerProps> = ({ onMapClick }) => {
 const Directions = () => {
     const location = useLocation(); //useLocation to get the state
     // const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW); // to be used to simulate being on campus
+    const eventNameQuery = location.state?.eventName || ""; // Get event name from state
     const destinationFromState = location.state?.destination || ""; // Get destination from state
+    const isFromSchedule = location.state?.isFromSchedule || false; // Check if direction is from schedule
     const [active, setActive] = useState<string>("");
     const [sourceQuery, setSourceQuery] = useState<string>("");
     const [destinationQuery, setDestinationQuery] = useState<string>(destinationFromState);
@@ -118,6 +119,61 @@ const Directions = () => {
     const DEBOUNCE_DELAY = parseInt(import.meta.env.VITE_DEBOUNCE_DELAY || "300");
     const [otherCampus, setOtherCampus] = useState<LocationType | null>(null);
     const [shouldFetchDirections, setShouldFetchDirections] = useState(false);
+    
+    const [hasArrived, setHasArrived] = useState<boolean>(false);
+
+
+    const JumpingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
+        return (
+            <div
+                onClick={onClick} onKeyDown={(e) => e.key === "Enter" && onClick}
+                className="fixed bottom-20 right-8 cursor-pointer flex items-center justify-center bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-700 transition-all"
+                style={{ zIndex: 1000 }}
+            >
+                <span className="mr-2 font-bold">Clear All</span>
+                <MyLocationIcon style={{ fontSize: 20 }} />
+            </div>
+        );
+    };
+    
+    const BuildingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
+        return (
+            <div
+                onClick={onClick} onKeyDown={(e) => e.key === "Enter" && onClick}
+                className="fixed bottom-32 right-5 cursor-pointer flex items-center justify-center bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-all animate-bounce"
+                style={{ zIndex: 1000 }}
+            >
+                <span className="mr-2 font-bold">Indoor View</span>
+                <LocationCityIcon style={{ fontSize: 20 }} />
+            </div>
+        );
+    };
+
+    const handleClearRouteAndPrompts = () => {
+        setRoutes([]);
+        setRoutesAvailable(false);
+        setSourceQuery("");
+        setDestinationQuery("");
+        setSource(undefined);
+        setDestination(undefined);
+        setSelectedRouteIndex(-1);
+        setHasArrived(false);
+    };
+
+
+    const navigate = useNavigate();
+    
+    const handleSwitchToIndoorDirections = () => {
+        navigate(`/indoordirections?dest=${encodeURIComponent(eventNameQuery)}`);
+        // Logic to switch to indoor directions view
+        console.log("Switching to indoor directions view", (eventNameQuery),destinationQuery , isFromSchedule);
+
+        
+        // Create a context to store the event name and destination
+        // Use the context to display the event name and destination in the indoor directions view
+        
+    };
+
 
 
     // Debounced suggestion fetching function (KEY CHANGE)
@@ -296,6 +352,7 @@ const Directions = () => {
         setDestinationResults([]); // Clear the destination results
         setActive(""); // Reset active field
         setSelectedRouteIndex(0); // Select the first route so that its displayed
+        setHasArrived(true);
     };
 
     // Ensure suggestions are hidden when the route is displayed
@@ -409,7 +466,7 @@ const Directions = () => {
     return (
         <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={["places", "geometry"]}>
             <div className="relative flex flex-col flex-shrink-0 w-full" >
-                <div className=" fixed flex flex-col flex-shrink-0 w-full top-55 bg-white z-30">
+                <div className=" fixed flex flex-col flex-shrink-0 w-full top-55 z-30">
                     <div id="input-start-container"
                         className="flex flex-row items-center pl-2 pr-2">
                         <MyLocationIcon />
@@ -417,7 +474,7 @@ const Directions = () => {
                             id="start-input"
                             type="text"
                             placeholder="Enter your starting location"
-                            className="p-2 m-2 border-2 border-gray-200 rounded-lg w-full"
+                            className="p-2 m-2 border-2 rounded-lg w-full"
                             value={sourceQuery}
                             onChange={(e) => {
                                 setActive("start");
@@ -436,7 +493,7 @@ const Directions = () => {
                         />
                         {sourceQuery &&
                             <button
-                                className="text-l font-bold text-gray-700 bg-white p-1"
+                                className="text-l font-bold text-gray-700 p-1"
                                 onClick={handleClearStart}>
                                 x
                             </button>
@@ -449,7 +506,7 @@ const Directions = () => {
                             id="end-input"
                             type="text"
                             placeholder="Enter your destination location"
-                            className="p-2 m-2 border-2 border-gray-200 rounded-lg w-full"
+                            className="p-2 m-2 border-2 rounded-lg w-full"
                             value={destinationQuery}
                             onChange={(e) => {
                                 setActive("end");
@@ -462,7 +519,7 @@ const Directions = () => {
                         />
                         {destinationQuery &&
                             <button
-                                className="text-l font-bold text-gray-700 bg-white p-1"
+                                className="text-l font-bold text-gray-700 p-1"
                                 onClick={handleClearDestination}
                             >
                                 x
@@ -481,7 +538,7 @@ const Directions = () => {
                                             handleSelect(index);
                                             console.log("Selected: ", result);
                                         }}
-                                        className="flex flex-row items-center m-2 border-2 border-gray-200 rounded-lg w-full pr-4 text-black bg-white">
+                                        className="flex flex-row items-center m-2 border-2 rounded-lg w-full pr-4">
                                         <div className="flex flex-col items-center">
                                             <RoomIcon style={{ color: "gray" }} />
                                         </div>
@@ -500,7 +557,7 @@ const Directions = () => {
                             <button
                                 id="get-directions-button"
                                 onClick={getDirections}
-                                className="m-1 border-2 border-gray-200 focus:outline-none rounded-lg w-full bg-blue-600 text-white font-bold"
+                                className="m-1 border-2 focus:outline-none rounded-lg w-full bg-blue-600 text-white font-bold"
                                 onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && console.log("Getting directions...")}
                             >
                                 Get Directions
@@ -508,7 +565,7 @@ const Directions = () => {
                             {otherCampus != null && <button
                                 id="get-directions-to-campus-button"
                                 onClick={handleCampusDirection}
-                                className="m-1 border-2 border-gray-200 focus:outline-none rounded-lg w-full bg-blue-600 text-white font-bold">
+                                className="m-1 border-2 focus:outline-none rounded-lg w-full bg-blue-600 text-white font-bold">
                                 Get Directions to {otherCampus?.name}
                             </button>
                             }
@@ -522,7 +579,7 @@ const Directions = () => {
                                 onKeyDown={handleTransportKeyDown}>
                                 <button id="driving-option"
                                     onClick={() => setTransportationMode("driving")}
-                                    className={`flex flex-row  bg-white items-center justify-center  focus:outline-none m-2 p-1 truncate  rounded-full ${transportationMode === "driving" ? "flex-[2] sm:flex-1 bg-blue-500" : "flex-1"}`}>
+                                    className={`flex flex-row items-center justify-center  focus:outline-none m-2 p-1 truncate  rounded-full ${transportationMode === "driving" ? "flex-[2] sm:flex-1 bg-blue-500" : "flex-1"}`}>
                                     <DirectionsCarIcon
                                         style={{ color: transportationMode === "driving" ? "white" : "gray" }}
                                     />
@@ -535,7 +592,7 @@ const Directions = () => {
 
                                 <button id="transit-option"
                                     onClick={() => setTransportationMode("transit")}
-                                    className={`flex flex-row items-center bg-white focus:outline-none  justify-center  p-2 m-2 truncate rounded-full ${transportationMode === "transit" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}>
+                                    className={`flex flex-row items-center focus:outline-none  justify-center  p-2 m-2 truncate rounded-full ${transportationMode === "transit" ? "flex-[2] sm:flex-1 bg-blue-500" : "flex-1"}`}>
                                     <DirectionsBusIcon
                                         style={{ color: transportationMode === "transit" ? "white" : "gray" }}
                                     />
@@ -548,7 +605,7 @@ const Directions = () => {
                                 
                                 <button id="walking-option"
                                     onClick={() => setTransportationMode("walking")}
-                                    className={`flex flex-row  bg-white items-center justify-center focus:outline-none p-2 m-2 truncate rounded-full ${transportationMode === "walking" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}>
+                                    className={`flex flex-row items-center justify-center focus:outline-none p-2 m-2 truncate rounded-full ${transportationMode === "walking" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}>
                                     <DirectionsWalkIcon
                                         style={{ color: transportationMode === "walking" ? "white" : "gray" }}
                                     />
@@ -561,7 +618,7 @@ const Directions = () => {
                                 
                                 <button id="bicycling-option"
                                     onClick={() => setTransportationMode("bicycling")}
-                                    className={`flex flex-row items-center justify-center focus:outline-none  bg-white  p-2 m-2 truncate rounded-full ${transportationMode === "bicycling" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}
+                                    className={`flex flex-row items-center justify-center focus:outline-none p-2 m-2 truncate rounded-full ${transportationMode === "bicycling" ? "flex-[2] sm:flex-1  bg-blue-500" : "flex-1"}`}
                                 >
                                     <DirectionsBike
                                         style={{ color: transportationMode === "bicycling" ? "white" : "gray" }}
@@ -594,10 +651,10 @@ const Directions = () => {
                                             tabIndex={0}
                                             onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && console.log("Selected Route", index, ":", routes[index])}
                                             id="route-item-container"
-                                            className="flex flex-row border-2 border-gray-200 rounded-lg w-full  mt-2 p-2 justify-between focus:outline-none bg-white  text-black align-middle shadow-sm"
+                                            className="flex flex-row border-2 rounded-lg w-full mt-2 p-2 justify-between focus:outline-none align-middle shadow-sm"
                                         >
                                             <button id='route-item-duration-distance '
-                                                className="flex flex-col items-start align-middle  bg-white w-full"
+                                                className="flex flex-col items-start align-middle w-full"
                                                 onClick={() => {
                                                     console.log("Selected Route ", index, ":",
                                                         routes[index]);
@@ -693,7 +750,10 @@ const Directions = () => {
                             setActive("end");
                         }}
                       />
+                    
                     </div>
+                    {hasArrived && <JumpingIcon onClick={handleClearRouteAndPrompts} />}
+                    {hasArrived && isFromSchedule && <BuildingIcon onClick={handleSwitchToIndoorDirections} />}
                 </div>
             </div>
         </APIProvider>
