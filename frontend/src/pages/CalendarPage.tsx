@@ -21,7 +21,7 @@ const CalendarPage: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  
   const [isSmartPlannerOpen, setIsSmartPlannerOpen] = useState(false);
   const [currentPosition, setCurrentPosition] = useState<{ lat: number; lng: number } | null>(null);
 

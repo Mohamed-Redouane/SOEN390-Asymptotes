@@ -284,6 +284,7 @@ const SmartPlanner: React.FC<SmartPlannerProps> = ({
                                     className="flex-1 bg-blue-500 text-white py-2 rounded-md text-sm hover:bg-blue-600 transition duration-200"
                                     onClick={generatePlan}
                                     disabled={isLoading}
+                                    data-cy="regenerate-smart-planner-button"  // Preferred for Cypress
                                 >
                                     Regenerate
                                 </button>
