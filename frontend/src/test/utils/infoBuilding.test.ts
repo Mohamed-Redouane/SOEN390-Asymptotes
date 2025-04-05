@@ -23,6 +23,16 @@ describe("getAddress", () => {
         expect(getAddress(feature)).toBe("123 Street, Montreal");
     });
 
+    it("should handle missing individual address fields", () => {
+        const feature = {
+            properties: {
+                "addr:street": "Street"
+                
+            },
+        };
+        expect(getAddress(feature)).toBe("Street,");
+    });
+
 });
 
 describe("createInfoWindow", () => {
