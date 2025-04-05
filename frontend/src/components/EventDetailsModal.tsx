@@ -21,7 +21,6 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ isOpen, onClose, 
           <Dialog.Panel className="widget max-w-md w-full rounded-xl shadow-xl p-6">
             <Dialog.Title className="text-2xl font-bold">
               {selectedEvent?.summary}
-
             </Dialog.Title>
             <div className="mt-4 space-y-3">
               <div className="flex items-center">

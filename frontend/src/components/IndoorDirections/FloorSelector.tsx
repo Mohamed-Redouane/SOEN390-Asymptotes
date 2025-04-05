@@ -59,7 +59,6 @@ export default function FloorSelector() {
   const handleFloorChange = (floorId: string) => {
     try {
       setIsChanging(true)
-      // Fixed: Removed redundant 'await'
       mapView?.setFloor(floorId)
       setCurrentFloor(floorId)
       setIsOpen(false)

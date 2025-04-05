@@ -6,14 +6,14 @@ import type { ScheduleItemProps } from "../types";
 const ScheduleItemStyles = {
   urgent: {
     container: "bg-orange-500 text-white",
-    text: "text-orange-600"
+    text: "text-orange-500"
   },
   upcoming: {
     container: "bg-teal-500 text-white",
-    text: "text-teal-600"
+    text: "text-teal-500"
   },
   inactive: {
-    container: "bg-gray-200 text-gray-500",
+    container: "bg-gray-100 dark:bg-gray-800 text-gray-500",
     text: "text-gray-500"
   }
 }
@@ -30,9 +30,7 @@ const BaseScheduleItem = ({
   status: "urgent" | "upcoming" | "inactive";
   locationName: string;
 }) => {
-
   const style = ScheduleItemStyles[status]
-
   return (
     <div className="flex items-center gap-3 w-1/2">
       <div
@@ -51,9 +49,9 @@ const BaseScheduleItem = ({
           )}
         >
           {time}
-          {time.includes("*") && <span className="text-xs ml-1 align-top">*</span>}
+          {time.includes("*")}
         </span>
-        <span className="text-xs text-gray-500">{locationName}</span>
+        <span className="text-xs text-primary">{locationName}</span>
         {status !== "inactive" && minutesUntil > 0 && (
           <span
             className={cn(
@@ -70,10 +68,10 @@ const BaseScheduleItem = ({
 };
 
 const ContainerStyles = {
-  next: "bg-white border border-teal-200",
-  urgent: "bg-white border border-orange-200",
-  upcoming: "bg-white hover:bg-gray-50",
-  default: "hover:bg-gray-50"
+  next: "border border-teal-200",
+  urgent: "border border-orange-200",
+  upcoming: "hover:bg-secondary",
+  default: "hover:bg-secondary"
 }
 
 // Main Schedule Item Component
