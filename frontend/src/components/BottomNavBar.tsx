@@ -6,7 +6,7 @@ const BottomNavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [showDirectionOptions, setShowDirectionOptions] = useState(false);
-  const [directionType, setDirectionType] = useState<'indoor' | 'outdoor'>('indoor');
+  const [directionType, setDirectionType] = useState<'indoor' | 'outdoor'>('outdoor');
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -144,7 +144,7 @@ const BottomNavBar = () => {
         <NavButton
           icon={Navigation}
           label={directionLabel}
-          value="/indoordirections"
+          value="/directions"
           isActive={isDirectionsActive}
 
 
