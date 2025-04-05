@@ -87,9 +87,9 @@ const MapClickListener: React.FC<MapclickListenerProps> = ({ onMapClick }) => {
 const Directions = () => {
     const location = useLocation(); //useLocation to get the state
     //const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW); // to be used to simulate being on campus
-    const eventNameQuery = location.state?.eventName || ""; // Get event name from state
-    const destinationFromState = location.state?.destination || ""; // Get destination from state
-    const isFromSchedule = location.state?.isFromSchedule || false; // Check if direction is from schedule
+    const eventNameQuery = location.state?.eventName ?? ""; // Get event name from state
+    const destinationFromState = location.state?.destination ?? ""; // Get destination from state
+    const isFromSchedule = location.state?.isFromSchedule ?? false; // Check if direction is from schedule
     const [active, setActive] = useState<string>("");
     const [sourceQuery, setSourceQuery] = useState<string>("");
     const [destinationQuery, setDestinationQuery] = useState<string>(destinationFromState);
@@ -116,7 +116,7 @@ const Directions = () => {
     // Debounce ref
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
     // Get debounce delay from environment variable, default to 300ms
-    const DEBOUNCE_DELAY = parseInt(import.meta.env.VITE_DEBOUNCE_DELAY || "300");
+    const DEBOUNCE_DELAY = parseInt(import.meta.env.VITE_DEBOUNCE_DELAY ?? "300");
     const [otherCampus, setOtherCampus] = useState<LocationType | null>(null);
     const [shouldFetchDirections, setShouldFetchDirections] = useState(false);
     
