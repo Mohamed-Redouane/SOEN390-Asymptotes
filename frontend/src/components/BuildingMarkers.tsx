@@ -18,6 +18,7 @@ const BuildingMarkers: React.FC<BuildingMarkersProps> = ({ geoJsonData }) => {
 
   const handleMarkerClick = (feature: any, position: google.maps.LatLngLiteral) =>{
     activeInfoWindow?.close();
+    
   
 const address = getAddress(feature);
 const info = new google.maps.InfoWindow({
