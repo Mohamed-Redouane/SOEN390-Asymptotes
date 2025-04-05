@@ -29,14 +29,14 @@ export function VerifyEmailPage() {
 
     try {
       const data = await handleVerifyEmail(user.id, code);
-      setMessage(data.message || 'Email verified successfully!');
+      setMessage(data.message ?? 'Email verified successfully!');
 
       setTimeout(() => {
         navigate('/login');
       }, 2000);
     } catch (err: unknown) {
       if (isAxiosError<ErrorResponse>(err)) {
-        setError(err.response?.data?.error || 'Verification failed');
+        setError(err.response?.data?.error ?? 'Verification failed');
       } else if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -61,7 +61,7 @@ export function VerifyEmailPage() {
       setMessage(data.message || 'Verification code resent!');
     } catch (err: unknown) {
       if (isAxiosError<ErrorResponse>(err)) {
-        setError(err.response?.data?.error || 'Failed to resend code');
+        setError(err.response?.data?.error ?? 'Failed to resend code');
       } else if (err instanceof Error) {
         setError(err.message);
       } else {
