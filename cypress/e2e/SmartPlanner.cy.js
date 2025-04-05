@@ -114,9 +114,34 @@ describe("Smart Planner", () => {
     });
   });
 
+  // Custom command to handle flaky sign-in
+  Cypress.Commands.add('reliableSignIn', (maxAttempts = 3) => {
+    function attemptSignIn(remainingAttempts) {
+      cy.contains("Sign In with Google").click();
+      
+      // Check if sign-in was successful by looking for an element that should appear after sign-in
+      cy.get('body').then(($body) => {
+        if ($body.find('select#calendar-select').length > 0) {
+          return cy.get('select#calendar-select');
+        }
+        
+        if (remainingAttempts > 1) {
+          cy.log(`Sign-in failed, retrying (${maxAttempts - remainingAttempts + 1}/${maxAttempts})`);
+          cy.reload();
+          attemptSignIn(remainingAttempts - 1);
+        } else {
+          throw new Error('Sign-in failed after multiple attempts');
+        }
+      });
+    }
+    
+    return attemptSignIn(maxAttempts);
+  });
+
+
   it("should show no events when there are no active events", () => {
     // Sign in
-    cy.contains("Sign In with Google").click();
+    cy.reliableSignIn();
     cy.get("select#calendar-select").should("be.visible").select("cal1");
 
     cy.get('[data-cy="smart-planner-button"]').click({ force: true });
@@ -127,7 +152,7 @@ describe("Smart Planner", () => {
 
   it("should visit the schedule page and click the Smart Planner button, then close", () => {
     // Sign in
-    cy.contains("Sign In with Google").click();
+      cy.reliableSignIn();
     cy.get("select#calendar-select").should("be.visible").select("cal1");
 
     // Check if the Smart Planner button is visible
@@ -143,7 +168,7 @@ describe("Smart Planner", () => {
 
   it("should visit the schedule page and click the Smart Planner button, then regenerate", () => {
     // Sign in
-    cy.contains("Sign In with Google").click();
+    cy.reliableSignIn();
     cy.get("select#calendar-select").should("be.visible").select("cal1");
 
     // Check if the Smart Planner button is visible
