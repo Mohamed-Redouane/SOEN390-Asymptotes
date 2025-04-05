@@ -84,6 +84,19 @@ const MapClickListener: React.FC<MapclickListenerProps> = ({ onMapClick }) => {
   return null;
 } ;
 
+const JumpingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
+    return (
+        <div
+            onClick={onClick} onKeyDown={(e) => e.key === "Enter" && onClick}
+            className="fixed bottom-20 right-8 cursor-pointer flex items-center justify-center bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-700 transition-all"
+            style={{ zIndex: 1000 }}
+        >
+            <span className="mr-2 font-bold">Clear All</span>
+            <MyLocationIcon style={{ fontSize: 20 }} />
+        </div>
+    );
+};
+
 const Directions = () => {
     const location = useLocation(); //useLocation to get the state
     //const [userLocation, setUserLocation] = useState(CAMPUS_COORDINATES.SGW); // to be used to simulate being on campus
@@ -122,20 +135,8 @@ const Directions = () => {
     
     const [hasArrived, setHasArrived] = useState<boolean>(false);
 
+    <JumpingIcon onClick={() => setHasArrived(true)} />
 
-    const JumpingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
-        return (
-            <div
-                onClick={onClick} onKeyDown={(e) => e.key === "Enter" && onClick}
-                className="fixed bottom-20 right-8 cursor-pointer flex items-center justify-center bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-700 transition-all"
-                style={{ zIndex: 1000 }}
-            >
-                <span className="mr-2 font-bold">Clear All</span>
-                <MyLocationIcon style={{ fontSize: 20 }} />
-            </div>
-        );
-    };
-    
     const BuildingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
         return (
             <div
