@@ -10,11 +10,11 @@ export async function handlerRequestPasswordReset(
 ) {
   try {
     const data = await handler(email);
-    setMessage(data.message || 'Reset instructions sent!');
+    setMessage(data.message ?? 'Reset instructions sent!');
     setTimeout(() => navigate('/reset-password'), 2000);
   } catch (err: unknown) {
     if (isAxiosError<ErrorResponse>(err)) {
-      setError(err.response?.data?.error || 'Request failed');
+      setError(err.response?.data?.error ?? 'Request failed');
     } else if (err instanceof Error) {
       setError(err.message);
     } else {
@@ -34,14 +34,15 @@ export async function handlerResetPassword(
 ) {
   try {
     const data = await handler(code, newPassword);
-    setMessage(data.message || 'Password reset successful!');
+    setMessage(data.message ?? 'Password reset successful!');
     setTimeout(() => navigate('/login'), 2000); // Redirect to login after reset
   } catch (err: unknown) {
     if (isAxiosError<ErrorResponse>(err)) {
-      setError(err.response?.data?.error || 'Request failed');
+      setError(err.response?.data?.error ?? 'Request failed');
     } else if (err instanceof Error) {
       setError(err.message);
     } else {
+      //occurred must not have a period at the end of the sentence
       setError('An unknown error occurred');
     }
   }
