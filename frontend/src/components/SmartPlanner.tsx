@@ -111,6 +111,7 @@ const SmartPlanner: React.FC<SmartPlannerProps> = ({
               3. Recommends the best mode of transportation for each journey (walking, public transit, or driving)
               4. Suggests optimal departure times to arrive 10 minutes early to each event
               5. Indicates if there are any scheduling conflicts or tight transitions
+              6. Always mention that you are prioritizing indoor routes when available (in the summary)
     
               Format the response as a JSON object with this structure:
               {
@@ -143,6 +144,16 @@ const SmartPlanner: React.FC<SmartPlannerProps> = ({
     
             const result = JSON.parse(content) as Plan;
             setPlan(result);
+                // Save to localStorage
+                 // Add metadata to the plan before saving;
+            
+                localStorage.setItem('smartPlannerPlan', JSON.stringify(result));
+                // Also after generating the plan, I want to save a list of boole  ans that will save the status of the events in the plan
+                setCheckedItems(new Array(result.items.length).fill(false)); // Initialize with false
+                const newCheckedItems = [...checkedItems];
+
+                localStorage.setItem('smartPlannerEventsStatus', JSON.stringify(newCheckedItems));
+                console.log('Plan saved to localStorage:', newCheckedItems);
         } catch (err: any) {
             console.error('Error generating plan:', err);
             setError(`Failed to generate plan. Please try again.  Error: ${err.message}`);
@@ -151,11 +162,34 @@ const SmartPlanner: React.FC<SmartPlannerProps> = ({
         }
     };
 
-    useEffect(() => {
-        if (isOpen && events.length > 0) {
-            generatePlan();
+  // Load saved plan from localStorage when component mounts
+  useEffect(() => {
+    const savedPlan = localStorage.getItem('smartPlannerPlan');
+    if (savedPlan) {
+        try {
+            const parsedPlan = JSON.parse(savedPlan);
+            setPlan(parsedPlan);
+        } catch (e) {
+            console.error('Failed to parse saved plan', e);
+            localStorage.removeItem('smartPlannerPlan');
         }
-    }, [isOpen, events]);
+    }
+}, []);
+
+ // State for checked items
+ const [checkedItems, setCheckedItems] = useState<boolean[]>(() => {
+    const saved = localStorage.getItem('smartPlannerEventsStatus');
+    return saved ? JSON.parse(saved) : [];
+});
+
+// Handler for checkbox changes
+const handleCheckboxChange = (index: number, isChecked: boolean) => {
+    const newCheckedItems = [...checkedItems];
+    newCheckedItems[index] = isChecked;
+    setCheckedItems(newCheckedItems);
+    localStorage.setItem('smartPlannerEventsStatus', JSON.stringify(newCheckedItems));
+};
+
 
     const totalPages = plan ? Math.ceil(plan.items.length / itemsPerPage) : 0;
 
@@ -227,11 +261,23 @@ const SmartPlanner: React.FC<SmartPlannerProps> = ({
                                                                     destination: item.location,
                                                                     isFromSchedule: false
                                                                 }}
->
+
+                                                                >
 
                                                             {item.location} {/* Location name */} 
                 
                                                             </Link>
+                                                                {/* Add a checkbox to see if the event is done yet */}
+                                                                <input
+                    type="checkbox"
+                    className="ml-2"
+                    onChange={(e) => handleCheckboxChange(
+                        currentPage * itemsPerPage + index, 
+                        e.target.checked
+                    )}
+                    checked={checkedItems[currentPage * itemsPerPage + index] || false}
+                />
+
                                                         </div>
                                                     )}
                                                     {item.directions && (
