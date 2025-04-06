@@ -2,6 +2,34 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Bus, Map, Navigation, Calendar, MapPin, Building } from 'lucide-react';
 
+// SonarQube recommends to not nest React components.
+const NavButton = ({
+    icon: Icon,
+    label,
+    isActive,
+    onClick
+  }: {
+    icon: React.ElementType;
+    label: string;
+    isActive: boolean;
+    onClick?: () => void;
+  }) => (
+    <button
+      onClick={() => {
+        onClick?.();
+      }}
+      aria-label={label}
+      aria-current={isActive ? 'page' : undefined}
+      className={`nav-button rounded-none flex flex-1 flex-col items-center justify-center px-2 py-1 transition-all duration-300
+        ${isActive ? 'text-white bg-[#4c3ee2]' : 'text-gray-500'}
+        hover:text-white hover:bg-gradient-to-r hover:from-[#4361ee] hover:to-[#7209b7] hover:bg-opacity-80
+        relative`}
+    >
+      <Icon className={`h-6 w-6 mb-1 transition-all duration-300 ${isActive ? 'scale-110' : 'scale-100'}`} />
+      <span className="text-xs font-medium">{label}</span>
+    </button>
+);
+
 const BottomNavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -36,23 +64,6 @@ const BottomNavBar = () => {
   // Determine if the current path is the directions page (indoor or outdoor)
   const isDirectionsActive = (location.pathname === '/directions' || location.pathname === '/indoordirections');
 
-  const handleNavigation = (value: string) => {
-    if (value === '/map') {
-      navigate(value);
-    } else if (value === '/directions' || value === '/indoordirections') {
-
-      if (!(location.pathname === '/directions' || location.pathname === '/indoordirections'))
-        navigate(value);
-      // Only toggle direction options if already on directions page
-      if (isDirectionsActive) {
-        setShowDirectionOptions((prev) => !prev);
-      }
-    } else {
-      navigate(value);
-    }
-  };
-
-
   // Handle direction type selection
   const handleDirectionTypeChange = (type: 'indoor' | 'outdoor') => {
     setDirectionType(type);
@@ -70,39 +81,8 @@ const BottomNavBar = () => {
     // Navigate to : /directions or /indoordirections
     navigate(type === 'indoor' ? '/indoordirections' : '/directions');
 
-
     // Don't automatically close the menu to allow for easier toggling
   };
-
-  const NavButton = ({
-    icon: Icon,
-    label,
-    value,
-    isActive,
-    onClick
-  }: {
-    icon: React.ElementType;
-    label: string;
-    value: string;
-    isActive: boolean;
-    onClick?: () => void;
-  }) => (
-    <button
-      onClick={() => {
-        handleNavigation(value);
-        onClick?.();
-      }}
-      aria-label={label}
-      aria-current={isActive ? 'page' : undefined}
-      className={`nav-button rounded-none flex flex-1 flex-col items-center justify-center px-2 py-1 transition-all duration-300
-        ${isActive ? 'text-white bg-[#4c3ee2]' : 'text-gray-500'}
-        hover:text-white hover:bg-gradient-to-r hover:from-[#4361ee] hover:to-[#7209b7] hover:bg-opacity-80
-        relative`}
-    >
-      <Icon className={`h-6 w-6 mb-1 transition-all duration-300 ${isActive ? 'scale-110' : 'scale-100'}`} />
-      <span className="text-xs font-medium">{label}</span>
-    </button>
-  );
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50">
@@ -134,28 +114,43 @@ const BottomNavBar = () => {
           </div>
         </div>
       )}
-
-
+      
       <nav className="widget flex h-16 shadow-lg backdrop-blur-md">
-        <NavButton icon={Bus} label="Shuttle" value="/shuttle" isActive={location.pathname === '/shuttle'} />
-        <NavButton icon={Map} label="Map" value="/map" isActive={location.pathname === '/map' || location.pathname === '/LOYcampus'} />
-        {/* Need to disable the button if we are on /indoordirections or in /directions */}
-
+        <NavButton 
+          icon={Bus} 
+          label="Shuttle"
+          isActive={location.pathname === '/shuttle'}
+          onClick={() => {
+            navigate("/shuttle");
+          }}/>
+        <NavButton 
+          icon={Map} 
+          label="Map"
+          isActive={location.pathname === '/map' || location.pathname === '/LOYcampus'}
+          onClick={() => {
+            navigate("/map");
+          }}/>
         <NavButton
           icon={Navigation}
           label={directionLabel}
-          value="/directions"
           isActive={isDirectionsActive}
-
-
           onClick={() => {
-
+            navigate("/directions");
+            
+            // Need to disable the button if we are on 
+            // /indoordirections or in /directions.
             if (isDirectionsActive) {
               setShowDirectionOptions(!showDirectionOptions);
             }
           }}
         />
-        <NavButton icon={Calendar} label="Schedule" value="/schedule" isActive={location.pathname === '/schedule'} />
+        <NavButton 
+          icon={Calendar} 
+          label="Schedule"
+          isActive={location.pathname === '/schedule'}
+          onClick={() => {
+            navigate("/schedule");
+          }}/>
       </nav>
     </div>
   );
