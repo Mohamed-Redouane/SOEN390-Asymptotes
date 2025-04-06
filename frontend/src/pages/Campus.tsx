@@ -65,7 +65,6 @@ function CampusMap() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [center, setCenter] = useState(CAMPUS_COORDINATES.SGW)
   const [showBuildings, setShowBuildings] = useState(false)
-  const [, setDestination] = useState<string>("")
   const navigate = useNavigate()
   const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 0)
 
@@ -110,8 +109,27 @@ function CampusMap() {
     }
   }
 
+  // Extracted handler for nearby search results
+  const handleNearbySearchResults = (
+    results: PlaceResult[] | null, 
+    status: PlacesServiceStatus
+  ) => {
+    setLoading(false)
+    if (status !== window.google.maps.places.PlacesServiceStatus.OK || !results) {
+      console.error("Nearby search failed:", status)
+      return
+    }
+
+    const newPoints = results.filter(
+      (newPoint) => !pointsOfInterest.some(
+        (prevPoint) => prevPoint.place_id === newPoint.place_id
+      )
+    )
+    setPointsOfInterest([...pointsOfInterest, ...newPoints])
+  }
+
   const performNearbySearch = (location: { lat: number; lng: number }, map?: google.maps.Map) => {
-    if (typeof window === "undefined" || !window.google || !window.google.maps || !window.google.maps.places) {
+    if (typeof window === "undefined" || !window.google?.maps?.places) {
       console.error("Google Maps API is not fully loaded.")
       return
     }
@@ -130,20 +148,7 @@ function CampusMap() {
       type: poiType,
     }
 
-    service.nearbySearch(request, (results: PlaceResult[] | null, status: PlacesServiceStatus) => {
-      setLoading(false)
-      if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
-        console.log("Nearby search results:", results)
-        setPointsOfInterest((prevPoints) => {
-          const newPoints = results.filter(
-            (newPoint: PlaceResult) => !prevPoints.some((prevPoint) => prevPoint.place_id === newPoint.place_id),
-          )
-          return [...prevPoints, ...newPoints]
-        })
-      } else {
-        console.error("Nearby search failed:", status)
-      }
-    })
+    service.nearbySearch(request, handleNearbySearchResults)
   }
 
   const filterPointsOfInterest = () => {
@@ -151,9 +156,15 @@ function CampusMap() {
 
     const userLatLng = new window.google.maps.LatLng(userLocation.lat, userLocation.lng)
     return pointsOfInterest.filter((poi) => {
-      const poiLatLng = new window.google.maps.LatLng(poi.geometry.location.lat(), poi.geometry.location.lng())
-      const distance = window.google.maps.geometry.spherical.computeDistanceBetween(userLatLng, poiLatLng)
-      return distance <= radius
+      const poiLocation = poi.geometry.location;
+      const poiLatLng = new window.google.maps.LatLng(
+        poiLocation.lat(), 
+        poiLocation.lng()
+      )
+      return window.google.maps.geometry.spherical.computeDistanceBetween(
+        userLatLng, 
+        poiLatLng
+      ) <= radius;
     })
   }
 
@@ -220,6 +231,13 @@ function CampusMap() {
     e.currentTarget.style.transform = "translateY(0)"
     e.currentTarget.style.boxShadow = "0 4px 10px rgba(31, 38, 135, 0.3)"
     e.currentTarget.style.background = "rgba(90, 45, 162, 0.7)"
+  }
+
+  const getBuildingToggleText = (isSmallScreen: boolean, showBuildings: boolean) => {
+    if (isSmallScreen) {
+      return showBuildings ? "Hide" : "Show";
+    }
+    return showBuildings ? "Hide Buildings" : "Show Buildings";
   }
 
   // Determine if we're on a small screen
@@ -339,7 +357,7 @@ function CampusMap() {
             <FaBuilding
               style={{ marginRight: isSmallScreen ? "4px" : "6px", fontSize: isSmallScreen ? "10px" : "12px" }}
             />
-            {isSmallScreen ? (showBuildings ? "Hide" : "Show") : showBuildings ? "Hide Buildings" : "Show Buildings"}
+            {getBuildingToggleText(isSmallScreen, showBuildings)}
           </button>
         </div>
 
@@ -359,9 +377,9 @@ function CampusMap() {
             {showBuildings && geoJsonData && <BuildingMarkers geoJsonData={geoJsonData} />}
 
             {showPOIs &&
-              filterPointsOfInterest().map((poi, index) => (
+              filterPointsOfInterest().map((poi) => (
                 <Marker
-                  key={index}
+                  key={poi.place_id}
                   position={poi.geometry.location}
                   onClick={() => {
                     console.log("Selected POI:", poi)
@@ -391,7 +409,6 @@ function CampusMap() {
                     className="mt-3 rounded-lg bg-[#5A2DA2] text-white font-bold px-4 py-2 cursor-pointer hover:bg-[#4b29f1]"
                     onClick={() => {
                       const modifiedAddress = `${selectedPoi.vicinity} `
-                      setDestination(modifiedAddress)
                       navigate("/directions", { state: { destination: modifiedAddress } })
                     }}
                   >
