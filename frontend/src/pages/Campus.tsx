@@ -377,7 +377,7 @@ function CampusMap() {
             {showBuildings && geoJsonData && <BuildingMarkers geoJsonData={geoJsonData} />}
 
             {showPOIs &&
-              filterPointsOfInterest().map((poi, index) => (
+              filterPointsOfInterest().map((poi) => (
                 <Marker
                   key={poi.place_id}
                   position={poi.geometry.location}
