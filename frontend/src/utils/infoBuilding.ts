@@ -1,13 +1,14 @@
 export const getAddress = (feature: any): string => {
-    const houseNumber = feature.properties["addr:housenumber"] || "";
-    const street = feature.properties["addr:street"] || "";
-    const city = feature.properties["addr:city"] || "";
-    return feature.properties.address || `${houseNumber} ${street}, ${city}`.trim();
-}
-
+  const houseNumber = feature?.properties?.["addr:housenumber"] ?? "";
+  const street = feature?.properties?.["addr:street"] ?? "";
+  const city = feature?.properties?.["addr:city"] ?? "";
+  const fallback = `${houseNumber} ${street}, ${city}`.trim();
+  return feature?.properties?.address ?? fallback;
+};
+//there is a whitespace in the test file infoBuilding.test.ts at "createInfoWindow" test : `<button id = "get-directions-building-button"`
 export const createInfoWindow = (
-    name: string,
-    address: string
+  name: string,
+  address: string
 ): string => `
   <div class="max-w-[250px] bg-white rounded-lg p-3 shadow-md text-gray-800 font-sans">
     <h3 class="text-xl font-bold text-[#5A2DA2] mb-2">${name}</h3>
