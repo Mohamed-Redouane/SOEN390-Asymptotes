@@ -243,11 +243,8 @@ const Directions = () => {
                     })
                     .catch(error => console.error('Error fetching suggestions:', error));
             } else {
-                if (activeField === "start") {
-                    setSourceResults([]);
-                } else {
-                    setDestinationResults([]);
-                }
+                const clearResults = activeField === "start" ? setSourceResults([]) : setDestinationResults([]);
+                clearResults;
             }
         }, DEBOUNCE_DELAY); // Use the environment variable here
     };
