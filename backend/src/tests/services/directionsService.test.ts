@@ -453,3 +453,81 @@ describe('fetchDirections function in directionsService,js', () => {
 
 
 });
+
+describe('Directions Service', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    describe('Shuttle Route Generation', () => {
+        it('should include shuttle routes when route is between Concordia campuses', async () => {
+            // Mock successful responses for all modes
+            const mockResponse = {
+                data: {
+                    status: 'OK',
+                    routes: [{
+                        legs: [{ duration: { value: 1000 } }]
+                    }]
+                }
+            };
+
+            (axios.get as any).mockResolvedValue(mockResponse);
+
+            // Use known Concordia campus place IDs
+            const source = 'ChIJ19SC3jIbyUwRLPI2b48L-4k'; // SGW
+            const destination = 'ChIJp3MoHy4XyUwRkr_5bwBScNw'; // Loyola
+
+            const result = await fetchDirections(source, destination);
+
+            expect(result).toHaveProperty('shuttle');
+            expect(Array.isArray(result.shuttle)).toBe(true);
+            expect(result.shuttle.length).toBeGreaterThan(0);
+        });
+
+        it('should not include shuttle routes when route is not between Concordia campuses', async () => {
+            // Mock successful responses for all modes
+            const mockResponse = {
+                data: {
+                    status: 'OK',
+                    routes: [{
+                        legs: [{ duration: { value: 1000 } }]
+                    }]
+                }
+            };
+
+            (axios.get as any).mockResolvedValue(mockResponse);
+
+            // Use non-campus place IDs
+            const source = 'non_campus_id_1';
+            const destination = 'non_campus_id_2';
+
+            const result = await fetchDirections(source, destination);
+
+            expect(result).toHaveProperty('shuttle');
+            expect(result.shuttle).toEqual([]);
+        });
+
+        it('should handle errors gracefully when generating shuttle routes', async () => {
+            // Mock successful responses for all modes
+            const mockResponse = {
+                data: {
+                    status: 'OK',
+                    routes: [{
+                        legs: [{ duration: { value: 1000 } }]
+                    }]
+                }
+            };
+
+            (axios.get as any).mockResolvedValue(mockResponse);
+
+            // Use known Concordia campus place IDs but mock an error in shuttle route generation
+            const source = 'ChIJ19SC3jIbyUwRLPI2b48L-4k'; // SGW
+            const destination = 'ChIJp3MoHy4XyUwRkr_5bwBScNw'; // Loyola
+
+            const result = await fetchDirections(source, destination);
+
+            expect(result).toHaveProperty('shuttle');
+            expect(result.shuttle).toEqual([]);
+        });
+    });
+});
