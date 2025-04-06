@@ -9,10 +9,57 @@ interface LocationType {
     lng: number;
 }
 
-// Campus coordinates
+// Campus coordinates with Hall Building specifically defined
 const CONCORDIA_POINTS = {
     SGW: { lat: 45.4949, lng: -73.5779, title: "Sir George Williams Campus" },
+    HALL_BUILDING: { lat: 45.4973, lng: -73.5786, title: "Hall Building" },
     LOYOLA: { lat: 45.4583, lng: -73.6403, title: "Loyola Campus" }
+};
+
+// Style configurations for different route types
+const ROUTE_STYLES = {
+    shuttle: {
+        strokeColor: '#912338', // Concordia maroon
+        strokeOpacity: 1.0,
+        strokeWeight: 5,
+        icons: [{
+            icon: {
+                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                scale: 3,
+                fillColor: '#912338',
+                fillOpacity: 1.0,
+                strokeWeight: 1
+            },
+            offset: '50%',
+            repeat: '150px'
+        }]
+    },
+    walking: {
+        strokeColor: '#4A90E2',
+        strokeOpacity: 0.9,
+        strokeWeight: 4,
+        strokePattern: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 3,
+            fillOpacity: 1,
+            strokeWeight: 1
+        }
+    },
+    transit: {
+        strokeColor: '#38761D',
+        strokeOpacity: 0.9,
+        strokeWeight: 5
+    },
+    driving: {
+        strokeColor: '#FF8C00',
+        strokeOpacity: 0.9,
+        strokeWeight: 5
+    },
+    bicycling: {
+        strokeColor: '#8B4513',
+        strokeOpacity: 0.9,
+        strokeWeight: 5
+    }
 };
 
 // Helper function to calculate distance between two points
@@ -28,11 +75,48 @@ const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: numbe
     return R * c; // Distance in km
 };
 
-// Helper function to find nearest campus
-const findNearestCampus = (lat: number, lng: number) => {
-    const distToSGW = calculateDistance(lat, lng, CONCORDIA_POINTS.SGW.lat, CONCORDIA_POINTS.SGW.lng);
-    const distToLoyola = calculateDistance(lat, lng, CONCORDIA_POINTS.LOYOLA.lat, CONCORDIA_POINTS.LOYOLA.lng);
-    return distToSGW < distToLoyola ? CONCORDIA_POINTS.SGW : CONCORDIA_POINTS.LOYOLA;
+
+
+// Function to create custom markers
+const createCustomMarker = (map: google.maps.Map, position: google.maps.LatLngLiteral, label: string, isStart: boolean) => {
+    const markerIcon = {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 12,
+        fillColor: isStart ? '#4285F4' : '#34A853',
+        fillOpacity: 1,
+        strokeColor: '#FFFFFF',
+        strokeWeight: 2
+    };
+    
+    const marker = new google.maps.Marker({
+        position,
+        map,
+        icon: markerIcon,
+        label: {
+            text: label[0], // First character of label
+            color: '#FFFFFF',
+            fontSize: '14px',
+            fontWeight: 'bold'
+        },
+        animation: google.maps.Animation.DROP,
+        title: label
+    });
+
+    // Add tooltip on hover
+    const infoWindow = new google.maps.InfoWindow({
+        content: `<div style="font-weight: bold; color: #333;">${label}</div>`,
+        disableAutoPan: true
+    });
+
+    marker.addListener('mouseover', () => {
+        infoWindow.open(map, marker);
+    });
+
+    marker.addListener('mouseout', () => {
+        infoWindow.close();
+    });
+
+    return marker;
 };
 
 function RouteRenderer({ source, destination, selectedRouteIndex, transportationMode }: {
@@ -45,33 +129,45 @@ function RouteRenderer({ source, destination, selectedRouteIndex, transportation
     const routesLibrary = useMapsLibrary('routes');
     const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService>();
     const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer>();
-    const shuttlePathRef = useRef<google.maps.DirectionsRenderer | null>(null);
+    // Track additional renderers and markers
+    const additionalRenderersRef = useRef<google.maps.DirectionsRenderer[]>([]);
+    const markersRef = useRef<google.maps.Marker[]>([]);
 
-    // Cleanup function for previous renderers
+    // Cleanup function for previous renderers and markers
     const cleanupPreviousRoute = () => {
         if (directionsRenderer) {
             directionsRenderer.setMap(null);
         }
-        if (shuttlePathRef.current) {
-            shuttlePathRef.current.setMap(null);
-        }
+        
+        // Clean up any additional renderers
+        additionalRenderersRef.current.forEach(renderer => {
+            renderer.setMap(null);
+        });
+        additionalRenderersRef.current = [];
+        
+        // Clean up markers
+        markersRef.current.forEach(marker => {
+            marker.setMap(null);
+        });
+        markersRef.current = [];
     };
 
     useEffect(() => {
         if (!routesLibrary || !map) return;
         setDirectionsService(new google.maps.DirectionsService());
-        const renderer = new google.maps.DirectionsRenderer({ map: map });
+        const renderer = new google.maps.DirectionsRenderer({
+            map: map,
+            suppressMarkers: true // We'll handle markers separately
+        });
         setDirectionsRenderer(renderer);
+        
         return () => {
-            renderer.setMap(null);
-            if (shuttlePathRef.current) {
-                shuttlePathRef.current.setMap(null);
-            }
+            cleanupPreviousRoute();
         };
     }, [routesLibrary, map]);
 
     useEffect(() => {
-        if (!directionsService || !directionsRenderer) {
+        if (!directionsService || !directionsRenderer || !map) {
             cleanupPreviousRoute();
             return;
         }
@@ -83,28 +179,60 @@ function RouteRenderer({ source, destination, selectedRouteIndex, transportation
 
         cleanupPreviousRoute();
 
+        // Create source marker
+        if (source) {
+            const sourceMarker = createCustomMarker(
+                map, 
+                { lat: source.lat, lng: source.lng }, 
+                source.name || "Start", 
+                true
+            );
+            markersRef.current.push(sourceMarker);
+        }
+
+        // Create destination marker
+        if (destination) {
+            const destMarker = createCustomMarker(
+                map, 
+                { lat: destination.lat, lng: destination.lng }, 
+                destination.name || "End", 
+                false
+            );
+            markersRef.current.push(destMarker);
+        }
+
         if (transportationMode === "shuttle") {
+            // Create Hall Building marker if not starting there
+            if (calculateDistance(source.lat, source.lng, CONCORDIA_POINTS.HALL_BUILDING.lat, CONCORDIA_POINTS.HALL_BUILDING.lng) > 0.1) {
+                const hallMarker = createCustomMarker(
+                    map, 
+                    { lat: CONCORDIA_POINTS.HALL_BUILDING.lat, lng: CONCORDIA_POINTS.HALL_BUILDING.lng }, 
+                    "Hall Building", 
+                    false
+                );
+                markersRef.current.push(hallMarker);
+            }
+
+            // Create Loyola marker if not ending there
+            if (calculateDistance(destination.lat, destination.lng, CONCORDIA_POINTS.LOYOLA.lat, CONCORDIA_POINTS.LOYOLA.lng) > 0.1) {
+                const loyolaMarker = createCustomMarker(
+                    map, 
+                    { lat: CONCORDIA_POINTS.LOYOLA.lat, lng: CONCORDIA_POINTS.LOYOLA.lng }, 
+                    "Loyola Campus", 
+                    false
+                );
+                markersRef.current.push(loyolaMarker);
+            }
+
             directionsRenderer.setOptions({
                 suppressMarkers: true,
-                polylineOptions: {
-                strokeColor: '#912338', // Concordia maroon color
-                strokeOpacity: 1.0,
-                strokeWeight: 4,
-                icons: [{
-                    icon: {
-                        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                        scale: 3,
-                    },
-                    offset: '50%',
-                    repeat: '200px'
-                }]
-                }
+                polylineOptions: ROUTE_STYLES.shuttle
             });
             
-            // Create a directions request for the shuttle route
+            // Create a directions request for the shuttle route - starting from Hall Building
             directionsService.route(
                 {
-                    origin: { lat: CONCORDIA_POINTS.SGW.lat, lng: CONCORDIA_POINTS.SGW.lng },
+                    origin: { lat: CONCORDIA_POINTS.HALL_BUILDING.lat, lng: CONCORDIA_POINTS.HALL_BUILDING.lng },
                     destination: { lat: CONCORDIA_POINTS.LOYOLA.lat, lng: CONCORDIA_POINTS.LOYOLA.lng },
                     travelMode: google.maps.TravelMode.DRIVING,
                     provideRouteAlternatives: false,
@@ -124,26 +252,24 @@ function RouteRenderer({ source, destination, selectedRouteIndex, transportation
                         directionsRenderer.setDirections(response);
                         directionsRenderer.setMap(map);
 
-                        // Show walking segments if needed
-                        if (calculateDistance(source.lat, source.lng, CONCORDIA_POINTS.SGW.lat, CONCORDIA_POINTS.SGW.lng) > 0.1) {
+                        // Show walking segments if needed - using Hall Building instead of SGW
+                        if (calculateDistance(source.lat, source.lng, CONCORDIA_POINTS.HALL_BUILDING.lat, CONCORDIA_POINTS.HALL_BUILDING.lng) > 0.1) {
                             directionsService.route(
                                 {
                                     origin: { lat: source.lat, lng: source.lng },
-                                    destination: { lat: CONCORDIA_POINTS.SGW.lat, lng: CONCORDIA_POINTS.SGW.lng },
+                                    destination: { lat: CONCORDIA_POINTS.HALL_BUILDING.lat, lng: CONCORDIA_POINTS.HALL_BUILDING.lng },
                                     travelMode: google.maps.TravelMode.WALKING
                                 },
                                 (walkResponse, walkStatus) => {
                                     if (walkStatus === "OK" && walkResponse) {
-                                        new google.maps.DirectionsRenderer({
+                                        // Create a new renderer with styled walking path
+                                        const walkRenderer = new google.maps.DirectionsRenderer({
                                             map: map,
                                             directions: walkResponse,
                                             suppressMarkers: true,
-                                            polylineOptions: {
-                                                strokeColor: '#4A90E2',
-                                                strokeOpacity: 0.7,
-                                                strokeWeight: 4
-                                            }
+                                            polylineOptions: ROUTE_STYLES.walking
                                         });
+                                        additionalRenderersRef.current.push(walkRenderer);
                                     }
                                 }
                             );
@@ -158,22 +284,20 @@ function RouteRenderer({ source, destination, selectedRouteIndex, transportation
                                 },
                                 (walkResponse, walkStatus) => {
                                     if (walkStatus === "OK" && walkResponse) {
-                                        new google.maps.DirectionsRenderer({
+                                        // Create a new renderer with styled walking path
+                                        const walkRenderer = new google.maps.DirectionsRenderer({
                                             map: map,
                                             directions: walkResponse,
                                             suppressMarkers: true,
-                                            polylineOptions: {
-                                                strokeColor: '#4A90E2',
-                                                strokeOpacity: 0.7,
-                                                strokeWeight: 4
-                                            }
+                                            polylineOptions: ROUTE_STYLES.walking
                                         });
+                                        additionalRenderersRef.current.push(walkRenderer);
                                     }
                                 }
                             );
                         }
             
-            // Fit bounds to show the entire route
+                        // Fit bounds to show the entire route
                         if (response.routes[0].bounds) {
                             const bounds = new google.maps.LatLngBounds(
                                 response.routes[0].bounds.getSouthWest(),
@@ -181,35 +305,63 @@ function RouteRenderer({ source, destination, selectedRouteIndex, transportation
                             );
                             bounds.extend({ lat: source.lat, lng: source.lng });
                             bounds.extend({ lat: destination.lat, lng: destination.lng });
-            map?.fitBounds(bounds);
+                            
+                            // Add some padding for better view
+                            map?.fitBounds(bounds, 50); // 50 pixels of padding
                         }
                     }
                 }
             );
         } else {
-            // Handle other transportation modes
+            // Handle other transportation modes with appropriate styles
             directionsRenderer.setOptions({
-                suppressMarkers: false,
-                polylineOptions: null
+                suppressMarkers: true,
+                polylineOptions: ROUTE_STYLES[transportationMode] || null
             });
             
-        directionsService.route(
-            {
-                origin: { lat: source.lat, lng: source.lng },
-                destination: { lat: destination.lat, lng: destination.lng },
-                travelMode: google.maps.TravelMode[transportationMode.toUpperCase() as keyof typeof google.maps.TravelMode],
-                provideRouteAlternatives: true,
-            },
-            (response, status) => {
-                if (status === "OK") {
-                    directionsRenderer.setDirections(response);
-                    directionsRenderer.setRouteIndex(selectedRouteIndex);
-                } else {
-                    console.error("Directions request failed due to " + status);
-                    directionsRenderer.setMap(null);
+            directionsService.route(
+                {
+                    origin: { lat: source.lat, lng: source.lng },
+                    destination: { lat: destination.lat, lng: destination.lng },
+                    travelMode: google.maps.TravelMode[transportationMode.toUpperCase() as keyof typeof google.maps.TravelMode],
+                    provideRouteAlternatives: true,
+                },
+                (response, status) => {
+                    if (status === "OK" && response) {
+                        directionsRenderer.setDirections(response);
+                        directionsRenderer.setRouteIndex(selectedRouteIndex);
+                        
+                        // Add intermediate point markers for longer routes
+                        if (response.routes[selectedRouteIndex] && 
+                            response.routes[selectedRouteIndex].legs[0].steps.length > 5) {
+                            
+                            const steps = response.routes[selectedRouteIndex].legs[0].steps;
+                            // Add markers at major turning points (every 3 steps for clarity)
+                            for (let i = 1; i < steps.length - 1; i += 3) {
+                                const step = steps[i];
+                                if (step.instructions && step.instructions.includes("Turn")) {
+                                    const waypointMarker = new google.maps.Marker({
+                                        position: step.start_location,
+                                        map: map,
+                                        icon: {
+                                            path: google.maps.SymbolPath.CIRCLE,
+                                            scale: 5,
+                                            fillColor: '#FFA500',
+                                            fillOpacity: 0.8,
+                                            strokeColor: '#FFFFFF',
+                                            strokeWeight: 1
+                                        }
+                                    });
+                                    markersRef.current.push(waypointMarker);
+                                }
+                            }
+                        }
+                    } else {
+                        console.error("Directions request failed due to " + status);
+                        directionsRenderer.setMap(null);
+                    }
                 }
-            }
-        );
+            );
         }
     }, [directionsService, directionsRenderer, source, destination, selectedRouteIndex, transportationMode, map]);
 
