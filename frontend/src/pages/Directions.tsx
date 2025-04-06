@@ -84,18 +84,39 @@ const MapClickListener: React.FC<MapclickListenerProps> = ({ onMapClick }) => {
   return null;
 } ;
 
-const JumpingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
+interface JumpingIconProps {
+    onClick: () => void;
+    label?: string;
+    icon?: React.ReactNode;
+    position?: { bottom: string; right: string };
+  }
+  
+  const JumpingIcon: React.FC<JumpingIconProps> = ({ 
+    onClick, 
+    label = "Clear All", 
+    icon = <MyLocationIcon style={{ fontSize: 20 }} />,
+    position = { bottom: "20", right: "8" }
+  }) => {
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClick();
+      }
+    };
+  
     return (
-        <div
-            onClick={onClick} onKeyDown={(e) => e.key === "Enter" && onClick}
-            className="fixed bottom-20 right-8 cursor-pointer flex items-center justify-center bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-700 transition-all"
-            style={{ zIndex: 1000 }}
-        >
-            <span className="mr-2 font-bold">Clear All</span>
-            <MyLocationIcon style={{ fontSize: 20 }} />
-        </div>
+      <button
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        className={`fixed bottom-${position.bottom} right-${position.right} cursor-pointer flex items-center justify-center bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-700 transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2`}
+        style={{ zIndex: 1000 }}
+        aria-label={label}
+      >
+        <span className="mr-2 font-bold">{label}</span>
+        {icon}
+      </button>
     );
-};
+  };
 
 const Directions = () => {
     const location = useLocation(); //useLocation to get the state
