@@ -107,7 +107,7 @@ const TodaysTaskList: React.FC<TodaysTaskListProps> = ({ events, onClose }) => {
       <div className="bg-gray-50 p-4 rounded-lg mb-4">
         <div className="space-y-2">
           <div>
-            <label className="block text-sm text-gray-600" for="planner-name">Name:</label>
+            <label className="block text-sm text-gray-600" htmlFor="planner-name">Name:</label>
             <input
               id="planner-name"
               type="text"
@@ -117,7 +117,7 @@ const TodaysTaskList: React.FC<TodaysTaskListProps> = ({ events, onClose }) => {
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600" for="planner-description">Description:</label>
+            <label className="block text-sm text-gray-600" htmlFor="planner-description">Description:</label>
             <input
               id="planner-description"
               type="text"
@@ -127,7 +127,7 @@ const TodaysTaskList: React.FC<TodaysTaskListProps> = ({ events, onClose }) => {
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600" for="planner-time">Time:</label>
+            <label className="block text-sm text-gray-600" htmlFor="planner-time">Time:</label>
             <input
               id="planner-time"
               type="text"
@@ -138,7 +138,7 @@ const TodaysTaskList: React.FC<TodaysTaskListProps> = ({ events, onClose }) => {
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600" for="planner-location">Location:</label>
+            <label className="block text-sm text-gray-600" htmlFor="planner-location">Location:</label>
             <input
               id="planner-location"
               type="text"
