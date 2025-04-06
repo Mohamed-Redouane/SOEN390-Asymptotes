@@ -18,6 +18,7 @@ const BuildingMarkers: React.FC<BuildingMarkersProps> = ({ geoJsonData }) => {
 
   const handleMarkerClick = (feature: any, position: google.maps.LatLngLiteral) =>{
     activeInfoWindow?.close();
+    
   
 const address = getAddress(feature);
 const info = new google.maps.InfoWindow({
@@ -29,13 +30,23 @@ const info = new google.maps.InfoWindow({
 
     google.maps.event.addListener(info, "domready", () => {
       
-      const button = document.getElementById("get-directions-building-button");
-      console.log("Found button:", button);
-      if (button) {
-        button.addEventListener("click", () => {
+      const buttonDest = document.getElementById("destination-building-button");
+      const buttonStart = document.getElementById("start-building-button");
+      console.log("Found button:", buttonDest);
+      if (buttonDest) {
+        buttonDest.addEventListener("click", () => {
           console.log("Button clicked");
           // Navigate to the directions page and pass the building address as state
           navigate("/directions", { state: { destination: address } });
+          info.close();
+          setActiveInfoWindow(null);
+        });
+      }
+      if (buttonStart) {
+        buttonStart.addEventListener("click", () => {
+          console.log("Button clicked");
+          // Navigate to the directions page and pass the building address as state
+          navigate("/directions", { state: { source: address } });
           info.close();
           setActiveInfoWindow(null);
         });

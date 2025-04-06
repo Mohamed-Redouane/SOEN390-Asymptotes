@@ -12,8 +12,14 @@ export const createInfoWindow = (
   <div class="max-w-[250px] bg-white rounded-lg p-3 shadow-md text-gray-800 font-sans">
     <h3 class="text-xl font-bold text-[#5A2DA2] mb-2">${name}</h3>
     <p class="m-0">${address}</p>
-    <button id = "get-directions-building-button" class="mt-3 rounded-lg bg-[#5A2DA2] text-white font-bold px-4 py-2 cursor-pointer hover:bg-[#4b29f1]">
-      Get Directions
+    <div class= "flex flex-col items-center">
+    <button id = "start-building-button" class=" w-32 mt-3 rounded-lg bg-[#5A2DA2] text-white font-bold px-2 py-1 cursor-pointer hover:bg-[#4b29f1]">
+      Set as Start 
     </button>
+    <button id = "destination-building-button" class="w-36 mt-3 rounded-lg bg-[#5A2DA2] text-white font-bold px-2 py-1 cursor-pointer hover:bg-[#4b29f1]">
+      Set as Destination
+    </button>
+    </div>
+
   </div>
 `;

@@ -192,6 +192,7 @@ const Directions = () => {
     const [shouldFetchDirections, setShouldFetchDirections] = useState(false);
     
     const [hasArrived, setHasArrived] = useState<boolean>(false);
+    
 
     const handleClearRouteAndPrompts = () => {
         setRoutes([]);
@@ -264,7 +265,7 @@ const Directions = () => {
         }
     };
     useEffect(() => {
-        if (userLocation?.address && !sourceQuery && !isResettingStart && !isUserTyping) {
+        if (userLocation?.address && !sourceQuery && !isResettingStart && !isUserTyping ) {
             setSourceQuery(userLocation.address);
             setSource(userLocation); // Set the source to userLocation
         }
@@ -301,6 +302,35 @@ const Directions = () => {
         };
     }
 
+    const sourceState = location.state?.source || "";
+
+    useEffect(() => {
+        if(sourceState){
+            /*
+            if(resetTimeoutRef.current){
+                clearTimeout(resetTimeoutRef.current);
+                resetTimeoutRef.current = null; 
+                setIsResettingStart(false);
+            }
+                */
+        
+            const selectFirstSuggestion = async () => {
+                const predictions = await getSuggestions(sourceState, 45.5049, -73.5779);
+                if (predictions.length > 0) {
+                    const placeDetails = await getPlaceDetails(predictions[0].place_id);
+                    setSource(placeDetails as LocationType);
+                    setSourceQuery((placeDetails as LocationType).name);
+                    setSourceResults([]); //clear source results
+                    setActive(""); // Reset active field
+    
+                    // Select the first suggestion
+                    handleSelect(0);
+                }
+            };
+            selectFirstSuggestion();
+            setIsUserTyping(false);
+        }
+    }, [sourceState]);
 
     useEffect(() => {
         if (shouldFetchDirections && source && destination) {
@@ -437,18 +467,21 @@ const Directions = () => {
         setSourceQuery("");
         setSource(undefined);
         setIsResettingStart(true);
+        
         setRoutesAvailable(false);
         setActive("");
         setSourceResults([]);
         setIsUserTyping(false); // Reset typing state
         setSelectedRouteIndex(-1); // reset the selected route index so route is not displayed
+        
 
         if (resetTimeoutRef.current) {
             clearTimeout(resetTimeoutRef.current);
+            resetTimeoutRef.current = null; 
         }
 
         resetTimeoutRef.current = setTimeout(() => {
-            if (userLocation?.address) {
+            if (userLocation?.address && !isProgrammaticChange.current) {
                 isProgrammaticChange.current = true;
                 setSourceQuery(userLocation.address);
                 setSource(userLocation);
