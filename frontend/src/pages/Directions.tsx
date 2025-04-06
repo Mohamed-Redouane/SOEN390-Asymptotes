@@ -117,6 +117,41 @@ interface JumpingIconProps {
       </button>
     );
   };
+  interface BuildingIconProps {
+    onClick: () => void;
+    label?: string;
+    icon?: React.ReactNode;
+    position?: { bottom: string; right: string };
+    className?: string;
+  }
+  
+  const BuildingIcon: React.FC<BuildingIconProps> = ({
+    onClick,
+    label = 'Indoor View',
+    icon = <LocationCityIcon style={{ fontSize: 20 }} />,
+    position = { bottom: '32', right: '5' },
+    className = ''
+  }) => {
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClick();
+      }
+    };
+  
+    return (
+      <button
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        className={`fixed bottom-${position.bottom} right-${position.right} cursor-pointer flex items-center justify-center bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-all animate-bounce focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${className}`}
+        style={{ zIndex: 1000 }}
+        aria-label={label}
+      >
+        {icon}
+        {label && <span className="ml-2 font-bold">{label}</span>}
+      </button>
+    );
+  };
 
 const Directions = () => {
     const location = useLocation(); //useLocation to get the state
@@ -156,21 +191,6 @@ const Directions = () => {
     
     const [hasArrived, setHasArrived] = useState<boolean>(false);
 
-    <JumpingIcon onClick={() => setHasArrived(true)} />
-
-    const BuildingIcon: React.FC<{ onClick: () => void }> = ({ onClick }) => {
-        return (
-            <div
-                onClick={onClick} onKeyDown={(e) => e.key === "Enter" && onClick}
-                className="fixed bottom-32 right-5 cursor-pointer flex items-center justify-center bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-all animate-bounce"
-                style={{ zIndex: 1000 }}
-            >
-                <span className="mr-2 font-bold">Indoor View</span>
-                <LocationCityIcon style={{ fontSize: 20 }} />
-            </div>
-        );
-    };
-
     const handleClearRouteAndPrompts = () => {
         setRoutes([]);
         setRoutesAvailable(false);
@@ -180,6 +200,13 @@ const Directions = () => {
         setDestination(undefined);
         setSelectedRouteIndex(-1);
         setHasArrived(false);
+        navigate(location.pathname, {
+            replace: true,
+            state: {
+                ...location.state,
+                isFromSchedule: false  // Explicitly set to false
+            }
+        });   
     };
 
 
@@ -819,7 +846,7 @@ function MapWrapper({ source, destination, selectedRouteIndex, transportationMod
                 }
                 <MapClickListener onMapClick={onMapClick} />
             </Map>
-        </APIProvider>
+        </APIProvider>       
     );
 }
 
