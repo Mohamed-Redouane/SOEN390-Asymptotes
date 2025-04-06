@@ -159,8 +159,8 @@ export const MapComponent = ({ busLocations, campusPoints, onCenterMap }: MapCom
             className={cn(
               "shadow-md text-xs font-medium transition-all hover:translate-x-1",
               campus.ID === "GPLoyola"
-                ? "bg-white hover:bg-gray-50 text-teal-700 border border-teal-200"
-                : "bg-white hover:bg-gray-50 text-orange-700 border border-orange-200",
+                ? "border border-teal-200"
+                : "text-orange-500 border border-orange-200",
             )}
             onClick={() => centerMapRef.current({ lat: campus.Latitude, lng: campus.Longitude })}
           >
