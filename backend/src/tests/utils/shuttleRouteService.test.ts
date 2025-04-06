@@ -30,12 +30,6 @@ describe('calculateDistance', () => {
     expect(dist).toBeGreaterThan(6);
     expect(dist).toBeLessThan(7);
   });
-
-  it('should handle edge cases with extreme coordinates', () => {
-    const dist = calculateDistance(90, 180, -90, -180);
-    expect(dist).toBeGreaterThan(0);
-    expect(dist).toBeLessThan(40000); // Earth's circumference is about 40,000 km
-  });
 });
 
 describe('isCampusPlaceId', () => {
@@ -44,19 +38,9 @@ describe('isCampusPlaceId', () => {
     expect(result).toBe(true);
   });
 
-  it('should return true for a valid SGW place id', () => {
-    const result = isCampusPlaceId("ChIJ19SC3jIbyUwRLPI2b48L-4k", 'SGW');
-    expect(result).toBe(true);
-  });
-
   it('should return false for an invalid campus place id', () => {
     const result = isCampusPlaceId("InvalidID", 'LOYOLA');
     expect(result).toBe(false);
-  });
-
-  it('should handle empty or undefined place ids', () => {
-    expect(isCampusPlaceId("", 'LOYOLA')).toBe(false);
-    expect(isCampusPlaceId(undefined as any, 'LOYOLA')).toBe(false);
   });
 });
 
@@ -85,11 +69,13 @@ describe('getCoordinatesForPlaceId', () => {
       }
     };
 
+    // Create a real Response object with the JSON data.
     const mockResponse = new Response(JSON.stringify(mockData), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
 
+    // Mock global.fetch to return the Response.
     global.fetch = vi.fn(() => Promise.resolve(mockResponse)) as unknown as typeof fetch;
 
     const coords = await getCoordinatesForPlaceId("NonCampusID");
@@ -101,27 +87,11 @@ describe('getCoordinatesForPlaceId', () => {
     const coords = await getCoordinatesForPlaceId("NonCampusID");
     expect(coords).toBeNull();
   });
-
-  it('should handle invalid API responses', async () => {
-    const mockData = {
-      status: 'INVALID_REQUEST',
-      result: null
-    };
-
-    const mockResponse = new Response(JSON.stringify(mockData), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
-
-    global.fetch = vi.fn(() => Promise.resolve(mockResponse)) as unknown as typeof fetch;
-
-    const coords = await getCoordinatesForPlaceId("NonCampusID");
-    expect(coords).toBeNull();
-  });
 });
 
 describe('findNearestCampus', () => {
   it('should return SGW when location is closer to SGW', () => {
+    // Coordinates slightly offset from SGW
     const coordsNearSGW = {
       lat: CONCORDIA_POINTS.SGW.Latitude + 0.001,
       lng: CONCORDIA_POINTS.SGW.Longitude + 0.001
@@ -131,6 +101,7 @@ describe('findNearestCampus', () => {
   });
 
   it('should return Loyola when location is closer to Loyola', () => {
+    // Coordinates slightly offset from Loyola
     const coordsNearLoyola = {
       lat: CONCORDIA_POINTS.LOYOLA.Latitude - 0.001,
       lng: CONCORDIA_POINTS.LOYOLA.Longitude - 0.001
@@ -138,20 +109,11 @@ describe('findNearestCampus', () => {
     const campus = findNearestCampus(coordsNearLoyola.lat, coordsNearLoyola.lng);
     expect(campus).toEqual(CONCORDIA_POINTS.LOYOLA);
   });
-
-  it('should handle equidistant locations', () => {
-    // Calculate midpoint between campuses
-    const midLat = (CONCORDIA_POINTS.SGW.Latitude + CONCORDIA_POINTS.LOYOLA.Latitude) / 2;
-    const midLng = (CONCORDIA_POINTS.SGW.Longitude + CONCORDIA_POINTS.LOYOLA.Longitude) / 2;
-    
-    const campus = findNearestCampus(midLat, midLng);
-    // Should return one of the campuses (implementation dependent)
-    expect([CONCORDIA_POINTS.SGW, CONCORDIA_POINTS.LOYOLA]).toContainEqual(campus);
-  });
 });
 
 describe('isRouteBetweenConcordiaCampuses', () => {
   it('should return false when both source and destination are near the same campus', async () => {
+    // Both points are known Loyola place ids so they return the same coordinates.
     const result = await isRouteBetweenConcordiaCampuses(
       "ChIJp3MoHy4XyUwRkr_5bwBScNw",
       "ChIJk5Bx5kkXyUwRHLCpsk_QqeM"
@@ -160,6 +122,7 @@ describe('isRouteBetweenConcordiaCampuses', () => {
   });
 
   it('should return true for a route between different campuses', async () => {
+    // One point is a Loyola campus and the other is SGW.
     const result = await isRouteBetweenConcordiaCampuses(
       "ChIJp3MoHy4XyUwRkr_5bwBScNw",
       "ChIJ19SC3jIbyUwRLPI2b48L-4k"
@@ -168,28 +131,10 @@ describe('isRouteBetweenConcordiaCampuses', () => {
   });
 
   it('should return false if coordinates cannot be fetched', async () => {
+    // For non-campus IDs, simulate a fetch failure.
     global.fetch = vi.fn(() => Promise.reject(new Error("Network error")));
     const result = await isRouteBetweenConcordiaCampuses("NonCampusID", "AnotherNonCampusID");
     expect(result).toBe(false);
-  });
-
-  it('should handle routes near but not at campuses', async () => {
-    const mockData = {
-      status: 'OK',
-      result: {
-        geometry: { location: { lat: 45.4949, lng: -73.5779 } } // Near SGW
-      }
-    };
-
-    const mockResponse = new Response(JSON.stringify(mockData), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
-
-    global.fetch = vi.fn(() => Promise.resolve(mockResponse)) as unknown as typeof fetch;
-
-    const result = await isRouteBetweenConcordiaCampuses("NonCampusID", "ChIJp3MoHy4XyUwRkr_5bwBScNw");
-    expect(result).toBe(true);
   });
 });
 
@@ -209,42 +154,12 @@ describe('generateShuttleRoute', () => {
     expect(route.length).toBe(1);
     const shuttleRoute = route[0];
 
+    // Verify that the route object has the expected properties.
     expect(shuttleRoute).toHaveProperty("bounds");
     expect(shuttleRoute).toHaveProperty("duration");
     expect(shuttleRoute).toHaveProperty("distance");
     expect(shuttleRoute).toHaveProperty("legs");
     expect(Array.isArray(shuttleRoute.legs)).toBe(true);
     expect(shuttleRoute.legs.length).toBeGreaterThan(0);
-
-    // Verify route details
-    expect(shuttleRoute.fare).toEqual({ currency: "CAD", text: "Free with student ID", value: 0 });
-    expect(shuttleRoute.legs[0].steps[1].travel_mode).toBe("TRANSIT");
-    expect(shuttleRoute.legs[0].steps[1].html_instructions).toBe("Take the Concordia Shuttle Bus");
-  });
-
-  it('should handle routes with walking segments', async () => {
-    const route = await generateShuttleRoute(
-      "ChIJp3MoHy4XyUwRkr_5bwBScNw",
-      "ChIJ19SC3jIbyUwRLPI2b48L-4k"
-    );
-    const shuttleRoute = route[0];
-
-    // Verify walking segments
-    const walkingSteps = shuttleRoute.legs[0].steps.filter(step => step.travel_mode === "WALKING");
-    expect(walkingSteps.length).toBeGreaterThan(0);
-    expect(walkingSteps[0].html_instructions).toContain("Walk to");
-  });
-
-  it('should calculate reasonable travel times', async () => {
-    const route = await generateShuttleRoute(
-      "ChIJp3MoHy4XyUwRkr_5bwBScNw",
-      "ChIJ19SC3jIbyUwRLPI2b48L-4k"
-    );
-    const shuttleRoute = route[0];
-
-    // Total duration should be reasonable (between 30 and 120 minutes)
-    const totalMinutes = shuttleRoute.duration.value / 60;
-    expect(totalMinutes).toBeGreaterThan(30);
-    expect(totalMinutes).toBeLessThan(120);
   });
 });

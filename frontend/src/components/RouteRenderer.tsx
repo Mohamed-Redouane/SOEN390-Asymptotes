@@ -82,22 +82,22 @@ function RouteRenderer({ source, destination, selectedRouteIndex, transportation
         }
 
         cleanupPreviousRoute();
-        
+
         if (transportationMode === "shuttle") {
             directionsRenderer.setOptions({
                 suppressMarkers: true,
                 polylineOptions: {
-                    strokeColor: '#912338', // Concordia maroon color
-                    strokeOpacity: 1.0,
-                    strokeWeight: 4,
-                    icons: [{
-                        icon: {
-                            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                            scale: 3,
-                        },
-                        offset: '50%',
-                        repeat: '200px'
-                    }]
+                strokeColor: '#912338', // Concordia maroon color
+                strokeOpacity: 1.0,
+                strokeWeight: 4,
+                icons: [{
+                    icon: {
+                        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                        scale: 3,
+                    },
+                    offset: '50%',
+                    repeat: '200px'
+                }]
                 }
             });
             
@@ -172,8 +172,8 @@ function RouteRenderer({ source, destination, selectedRouteIndex, transportation
                                 }
                             );
                         }
-
-                        // Fit bounds to show the entire route
+            
+            // Fit bounds to show the entire route
                         if (response.routes[0].bounds) {
                             const bounds = new google.maps.LatLngBounds(
                                 response.routes[0].bounds.getSouthWest(),
@@ -181,7 +181,7 @@ function RouteRenderer({ source, destination, selectedRouteIndex, transportation
                             );
                             bounds.extend({ lat: source.lat, lng: source.lng });
                             bounds.extend({ lat: destination.lat, lng: destination.lng });
-                            map?.fitBounds(bounds);
+            map?.fitBounds(bounds);
                         }
                     }
                 }
@@ -193,23 +193,23 @@ function RouteRenderer({ source, destination, selectedRouteIndex, transportation
                 polylineOptions: null
             });
             
-            directionsService.route(
-                {
-                    origin: { lat: source.lat, lng: source.lng },
-                    destination: { lat: destination.lat, lng: destination.lng },
-                    travelMode: google.maps.TravelMode[transportationMode.toUpperCase() as keyof typeof google.maps.TravelMode],
-                    provideRouteAlternatives: true,
-                },
-                (response, status) => {
-                    if (status === "OK") {
-                        directionsRenderer.setDirections(response);
-                        directionsRenderer.setRouteIndex(selectedRouteIndex);
-                    } else {
-                        console.error("Directions request failed due to " + status);
-                        directionsRenderer.setMap(null);
-                    }
+        directionsService.route(
+            {
+                origin: { lat: source.lat, lng: source.lng },
+                destination: { lat: destination.lat, lng: destination.lng },
+                travelMode: google.maps.TravelMode[transportationMode.toUpperCase() as keyof typeof google.maps.TravelMode],
+                provideRouteAlternatives: true,
+            },
+            (response, status) => {
+                if (status === "OK") {
+                    directionsRenderer.setDirections(response);
+                    directionsRenderer.setRouteIndex(selectedRouteIndex);
+                } else {
+                    console.error("Directions request failed due to " + status);
+                    directionsRenderer.setMap(null);
                 }
-            );
+            }
+        );
         }
     }, [directionsService, directionsRenderer, source, destination, selectedRouteIndex, transportationMode, map]);
 
