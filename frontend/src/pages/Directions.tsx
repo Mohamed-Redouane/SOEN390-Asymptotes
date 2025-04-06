@@ -386,7 +386,7 @@ const Directions = () => {
             setTransitRoutes(response.transit);
             setWalkingRoutes(response.walking);
             setBicyclingRoutes(response.bicycling);
-            setShuttleRoutes(response.shuttle || []);
+            setShuttleRoutes(response.shuttle ?? []);
             return response;
         }
         ).catch((error) => {
