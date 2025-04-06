@@ -133,10 +133,12 @@ interface JumpingIconProps {
     className = ''
   }) => {
     const handleKeyDown = (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        onClick();
-      }
+        if (e.key === ' ') {
+            e.preventDefault();
+            setTimeout(() => {
+                onClick();
+            }, 100); 
+        }
     };
   
     return (
@@ -224,7 +226,6 @@ const Directions = () => {
     };
 
 
-
     // Debounced suggestion fetching function (KEY CHANGE)
     const handleDebouncedSuggestions = (query: string, activeField: string) => {
         if (debounceRef.current) {
@@ -243,11 +244,15 @@ const Directions = () => {
                     })
                     .catch(error => console.error('Error fetching suggestions:', error));
             } else {
-                const clearResults = activeField === "start" ? setSourceResults([]) : setDestinationResults([]);
-                clearResults;
+                if (activeField === "start") {
+                    setSourceResults([]);
+                } else {
+                    setDestinationResults([]);
+                }
             }
         }, DEBOUNCE_DELAY); // Use the environment variable here
     };
+    
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "ArrowDown") {
