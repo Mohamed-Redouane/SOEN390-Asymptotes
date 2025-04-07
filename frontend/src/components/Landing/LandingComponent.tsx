@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, Suspense } from "react"
 import { useNavigate } from "react-router-dom" 
 
 import { XIcon } from "../../icons/x-icon"
@@ -6,16 +6,18 @@ import { InstagramIcon } from "../../icons/instagram-icon"
 import { FacebookIcon } from "../../icons/facebook-icon"
 import { SocialIcon } from "../../icons/social-icon"
 import { Button } from "../ui/button"
-import { FeatureCard } from "./Feature-card"
 import { NavigationIcon, CalendarIcon, BuildingIcon, CompassIcon, CoffeeIcon, X, ChevronDown } from "lucide-react"
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { useMediaQuery } from "../../hooks/use-media-query"
-import { NavBar } from "./NavBar"
 import Logo from "../../icons/logo"
 import { ContactSection } from "./Contact"
 import { AboutSection } from "./About"
-import { ParticleBackground } from "./Particule-background"
 import { GitHubIcon } from "../../icons/github-icon"
+
+// Lazy load non-critical components
+const ParticleBackground = React.lazy(() => import("./Particule-background").then(module => ({ default: module.ParticleBackground })))
+const NavBar = React.lazy(() => import("./NavBar").then(module => ({ default: module.NavBar })))
+const FeatureCard = React.lazy(() => import("./Feature-card").then(module => ({ default: module.FeatureCard })))
 
 export function ONCampusLanding() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -101,13 +103,29 @@ export function ONCampusLanding() {
       },
     ]
   
+    // Defer animations initialization
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            // Initialize animations after main content
+            if (mainRef.current) {
+                mainRef.current.style.opacity = "1";
+            }
+        }, 100);
+        return () => clearTimeout(timer);
+    }, []);
+  
     return (
       <div
-        className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-between min-h-screen"
+        className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-between min-h-screen opacity-0 transition-opacity duration-300"
         ref={mainRef}
       >
-        <NavBar activeSection={activeSection} setIsMenuOpen={setIsMenuOpen} />
-        <ParticleBackground />
+        <Suspense fallback={<div className="h-16" />}>
+            <NavBar activeSection={activeSection} setIsMenuOpen={setIsMenuOpen} />
+        </Suspense>
+  
+        <Suspense fallback={null}>
+            <ParticleBackground />
+        </Suspense>
   
         <AnimatePresence>
           {isMenuOpen && (
@@ -178,25 +196,17 @@ export function ONCampusLanding() {
           id="home"
           className="flex-1 flex flex-col justify-center items-center text-center py-12 md:py-16 mt-16 md:mt-20 relative"
         >
-          <motion.div className="flex flex-col items-center" style={{ opacity, scale }}>
-            <motion.div
-              className="relative"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-[#60A5FA] to-[#818CF8] opacity-30 blur-xl"></div>
-              <motion.h1
-                className="font-black leading-tight relative"
-                style={{
-                  fontFamily: "'Clash Display', sans-serif",
-                }}
-              >
-                <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white">Your Campus.</div>
-                <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white/90 mt-1">Your Community.</div>
-                <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white/80 mt-1">Your Experience.</div>
-              </motion.h1>
-            </motion.div>
+          <motion.div
+            className="flex flex-col items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <h1 className="font-black leading-tight relative">
+              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white">Your Campus.</div>
+              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white/90 mt-1">Your Community.</div>
+              <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white/80 mt-1">Your Experience.</div>
+            </h1>
           </motion.div>
           <motion.div
             className="w-24 h-1 bg-gradient-to-r from-[#60A5FA] to-[#818CF8] rounded-full my-6"
@@ -244,23 +254,22 @@ export function ONCampusLanding() {
             </a>
           </motion.div>
   
-          <motion.div
-            id="features"
-            className="mt-24 md:mt-32 w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-          >
-            {features.map((feature, index) => (
-              <FeatureCard
-                key={index}
-                icon={feature.icon}
-                title={feature.title}
-                description={feature.description}
-                index={index}
-              />
-            ))}
-          </motion.div>
+          <Suspense fallback={null}>
+            <div className="mt-24 md:mt-32 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+                    {features.map((feature, index) => (
+                        <Suspense key={index} fallback={<div className="h-48" />}>
+                            <FeatureCard
+                                icon={feature.icon}
+                                title={feature.title}
+                                description={feature.description}
+                                index={index}
+                            />
+                        </Suspense>
+                    ))}
+                </div>
+            </div>
+          </Suspense>
         </div>
   
         <AboutSection />
